@@ -401,6 +401,9 @@ export type Database = {
           balance: number
           currency: string
           deposit_address: string | null
+          deposit_currency: string
+          deposit_network: string
+          deposit_tag: string
           held: number
           updated_at: string
           user_id: string
@@ -409,6 +412,9 @@ export type Database = {
           balance?: number
           currency?: string
           deposit_address?: string | null
+          deposit_currency?: string
+          deposit_network?: string
+          deposit_tag: string
           held?: number
           updated_at?: string
           user_id: string
@@ -417,6 +423,9 @@ export type Database = {
           balance?: number
           currency?: string
           deposit_address?: string | null
+          deposit_currency?: string
+          deposit_network?: string
+          deposit_tag?: string
           held?: number
           updated_at?: string
           user_id?: string
@@ -431,6 +440,10 @@ export type Database = {
       create_escrow_order: {
         Args: { _listing_id: string; _shipping_address: string }
         Returns: string
+      }
+      credit_deposit: {
+        Args: { _amount: number; _reference: string; _user_id: string }
+        Returns: undefined
       }
       has_role: {
         Args: {
@@ -449,6 +462,15 @@ export type Database = {
       }
       refund_escrow: { Args: { _order_id: string }; Returns: undefined }
       release_escrow: { Args: { _order_id: string }; Returns: undefined }
+      set_deposit_address: {
+        Args: {
+          _address: string
+          _currency: string
+          _network: string
+          _user_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
