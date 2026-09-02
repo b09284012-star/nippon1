@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,17 +41,17 @@ function AuthPage() {
 
   const signIn = async () => {
     const parsed = schema.safeParse({ email, password });
-    if (!parsed.success) return toast.error(parsed.error.issues[0]?.message);
+    if (!parsed.success) { toast.error(parsed.error.issues[0]?.message); return; }
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) return toast.error("تعذر الدخول", { description: error.message });
+    if (error) { toast.error("تعذر الدخول", { description: error.message }); return; }
     toast.success("أهلاً بعودتك");
   };
 
   const signUp = async () => {
     const parsed = schema.safeParse({ email, password, name });
-    if (!parsed.success) return toast.error(parsed.error.issues[0]?.message);
+    if (!parsed.success) { toast.error(parsed.error.issues[0]?.message); return; }
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email,
@@ -63,17 +62,8 @@ function AuthPage() {
       },
     });
     setLoading(false);
-    if (error) return toast.error("تعذر التسجيل", { description: error.message });
+    if (error) { toast.error("تعذر التسجيل", { description: error.message }); return; }
     toast.success("تم إنشاء الحساب", { description: "تفقد بريدك لتأكيد الحساب إن طُلب منك" });
-  };
-
-  const google = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) return toast.error("تعذر الدخول عبر Google");
-    if (result.redirected) return;
-    void navigate({ to: "/market" });
   };
 
   return (
@@ -124,12 +114,6 @@ function AuthPage() {
           </TabsContent>
         </Tabs>
 
-        <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="h-px flex-1 bg-border" /> أو <span className="h-px flex-1 bg-border" />
-        </div>
-        <Button variant="outline" className="w-full" onClick={() => void google()}>
-          المتابعة عبر Google
-        </Button>
       </div>
     </div>
   );
