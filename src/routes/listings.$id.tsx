@@ -68,37 +68,37 @@ function ListingDetail() {
   const { data: imageUrl } = useStorageUrl("listing-images", listing?.images?.[0]);
 
   const startChat = async () => {
-    if (!user) return navigate({ to: "/auth" });
+    if (!user) { navigate({ to: "/auth" }); return; }
     if (!listing) return;
-    if (listing.seller_id === user.id) return toast.error("هذا عرضك الخاص");
+    if (listing.seller_id === user.id) { toast.error("هذا عرضك الخاص"); return; }
     const { data: existing } = await supabase
       .from("conversations")
       .select("id")
       .eq("listing_id", listing.id)
       .eq("buyer_id", user.id)
       .maybeSingle();
-    if (existing) return navigate({ to: "/chat/$id", params: { id: existing.id } });
+    if (existing) { navigate({ to: "/chat/$id", params: { id: existing.id } }); return; }
     const { data, error } = await supabase
       .from("conversations")
       .insert({ listing_id: listing.id, buyer_id: user.id, seller_id: listing.seller_id })
       .select("id")
       .single();
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     navigate({ to: "/chat/$id", params: { id: data.id } });
   };
 
   const buy = async () => {
-    if (!user) return navigate({ to: "/auth" });
+    if (!user) { navigate({ to: "/auth" }); return; }
     if (profile?.kyc_status !== "approved")
-      return toast.error("يجب توثيق هويتك قبل الشراء", { description: "افتح صفحة توثيق الهوية" });
-    if (address.trim().length < 10) return toast.error("أدخل عنوان شحن صحيح");
+      { toast.error("يجب توثيق هويتك قبل الشراء", { description: "افتح صفحة توثيق الهوية" }); return; }
+    if (address.trim().length < 10) { toast.error("أدخل عنوان شحن صحيح"); return; }
     setBuying(true);
     const { error } = await supabase.rpc("create_escrow_order", {
       _listing_id: id,
       _shipping_address: address.trim(),
     });
     setBuying(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setOpen(false);
     toast.success("تم حجز المبلغ في الضمان", { description: "تابع الطلب من صفحة طلباتي" });
     void refetch();
