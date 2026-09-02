@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as MarketRouteImport } from './routes/market'
 import { Route as ListingsIdRouteImport } from './routes/listings.$id'
+import { Route as ApiPublicNowpaymentsRouteImport } from './routes/api/public/nowpayments'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +35,25 @@ const ListingsIdRoute = ListingsIdRouteImport.update({
   path: '/listings/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicNowpaymentsRoute = ApiPublicNowpaymentsRouteImport.update({
+  id: '/api/public/nowpayments',
+  path: '/api/public/nowpayments',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/market': typeof MarketRoute
   '/listings/$id': typeof ListingsIdRoute
+  '/api/public/nowpayments': typeof ApiPublicNowpaymentsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/market': typeof MarketRoute
   '/listings/$id': typeof ListingsIdRoute
+  '/api/public/nowpayments': typeof ApiPublicNowpaymentsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,21 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/market': typeof MarketRoute
   '/listings/$id': typeof ListingsIdRoute
+  '/api/public/nowpayments': typeof ApiPublicNowpaymentsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/market' | '/listings/$id'
+  fullPaths:
+    '/' | '/auth' | '/market' | '/listings/$id' | '/api/public/nowpayments'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/market' | '/listings/$id'
-  id: '__root__' | '/' | '/auth' | '/market' | '/listings/$id'
+  to: '/' | '/auth' | '/market' | '/listings/$id' | '/api/public/nowpayments'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/market'
+    | '/listings/$id'
+    | '/api/public/nowpayments'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +83,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   MarketRoute: typeof MarketRoute
   ListingsIdRoute: typeof ListingsIdRoute
+  ApiPublicNowpaymentsRoute: typeof ApiPublicNowpaymentsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +116,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListingsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/nowpayments': {
+      id: '/api/public/nowpayments'
+      path: '/api/public/nowpayments'
+      fullPath: '/api/public/nowpayments'
+      preLoaderRoute: typeof ApiPublicNowpaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +131,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   MarketRoute: MarketRoute,
   ListingsIdRoute: ListingsIdRoute,
+  ApiPublicNowpaymentsRoute: ApiPublicNowpaymentsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
