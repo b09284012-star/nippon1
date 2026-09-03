@@ -432,11 +432,90 @@ export type Database = {
         }
         Relationships: []
       }
+      withdrawals: {
+        Row: {
+          address: string
+          amount: number
+          created_at: string
+          id: string
+          network: string
+          processed_at: string | null
+          reject_reason: string | null
+          status: Database["public"]["Enums"]["withdrawal_status"]
+          tx_hash: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          amount: number
+          created_at?: string
+          id?: string
+          network?: string
+          processed_at?: string | null
+          reject_reason?: string | null
+          status?: Database["public"]["Enums"]["withdrawal_status"]
+          tx_hash?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          amount?: number
+          created_at?: string
+          id?: string
+          network?: string
+          processed_at?: string | null
+          reject_reason?: string | null
+          status?: Database["public"]["Enums"]["withdrawal_status"]
+          tx_hash?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      admin_list_users: {
+        Args: never
+        Returns: {
+          balance: number
+          created_at: string
+          display_name: string
+          email: string
+          held: number
+          id: string
+          is_admin: boolean
+          kyc_status: Database["public"]["Enums"]["kyc_status"]
+        }[]
+      }
+      admin_list_withdrawals: {
+        Args: never
+        Returns: {
+          address: string
+          amount: number
+          created_at: string
+          display_name: string
+          email: string
+          id: string
+          network: string
+          processed_at: string
+          reject_reason: string
+          status: Database["public"]["Enums"]["withdrawal_status"]
+          user_id: string
+        }[]
+      }
+      admin_set_user_role: {
+        Args: { _make_admin: boolean; _user_id: string }
+        Returns: undefined
+      }
+      approve_withdrawal: {
+        Args: { _id: string; _tx_hash?: string }
+        Returns: undefined
+      }
       create_escrow_order: {
         Args: { _listing_id: string; _shipping_address: string }
         Returns: string
@@ -461,7 +540,15 @@ export type Database = {
         Returns: string
       }
       refund_escrow: { Args: { _order_id: string }; Returns: undefined }
+      reject_withdrawal: {
+        Args: { _id: string; _reason: string }
+        Returns: undefined
+      }
       release_escrow: { Args: { _order_id: string }; Returns: undefined }
+      request_withdrawal: {
+        Args: { _address: string; _amount: number }
+        Returns: string
+      }
       set_deposit_address: {
         Args: {
           _address: string
@@ -491,6 +578,7 @@ export type Database = {
         | "escrow_release"
         | "escrow_refund"
         | "fee"
+      withdrawal_status: "pending" | "completed" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -638,6 +726,7 @@ export const Constants = {
         "escrow_refund",
         "fee",
       ],
+      withdrawal_status: ["pending", "completed", "rejected"],
     },
   },
 } as const
