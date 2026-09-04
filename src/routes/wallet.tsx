@@ -197,6 +197,77 @@ function WalletPage() {
         )}
       </div>
 
+      <div className="glass mt-8 rounded-3xl p-6">
+        <h2 className="flex items-center gap-2 font-display text-xl font-bold">
+          <ArrowUpFromLine className="size-5 text-primary" /> سحب الرصيد
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          يُخصم المبلغ فور إرسال الطلب ويُراجع يدويًا من الإدارة. في حال الرفض يُعاد المبلغ لرصيدك.
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-[10rem_1fr_auto] sm:items-end">
+          <div>
+            <Label className="mb-2 block">المبلغ (USDT)</Label>
+            <Input
+              inputMode="decimal"
+              value={wdAmount}
+              onChange={(e) => setWdAmount(e.target.value.slice(0, 10))}
+              placeholder="50"
+            />
+          </div>
+          <div>
+            <Label className="mb-2 block">عنوان المحفظة (TRC20)</Label>
+            <Input
+              value={wdAddress}
+              onChange={(e) => setWdAddress(e.target.value.trim())}
+              placeholder="T..."
+            />
+          </div>
+          <Button
+            disabled={withdraw.isPending}
+            onClick={() => {
+              const n = Number(wdAmount);
+              if (!Number.isFinite(n) || n < 10) {
+                toast.error("أقل مبلغ للسحب 10 USDT");
+                return;
+              }
+              if (n > Number(wallet?.balance ?? 0)) {
+                toast.error("الرصيد المتاح غير كافٍ");
+                return;
+              }
+              if (wdAddress.length < 20) {
+                toast.error("عنوان المحفظة غير صحيح");
+                return;
+              }
+              withdraw.mutate({ amount: n, address: wdAddress });
+            }}
+          >
+            {withdraw.isPending ? "جارٍ الإرسال…" : "طلب سحب"}
+          </Button>
+        </div>
+
+        <div className="mt-6 divide-y divide-border/60 rounded-2xl border border-border/60">
+          {(withdrawals.data ?? []).length === 0 && (
+            <div className="px-4 py-6 text-sm text-muted-foreground">لا طلبات سحب بعد.</div>
+          )}
+          {(withdrawals.data ?? []).map((w) => {
+            const s = WITHDRAWAL_STATUS[w.status] ?? { label: w.status, variant: "secondary" as const };
+            return (
+              <div key={w.id} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
+                <Badge variant={s.variant}>{s.label}</Badge>
+                <span className="font-display font-bold">{formatUsd(w.amount)}</span>
+                <code className="max-w-[14rem] truncate text-xs text-muted-foreground">{w.address}</code>
+                <span className="text-xs text-muted-foreground">{formatDate(w.created_at)}</span>
+                {w.reject_reason && (
+                  <span className="w-full text-xs text-destructive">سبب الرفض: {w.reject_reason}</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+
+
       <div className="glass mt-8 overflow-hidden rounded-3xl">
         <h2 className="px-6 pt-6 font-display text-xl font-bold">سجل العمليات</h2>
         <div className="mt-4 divide-y divide-border/60">
