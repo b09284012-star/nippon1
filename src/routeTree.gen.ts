@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as MarketRouteImport } from './routes/market'
 import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as SellRouteImport } from './routes/sell'
+import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as ListingsIdRouteImport } from './routes/listings.$id'
 import { Route as ApiPublicNowpaymentsRouteImport } from './routes/api/public/nowpayments'
@@ -49,6 +50,11 @@ const SellRoute = SellRouteImport.update({
   path: '/sell',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VerifyRoute = VerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WalletRoute = WalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/market': typeof MarketRoute
   '/orders': typeof OrdersRoute
   '/sell': typeof SellRoute
+  '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
   '/listings/$id': typeof ListingsIdRoute
   '/api/public/nowpayments': typeof ApiPublicNowpaymentsRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/market': typeof MarketRoute
   '/orders': typeof OrdersRoute
   '/sell': typeof SellRoute
+  '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
   '/listings/$id': typeof ListingsIdRoute
   '/api/public/nowpayments': typeof ApiPublicNowpaymentsRoute
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/market': typeof MarketRoute
   '/orders': typeof OrdersRoute
   '/sell': typeof SellRoute
+  '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
   '/listings/$id': typeof ListingsIdRoute
   '/api/public/nowpayments': typeof ApiPublicNowpaymentsRoute
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/market'
     | '/orders'
     | '/sell'
+    | '/verify'
     | '/wallet'
     | '/listings/$id'
     | '/api/public/nowpayments'
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/market'
     | '/orders'
     | '/sell'
+    | '/verify'
     | '/wallet'
     | '/listings/$id'
     | '/api/public/nowpayments'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/market'
     | '/orders'
     | '/sell'
+    | '/verify'
     | '/wallet'
     | '/listings/$id'
     | '/api/public/nowpayments'
@@ -142,6 +154,7 @@ export interface RootRouteChildren {
   MarketRoute: typeof MarketRoute
   OrdersRoute: typeof OrdersRoute
   SellRoute: typeof SellRoute
+  VerifyRoute: typeof VerifyRoute
   WalletRoute: typeof WalletRoute
   ListingsIdRoute: typeof ListingsIdRoute
   ApiPublicNowpaymentsRoute: typeof ApiPublicNowpaymentsRoute
@@ -191,6 +204,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SellRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/verify': {
+      id: '/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof VerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/wallet': {
       id: '/wallet'
       path: '/wallet'
@@ -222,6 +242,7 @@ const rootRouteChildren: RootRouteChildren = {
   MarketRoute: MarketRoute,
   OrdersRoute: OrdersRoute,
   SellRoute: SellRoute,
+  VerifyRoute: VerifyRoute,
   WalletRoute: WalletRoute,
   ListingsIdRoute: ListingsIdRoute,
   ApiPublicNowpaymentsRoute: ApiPublicNowpaymentsRoute,
