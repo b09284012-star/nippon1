@@ -64,7 +64,7 @@ function OrdersPage() {
     );
   }
 
-  const run = async (fn: () => Promise<{ error: { message: string } | null }>, ok: string) => {
+  const run = async (fn: () => PromiseLike<{ error: { message: string } | null }>, ok: string) => {
     const { error } = await fn();
     if (error) {
       toast.error(error.message);

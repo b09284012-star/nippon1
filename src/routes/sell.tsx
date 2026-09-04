@@ -78,9 +78,17 @@ function SellPage() {
         if (error) throw error;
         paths.push(path);
       }
+      const { algorithm, hours_used, location, ...rest } = parsed.data;
       const { data, error } = await supabase
         .from("listings")
-        .insert({ ...parsed.data, images: paths, seller_id: user!.id })
+        .insert({
+          ...rest,
+          algorithm: algorithm ?? null,
+          hours_used: hours_used ?? null,
+          location: location ?? null,
+          images: paths,
+          seller_id: user!.id,
+        })
         .select("id")
         .single();
       if (error) throw error;
