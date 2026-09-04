@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import logo from "@/assets/nippon-logo.png.asset.json";
 
 const links = [
   { to: "/market", label: "السوق" },
@@ -23,9 +24,7 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
         <Link to="/" className="flex items-center gap-2">
-          <span className="grid size-9 place-items-center rounded-xl bg-[image:var(--gradient-neon)] font-display text-lg font-black text-primary-foreground shadow-[var(--shadow-neon)]">
-            N
-          </span>
+          <img src={logo.url} alt="شعار Nippon Mining" className="h-9 w-auto" />
           <span className="font-display text-xl font-extrabold tracking-tight">Nippon</span>
         </Link>
 
