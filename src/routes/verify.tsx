@@ -58,9 +58,18 @@ function VerifyPage() {
     const full_name = String(fd.get("full_name") ?? "").trim();
     const document_number = String(fd.get("document_number") ?? "").trim();
     const country = String(fd.get("country") ?? "").trim();
-    if (full_name.length < 5) return toast.error("أدخل الاسم الرباعي كما في المستند");
-    if (document_number.length < 4) return toast.error("أدخل رقم المستند");
-    if (!idDoc || !selfie) return toast.error("ارفع صورة المستند وصورة السيلفي");
+    if (full_name.length < 5) {
+      toast.error("أدخل الاسم الرباعي كما في المستند");
+      return;
+    }
+    if (document_number.length < 4) {
+      toast.error("أدخل رقم المستند");
+      return;
+    }
+    if (!idDoc || !selfie) {
+      toast.error("ارفع صورة المستند وصورة السيلفي");
+      return;
+    }
 
     setBusy(true);
     try {
