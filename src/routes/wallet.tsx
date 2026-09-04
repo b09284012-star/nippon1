@@ -1,16 +1,23 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Copy, Wallet2, ShieldCheck, ArrowDownToLine } from "lucide-react";
+import { Copy, Wallet2, ShieldCheck, ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth";
 import { formatUsd, formatDate } from "@/lib/media";
+import { supabase } from "@/integrations/supabase/client";
 import { createDepositAddress, getMyWallet } from "@/lib/wallet.functions";
+
+const WITHDRAWAL_STATUS: Record<string, { label: string; variant: "secondary" | "default" | "destructive" | "outline" }> = {
+  pending: { label: "قيد المراجعة", variant: "secondary" },
+  completed: { label: "مكتمل", variant: "default" },
+  rejected: { label: "مرفوض", variant: "destructive" },
+};
 
 export const Route = createFileRoute("/wallet")({
   head: () => ({
