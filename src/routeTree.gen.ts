@@ -17,6 +17,7 @@ import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as WalletRouteImport } from './routes/wallet'
+import { Route as ChatIndexRouteImport } from './routes/chat.index'
 import { Route as ListingsIdRouteImport } from './routes/listings.$id'
 import { Route as ApiPublicNowpaymentsRouteImport } from './routes/api/public/nowpayments'
 
@@ -60,6 +61,11 @@ const WalletRoute = WalletRouteImport.update({
   path: '/wallet',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChatIndexRoute = ChatIndexRouteImport.update({
+  id: '/chat/',
+  path: '/chat/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ListingsIdRoute = ListingsIdRouteImport.update({
   id: '/listings/$id',
   path: '/listings/$id',
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
   '/listings/$id': typeof ListingsIdRoute
+  '/chat/': typeof ChatIndexRoute
   '/api/public/nowpayments': typeof ApiPublicNowpaymentsRoute
 }
 export interface FileRoutesByTo {
@@ -93,6 +100,7 @@ export interface FileRoutesByTo {
   '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
   '/listings/$id': typeof ListingsIdRoute
+  '/chat': typeof ChatIndexRoute
   '/api/public/nowpayments': typeof ApiPublicNowpaymentsRoute
 }
 export interface FileRoutesById {
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/verify': typeof VerifyRoute
   '/wallet': typeof WalletRoute
   '/listings/$id': typeof ListingsIdRoute
+  '/chat/': typeof ChatIndexRoute
   '/api/public/nowpayments': typeof ApiPublicNowpaymentsRoute
 }
 export interface FileRouteTypes {
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/wallet'
     | '/listings/$id'
+    | '/chat/'
     | '/api/public/nowpayments'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/wallet'
     | '/listings/$id'
+    | '/chat'
     | '/api/public/nowpayments'
   id:
     | '__root__'
@@ -144,6 +155,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/wallet'
     | '/listings/$id'
+    | '/chat/'
     | '/api/public/nowpayments'
   fileRoutesById: FileRoutesById
 }
@@ -157,6 +169,7 @@ export interface RootRouteChildren {
   VerifyRoute: typeof VerifyRoute
   WalletRoute: typeof WalletRoute
   ListingsIdRoute: typeof ListingsIdRoute
+  ChatIndexRoute: typeof ChatIndexRoute
   ApiPublicNowpaymentsRoute: typeof ApiPublicNowpaymentsRoute
 }
 
@@ -218,6 +231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WalletRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/chat/': {
+      id: '/chat/'
+      path: '/chat'
+      fullPath: '/chat/'
+      preLoaderRoute: typeof ChatIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/listings/$id': {
       id: '/listings/$id'
       path: '/listings/$id'
@@ -245,6 +265,7 @@ const rootRouteChildren: RootRouteChildren = {
   VerifyRoute: VerifyRoute,
   WalletRoute: WalletRoute,
   ListingsIdRoute: ListingsIdRoute,
+  ChatIndexRoute: ChatIndexRoute,
   ApiPublicNowpaymentsRoute: ApiPublicNowpaymentsRoute,
 }
 export const routeTree = rootRouteImport
