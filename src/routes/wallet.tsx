@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth";
 import { formatUsd, formatDate } from "@/lib/media";
 import { supabase } from "@/integrations/supabase/client";
-import { createDepositAddress, getMyWallet } from "@/lib/wallet.functions";
+import { getMyWallet } from "@/lib/wallet.functions";
 
 const WITHDRAWAL_STATUS: Record<string, { label: string; variant: "secondary" | "default" | "destructive" | "outline" }> = {
   pending: { label: "قيد المراجعة", variant: "secondary" },
@@ -48,11 +48,9 @@ const TX_LABEL: Record<string, string> = {
 function WalletPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [amount, setAmount] = useState("100");
   const [wdAmount, setWdAmount] = useState("");
   const [wdAddress, setWdAddress] = useState("");
   const fetchWallet = useServerFn(getMyWallet);
-  const createAddress = useServerFn(createDepositAddress);
   const qc = useQueryClient();
 
   const { data, refetch } = useQuery({
@@ -73,15 +71,6 @@ function WalletPage() {
       if (error) throw error;
       return rows ?? [];
     },
-  });
-
-  const deposit = useMutation({
-    mutationFn: (amountUsd: number) => createAddress({ data: { amountUsd } }),
-    onSuccess: () => {
-      toast.success("تم إنشاء عنوان الإيداع الخاص بك");
-      void refetch();
-    },
-    onError: (e: Error) => toast.error(e.message || "تعذر إنشاء العنوان"),
   });
 
   const withdraw = useMutation({
@@ -115,7 +104,6 @@ function WalletPage() {
   }
 
   const wallet = data?.wallet;
-  const created = deposit.data;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
