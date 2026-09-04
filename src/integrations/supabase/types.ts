@@ -49,6 +49,39 @@ export type Database = {
           },
         ]
       }
+      deposit_requests: {
+        Row: {
+          admin_note: string | null
+          amount: number
+          created_at: string
+          id: string
+          processed_at: string | null
+          status: Database["public"]["Enums"]["withdrawal_status"]
+          txid: string
+          user_id: string
+        }
+        Insert: {
+          admin_note?: string | null
+          amount: number
+          created_at?: string
+          id?: string
+          processed_at?: string | null
+          status?: Database["public"]["Enums"]["withdrawal_status"]
+          txid: string
+          user_id: string
+        }
+        Update: {
+          admin_note?: string | null
+          amount?: number
+          created_at?: string
+          id?: string
+          processed_at?: string | null
+          status?: Database["public"]["Enums"]["withdrawal_status"]
+          txid?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       disputes: {
         Row: {
           created_at: string
@@ -479,6 +512,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_list_deposits: {
+        Args: never
+        Returns: {
+          admin_note: string
+          amount: number
+          created_at: string
+          display_name: string
+          email: string
+          id: string
+          processed_at: string
+          status: Database["public"]["Enums"]["withdrawal_status"]
+          txid: string
+          user_id: string
+        }[]
+      }
       admin_list_users: {
         Args: never
         Returns: {
@@ -512,6 +560,7 @@ export type Database = {
         Args: { _make_admin: boolean; _user_id: string }
         Returns: undefined
       }
+      approve_deposit: { Args: { _id: string }; Returns: undefined }
       approve_withdrawal: {
         Args: { _id: string; _tx_hash?: string }
         Returns: undefined
@@ -540,6 +589,10 @@ export type Database = {
         Returns: string
       }
       refund_escrow: { Args: { _order_id: string }; Returns: undefined }
+      reject_deposit: {
+        Args: { _id: string; _reason: string }
+        Returns: undefined
+      }
       reject_withdrawal: {
         Args: { _id: string; _reason: string }
         Returns: undefined
@@ -557,6 +610,10 @@ export type Database = {
           _user_id: string
         }
         Returns: undefined
+      }
+      submit_deposit_confirmation: {
+        Args: { _amount: number; _txid: string }
+        Returns: string
       }
     }
     Enums: {
