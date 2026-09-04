@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth";
 import { formatUsd, formatDate } from "@/lib/media";
 import { supabase } from "@/integrations/supabase/client";
-import { createDepositAddress, getMyWallet } from "@/lib/wallet.functions";
+import { getMyWallet } from "@/lib/wallet.functions";
 
 const WITHDRAWAL_STATUS: Record<string, { label: string; variant: "secondary" | "default" | "destructive" | "outline" }> = {
   pending: { label: "قيد المراجعة", variant: "secondary" },
@@ -48,11 +48,9 @@ const TX_LABEL: Record<string, string> = {
 function WalletPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [amount, setAmount] = useState("100");
   const [wdAmount, setWdAmount] = useState("");
   const [wdAddress, setWdAddress] = useState("");
   const fetchWallet = useServerFn(getMyWallet);
-  const createAddress = useServerFn(createDepositAddress);
   const qc = useQueryClient();
 
   const { data, refetch } = useQuery({
@@ -73,15 +71,6 @@ function WalletPage() {
       if (error) throw error;
       return rows ?? [];
     },
-  });
-
-  const deposit = useMutation({
-    mutationFn: (amountUsd: number) => createAddress({ data: { amountUsd } }),
-    onSuccess: () => {
-      toast.success("تم إنشاء عنوان الإيداع الخاص بك");
-      void refetch();
-    },
-    onError: (e: Error) => toast.error(e.message || "تعذر إنشاء العنوان"),
   });
 
   const withdraw = useMutation({
@@ -115,7 +104,6 @@ function WalletPage() {
   }
 
   const wallet = data?.wallet;
-  const created = deposit.data;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
@@ -141,58 +129,32 @@ function WalletPage() {
         <p className="mt-1 text-sm text-muted-foreground">
           شبكة الإيداع: USDT — {wallet?.deposit_network ?? "TRC20"}
         </p>
-        <div className="mt-4 flex flex-wrap items-end gap-3">
-          <div className="w-40">
-            <Label className="mb-2 block">المبلغ (دولار)</Label>
-            <Input
-              inputMode="decimal"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value.slice(0, 8))}
-            />
-          </div>
-          <Button
-            disabled={deposit.isPending}
-            onClick={() => {
-              const n = Number(amount);
-              if (!Number.isFinite(n) || n < 10) {
-                toast.error("أقل مبلغ للإيداع 10 دولار");
-                return;
-              }
-              deposit.mutate(n);
-            }}
-          >
-            {deposit.isPending ? "جارٍ الإنشاء…" : "أنشئ عنوان إيداع خاص بي"}
-          </Button>
-        </div>
+        <p className="mt-1 text-sm text-muted-foreground">
+          أرسل USDT إلى العنوان التالي، ثم يُضاف المبلغ لرصيدك بعد خصم رسوم الإيداع (1 دولار).
+        </p>
 
-        {(created?.address ?? wallet?.deposit_address) && (
+        {wallet?.deposit_address && (
           <div className="mt-6 rounded-2xl border border-border/60 bg-secondary/40 p-4">
-            <div className="text-xs text-muted-foreground">عنوان الإيداع الخاص بك</div>
+            <div className="text-xs text-muted-foreground">عنوان الإيداع</div>
             <div className="mt-2 flex items-center gap-2">
               <code className="flex-1 overflow-x-auto whitespace-nowrap rounded-lg bg-background/70 px-3 py-2 text-sm">
-                {created?.address ?? wallet?.deposit_address}
+                {wallet.deposit_address}
               </code>
               <Button
                 variant="outline"
                 size="icon"
                 aria-label="نسخ العنوان"
                 onClick={() => {
-                  void navigator.clipboard.writeText(
-                    (created?.address ?? wallet?.deposit_address) as string,
-                  );
+                  void navigator.clipboard.writeText(wallet.deposit_address as string);
                   toast.success("تم نسخ العنوان");
                 }}
               >
                 <Copy className="size-4" />
               </Button>
             </div>
-            {created && (
-              <p className="mt-3 text-xs text-muted-foreground">
-                أرسل {created.payAmount} {created.payCurrency.toUpperCase()} — سيُضاف لرصيدك{" "}
-                {formatUsd(created.creditedUsd)} بعد خصم رسوم الإيداع (
-                {formatUsd(created.feeUsd)}).
-              </p>
-            )}
+            <p className="mt-3 text-xs text-muted-foreground">
+              أرفق معرّف الإيداع الخاص بك ({wallet.deposit_tag}) عند مراسلة الدعم لتأكيد التحويل.
+            </p>
           </div>
         )}
       </div>
