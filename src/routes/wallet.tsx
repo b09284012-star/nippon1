@@ -49,13 +49,30 @@ function WalletPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [amount, setAmount] = useState("100");
+  const [wdAmount, setWdAmount] = useState("");
+  const [wdAddress, setWdAddress] = useState("");
   const fetchWallet = useServerFn(getMyWallet);
   const createAddress = useServerFn(createDepositAddress);
+  const qc = useQueryClient();
 
   const { data, refetch } = useQuery({
     queryKey: ["my-wallet"],
     enabled: Boolean(user),
     queryFn: () => fetchWallet(),
+  });
+
+  const withdrawals = useQuery({
+    queryKey: ["my-withdrawals"],
+    enabled: Boolean(user),
+    queryFn: async () => {
+      const { data: rows, error } = await supabase
+        .from("withdrawals")
+        .select("id, amount, address, network, status, reject_reason, created_at")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      return rows ?? [];
+    },
   });
 
   const deposit = useMutation({
@@ -65,6 +82,24 @@ function WalletPage() {
       void refetch();
     },
     onError: (e: Error) => toast.error(e.message || "تعذر إنشاء العنوان"),
+  });
+
+  const withdraw = useMutation({
+    mutationFn: async (vars: { amount: number; address: string }) => {
+      const { error } = await supabase.rpc("request_withdrawal", {
+        _amount: vars.amount,
+        _address: vars.address,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("تم إرسال طلب السحب للمراجعة");
+      setWdAmount("");
+      setWdAddress("");
+      void refetch();
+      void qc.invalidateQueries({ queryKey: ["my-withdrawals"] });
+    },
+    onError: (e: Error) => toast.error(e.message || "تعذر إرسال طلب السحب"),
   });
 
   if (!loading && !user) {
