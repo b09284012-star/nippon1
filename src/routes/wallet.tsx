@@ -1,16 +1,23 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Copy, Wallet2, ShieldCheck, ArrowDownToLine } from "lucide-react";
+import { Copy, Wallet2, ShieldCheck, ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth";
 import { formatUsd, formatDate } from "@/lib/media";
+import { supabase } from "@/integrations/supabase/client";
 import { createDepositAddress, getMyWallet } from "@/lib/wallet.functions";
+
+const WITHDRAWAL_STATUS: Record<string, { label: string; variant: "secondary" | "default" | "destructive" | "outline" }> = {
+  pending: { label: "قيد المراجعة", variant: "secondary" },
+  completed: { label: "مكتمل", variant: "default" },
+  rejected: { label: "مرفوض", variant: "destructive" },
+};
 
 export const Route = createFileRoute("/wallet")({
   head: () => ({
@@ -42,13 +49,30 @@ function WalletPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [amount, setAmount] = useState("100");
+  const [wdAmount, setWdAmount] = useState("");
+  const [wdAddress, setWdAddress] = useState("");
   const fetchWallet = useServerFn(getMyWallet);
   const createAddress = useServerFn(createDepositAddress);
+  const qc = useQueryClient();
 
   const { data, refetch } = useQuery({
     queryKey: ["my-wallet"],
     enabled: Boolean(user),
     queryFn: () => fetchWallet(),
+  });
+
+  const withdrawals = useQuery({
+    queryKey: ["my-withdrawals"],
+    enabled: Boolean(user),
+    queryFn: async () => {
+      const { data: rows, error } = await supabase
+        .from("withdrawals")
+        .select("id, amount, address, network, status, reject_reason, created_at")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      return rows ?? [];
+    },
   });
 
   const deposit = useMutation({
@@ -58,6 +82,24 @@ function WalletPage() {
       void refetch();
     },
     onError: (e: Error) => toast.error(e.message || "تعذر إنشاء العنوان"),
+  });
+
+  const withdraw = useMutation({
+    mutationFn: async (vars: { amount: number; address: string }) => {
+      const { error } = await supabase.rpc("request_withdrawal", {
+        _amount: vars.amount,
+        _address: vars.address,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("تم إرسال طلب السحب للمراجعة");
+      setWdAmount("");
+      setWdAddress("");
+      void refetch();
+      void qc.invalidateQueries({ queryKey: ["my-withdrawals"] });
+    },
+    onError: (e: Error) => toast.error(e.message || "تعذر إرسال طلب السحب"),
   });
 
   if (!loading && !user) {
@@ -154,6 +196,77 @@ function WalletPage() {
           </div>
         )}
       </div>
+
+      <div className="glass mt-8 rounded-3xl p-6">
+        <h2 className="flex items-center gap-2 font-display text-xl font-bold">
+          <ArrowUpFromLine className="size-5 text-primary" /> سحب الرصيد
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          يُخصم المبلغ فور إرسال الطلب ويُراجع يدويًا من الإدارة. في حال الرفض يُعاد المبلغ لرصيدك.
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-[10rem_1fr_auto] sm:items-end">
+          <div>
+            <Label className="mb-2 block">المبلغ (USDT)</Label>
+            <Input
+              inputMode="decimal"
+              value={wdAmount}
+              onChange={(e) => setWdAmount(e.target.value.slice(0, 10))}
+              placeholder="50"
+            />
+          </div>
+          <div>
+            <Label className="mb-2 block">عنوان المحفظة (TRC20)</Label>
+            <Input
+              value={wdAddress}
+              onChange={(e) => setWdAddress(e.target.value.trim())}
+              placeholder="T..."
+            />
+          </div>
+          <Button
+            disabled={withdraw.isPending}
+            onClick={() => {
+              const n = Number(wdAmount);
+              if (!Number.isFinite(n) || n < 10) {
+                toast.error("أقل مبلغ للسحب 10 USDT");
+                return;
+              }
+              if (n > Number(wallet?.balance ?? 0)) {
+                toast.error("الرصيد المتاح غير كافٍ");
+                return;
+              }
+              if (wdAddress.length < 20) {
+                toast.error("عنوان المحفظة غير صحيح");
+                return;
+              }
+              withdraw.mutate({ amount: n, address: wdAddress });
+            }}
+          >
+            {withdraw.isPending ? "جارٍ الإرسال…" : "طلب سحب"}
+          </Button>
+        </div>
+
+        <div className="mt-6 divide-y divide-border/60 rounded-2xl border border-border/60">
+          {(withdrawals.data ?? []).length === 0 && (
+            <div className="px-4 py-6 text-sm text-muted-foreground">لا طلبات سحب بعد.</div>
+          )}
+          {(withdrawals.data ?? []).map((w) => {
+            const s = WITHDRAWAL_STATUS[w.status] ?? { label: w.status, variant: "secondary" as const };
+            return (
+              <div key={w.id} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
+                <Badge variant={s.variant}>{s.label}</Badge>
+                <span className="font-display font-bold">{formatUsd(w.amount)}</span>
+                <code className="max-w-[14rem] truncate text-xs text-muted-foreground">{w.address}</code>
+                <span className="text-xs text-muted-foreground">{formatDate(w.created_at)}</span>
+                {w.reject_reason && (
+                  <span className="w-full text-xs text-destructive">سبب الرفض: {w.reject_reason}</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+
 
       <div className="glass mt-8 overflow-hidden rounded-3xl">
         <h2 className="px-6 pt-6 font-display text-xl font-bold">سجل العمليات</h2>
