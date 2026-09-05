@@ -50,6 +50,8 @@ function WalletPage() {
   const navigate = useNavigate();
   const [wdAmount, setWdAmount] = useState("");
   const [wdAddress, setWdAddress] = useState("");
+  const [depAmount, setDepAmount] = useState("");
+  const [depTxid, setDepTxid] = useState("");
   const fetchWallet = useServerFn(getMyWallet);
   const qc = useQueryClient();
 
@@ -71,6 +73,37 @@ function WalletPage() {
       if (error) throw error;
       return rows ?? [];
     },
+  });
+
+  const deposits = useQuery({
+    queryKey: ["my-deposit-requests"],
+    enabled: Boolean(user),
+    queryFn: async () => {
+      const { data: rows, error } = await supabase
+        .from("deposit_requests")
+        .select("id, amount, txid, status, admin_note, created_at")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      return rows ?? [];
+    },
+  });
+
+  const confirmDeposit = useMutation({
+    mutationFn: async (vars: { amount: number; txid: string }) => {
+      const { error } = await supabase.rpc("submit_deposit_confirmation", {
+        _amount: vars.amount,
+        _txid: vars.txid,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("تم إرسال تأكيد الإيداع للمراجعة");
+      setDepAmount("");
+      setDepTxid("");
+      void qc.invalidateQueries({ queryKey: ["my-deposit-requests"] });
+    },
+    onError: (e: Error) => toast.error(e.message || "تعذر إرسال تأكيد الإيداع"),
   });
 
   const withdraw = useMutation({
@@ -157,6 +190,69 @@ function WalletPage() {
             </p>
           </div>
         )}
+
+        <div className="mt-6 rounded-2xl border border-border/60 p-4">
+          <h3 className="font-display font-bold">تأكيد الإيداع</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            بعد إرسال التحويل، أدخل القيمة ورقم المعاملة (TxID) وسيراجعها الفريق ثم يُضاف المبلغ لرصيدك.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-[10rem_1fr_auto] sm:items-end">
+            <div>
+              <Label className="mb-2 block">القيمة (USDT)</Label>
+              <Input
+                inputMode="decimal"
+                value={depAmount}
+                onChange={(e) => setDepAmount(e.target.value.slice(0, 10))}
+                placeholder="100"
+              />
+            </div>
+            <div>
+              <Label className="mb-2 block">رقم المعاملة (TxID)</Label>
+              <Input
+                value={depTxid}
+                onChange={(e) => setDepTxid(e.target.value.trim())}
+                placeholder="hash التحويل على شبكة TRC20"
+              />
+            </div>
+            <Button
+              disabled={confirmDeposit.isPending}
+              onClick={() => {
+                const n = Number(depAmount);
+                if (!Number.isFinite(n) || n < 2) {
+                  toast.error("أقل قيمة إيداع 2 USDT");
+                  return;
+                }
+                if (depTxid.length < 10) {
+                  toast.error("رقم المعاملة غير صحيح");
+                  return;
+                }
+                confirmDeposit.mutate({ amount: n, txid: depTxid });
+              }}
+            >
+              {confirmDeposit.isPending ? "جارٍ الإرسال…" : "تأكيد الإيداع"}
+            </Button>
+          </div>
+
+          <div className="mt-6 divide-y divide-border/60 rounded-2xl border border-border/60">
+            {(deposits.data ?? []).length === 0 && (
+              <div className="px-4 py-6 text-sm text-muted-foreground">لا طلبات تأكيد إيداع بعد.</div>
+            )}
+            {(deposits.data ?? []).map((d) => {
+              const s = WITHDRAWAL_STATUS[d.status] ?? { label: d.status, variant: "secondary" as const };
+              return (
+                <div key={d.id} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
+                  <Badge variant={s.variant}>{s.label}</Badge>
+                  <span className="font-display font-bold">{formatUsd(d.amount)}</span>
+                  <code className="max-w-[14rem] truncate text-xs text-muted-foreground">{d.txid}</code>
+                  <span className="text-xs text-muted-foreground">{formatDate(d.created_at)}</span>
+                  {d.admin_note && (
+                    <span className="w-full text-xs text-destructive">ملاحظة الإدارة: {d.admin_note}</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       <div className="glass mt-8 rounded-3xl p-6">

@@ -10,6 +10,7 @@ const links = [
   { to: "/market", label: "السوق" },
   { to: "/sell", label: "أضف عرض" },
   { to: "/chat", label: "الدردشة" },
+  { to: "/forum", label: "المنتدى" },
   { to: "/orders", label: "طلباتي" },
   { to: "/wallet", label: "المحفظة" },
   { to: "/verify", label: "توثيق الهوية" },
@@ -40,12 +41,20 @@ export function Header() {
             </Link>
           ))}
           {isAdmin && (
-            <Link
-              to="/admin"
-              className="rounded-lg px-3 py-2 text-sm text-accent transition-colors hover:bg-secondary"
-            >
-              الإدارة
-            </Link>
+            <>
+              <Link
+                to="/admin"
+                className="rounded-lg px-3 py-2 text-sm text-accent transition-colors hover:bg-secondary"
+              >
+                الإدارة
+              </Link>
+              <Link
+                to="/finance"
+                className="rounded-lg px-3 py-2 text-sm text-accent transition-colors hover:bg-secondary"
+              >
+                اللوحة المالية
+              </Link>
+            </>
           )}
         </nav>
 
@@ -94,9 +103,14 @@ export function Header() {
             </Link>
           ))}
           {isAdmin && (
-            <Link to="/admin" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm text-accent">
-              الإدارة
-            </Link>
+            <>
+              <Link to="/admin" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm text-accent">
+                الإدارة
+              </Link>
+              <Link to="/finance" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm text-accent">
+                اللوحة المالية
+              </Link>
+            </>
           )}
         </nav>
       </div>

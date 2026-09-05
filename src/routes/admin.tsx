@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { BellRing, ShieldCheck, Users, Wallet2, Gavel } from "lucide-react";
+import { BellRing, ShieldCheck, Users, Wallet2, Gavel, ArrowDownToLine, Radio, UserPlus, Package } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth";
 import { formatDate, formatUsd } from "@/lib/media";
+import { useOnlineCount } from "@/lib/presence";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -60,6 +61,30 @@ function AdminPage() {
     },
   });
 
+  const deposits = useQuery({
+    queryKey: ["admin-deposits"],
+    enabled: isAdmin,
+    refetchInterval: 20000,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_list_deposits");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const stats = useQuery({
+    queryKey: ["admin-stats"],
+    enabled: isAdmin,
+    refetchInterval: 60000,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_platform_stats");
+      if (error) throw error;
+      return data?.[0] ?? null;
+    },
+  });
+
+  const onlineCount = useOnlineCount(isAdmin);
+
   const kyc = useQuery({
     queryKey: ["admin-kyc"],
     enabled: isAdmin,
@@ -99,6 +124,7 @@ function AdminPage() {
   }
 
   const pendingCount = (withdrawals.data ?? []).filter((w) => w.status === "pending").length;
+  const pendingDeposits = (deposits.data ?? []).filter((d) => d.status === "pending").length;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
@@ -109,12 +135,27 @@ function AdminPage() {
             <BellRing className="size-3.5" /> {pendingCount} طلب سحب جديد
           </Badge>
         )}
+        {pendingDeposits > 0 && (
+          <Badge className="gap-1" variant="secondary">
+            <ArrowDownToLine className="size-3.5" /> {pendingDeposits} تأكيد إيداع
+          </Badge>
+        )}
+      </div>
+
+      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard icon={Radio} label="المستخدمون المتصلون الآن" value={String(onlineCount)} live />
+        <StatCard icon={Users} label="إجمالي المستخدمين" value={String(stats.data?.total_users ?? 0)} />
+        <StatCard icon={UserPlus} label="حسابات جديدة (7 أيام)" value={String(stats.data?.new_users_7d ?? 0)} />
+        <StatCard icon={Package} label="العروض / الطلبات" value={`${stats.data?.total_listings ?? 0} / ${stats.data?.total_orders ?? 0}`} />
       </div>
 
       <Tabs defaultValue="withdrawals" className="mt-8">
         <TabsList className="flex-wrap">
           <TabsTrigger value="withdrawals">
             <Wallet2 className="size-4" /> طلبات السحب
+          </TabsTrigger>
+          <TabsTrigger value="deposits">
+            <ArrowDownToLine className="size-4" /> تأكيدات الإيداع
           </TabsTrigger>
           <TabsTrigger value="users">
             <Users className="size-4" /> إدارة المستخدمين
@@ -135,6 +176,16 @@ function AdminPage() {
             <WithdrawalRow key={w.id} w={w} onDone={() => void withdrawals.refetch()} />
           ))}
         </TabsContent>
+
+        <TabsContent value="deposits" className="mt-6 grid gap-4">
+          {(deposits.data ?? []).length === 0 && (
+            <p className="text-sm text-muted-foreground">لا تأكيدات إيداع.</p>
+          )}
+          {(deposits.data ?? []).map((d) => (
+            <DepositRow key={d.id} d={d} onDone={() => void deposits.refetch()} />
+          ))}
+        </TabsContent>
+
 
         <TabsContent value="users" className="mt-6 overflow-x-auto">
           <table className="w-full min-w-[640px] text-sm">
@@ -369,6 +420,115 @@ function WithdrawalRow({ w, onDone }: { w: WithdrawalRowData; onDone: () => void
                   if (error) toast.error(error.message);
                   else {
                     toast.success("تم الرفض وإرجاع المبلغ");
+                    onDone();
+                  }
+                }}
+              >
+                تأكيد الرفض
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  live,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+  live?: boolean;
+}) {
+  return (
+    <div className="glass card-3d rounded-2xl p-5">
+      <div className="flex items-center gap-2">
+        <Icon className="size-5 text-primary" />
+        {live && <span className="size-2 animate-pulse rounded-full bg-primary" />}
+      </div>
+      <div className="mt-3 text-xs text-muted-foreground">{label}</div>
+      <div className="mt-1 font-display text-2xl font-black">{value}</div>
+    </div>
+  );
+}
+
+type DepositRowData = {
+  id: string;
+  display_name: string | null;
+  email: string | null;
+  amount: number;
+  txid: string;
+  status: string;
+  admin_note: string | null;
+  created_at: string;
+};
+
+function DepositRow({ d, onDone }: { d: DepositRowData; onDone: () => void }) {
+  const [reason, setReason] = useState("");
+  const [showReason, setShowReason] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  return (
+    <div className="glass rounded-2xl p-5">
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="font-display font-bold">{d.display_name ?? d.email}</span>
+        <Badge variant={d.status === "pending" ? "default" : "secondary"}>
+          {WD_STATUS[d.status] ?? d.status}
+        </Badge>
+        <span className="ms-auto font-display text-lg font-black">{formatUsd(d.amount)}</span>
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">{d.email}</p>
+      <code className="mt-2 block overflow-x-auto whitespace-nowrap rounded-lg bg-background/70 px-3 py-2 text-xs">
+        TxID: {d.txid}
+      </code>
+      <p className="mt-2 text-xs text-muted-foreground">{formatDate(d.created_at)}</p>
+      {d.admin_note && <p className="mt-2 text-xs text-destructive">ملاحظة: {d.admin_note}</p>}
+
+      {d.status === "pending" && (
+        <div className="mt-4 grid gap-3">
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true);
+                const { error } = await supabase.rpc("approve_deposit", { _id: d.id });
+                setBusy(false);
+                if (error) toast.error(error.message);
+                else {
+                  toast.success("تم اعتماد الإيداع وإضافة الرصيد");
+                  onDone();
+                }
+              }}
+            >
+              اعتماد وإضافة الرصيد
+            </Button>
+            <Button size="sm" variant="destructive" onClick={() => setShowReason((v) => !v)}>
+              رفض
+            </Button>
+          </div>
+          {showReason && (
+            <div className="flex gap-2">
+              <Input placeholder="سبب الرفض" value={reason} onChange={(e) => setReason(e.target.value)} />
+              <Button
+                size="sm"
+                variant="destructive"
+                disabled={busy || reason.trim().length < 3}
+                onClick={async () => {
+                  setBusy(true);
+                  const { error } = await supabase.rpc("reject_deposit", {
+                    _id: d.id,
+                    _reason: reason.trim(),
+                  });
+                  setBusy(false);
+                  if (error) toast.error(error.message);
+                  else {
+                    toast.success("تم رفض طلب الإيداع");
                     onDone();
                   }
                 }}

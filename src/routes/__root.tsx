@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/lib/auth";
 import { Header } from "@/components/site/Header";
 import { SupportWhatsAppButton } from "@/components/site/SupportWhatsApp";
+import { PresenceTracker } from "@/components/site/PresenceTracker";
 import { Footer } from "@/components/site/Footer";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -132,6 +133,7 @@ function RootComponent() {
           </main>
           <Footer />
         </div>
+        <PresenceTracker />
         <SupportWhatsAppButton />
         <Toaster position="top-center" richColors />
       </AuthProvider>

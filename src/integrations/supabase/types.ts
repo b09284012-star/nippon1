@@ -120,6 +120,38 @@ export type Database = {
           },
         ]
       }
+      forum_posts: {
+        Row: {
+          author_id: string
+          body: string
+          channel: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          channel: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          channel?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       kyc_submissions: {
         Row: {
           admin_note: string | null
@@ -554,6 +586,15 @@ export type Database = {
           reject_reason: string
           status: Database["public"]["Enums"]["withdrawal_status"]
           user_id: string
+        }[]
+      }
+      admin_platform_stats: {
+        Args: never
+        Returns: {
+          new_users_7d: number
+          total_listings: number
+          total_orders: number
+          total_users: number
         }[]
       }
       admin_set_user_role: {
