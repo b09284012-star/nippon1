@@ -177,6 +177,16 @@ function AdminPage() {
           ))}
         </TabsContent>
 
+        <TabsContent value="deposits" className="mt-6 grid gap-4">
+          {(deposits.data ?? []).length === 0 && (
+            <p className="text-sm text-muted-foreground">لا تأكيدات إيداع.</p>
+          )}
+          {(deposits.data ?? []).map((d) => (
+            <DepositRow key={d.id} d={d} onDone={() => void deposits.refetch()} />
+          ))}
+        </TabsContent>
+
+
         <TabsContent value="users" className="mt-6 overflow-x-auto">
           <table className="w-full min-w-[640px] text-sm">
             <thead className="text-start text-xs text-muted-foreground">
