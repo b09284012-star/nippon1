@@ -36,6 +36,8 @@ const schema = z.object({
   condition: z.string().min(2, "أدخل حالة الجهاز"),
   price_usd: z.coerce.number().min(1, "السعر إلزامي"),
   warranty_months: z.coerce.number().int().min(0, "الضمان إلزامي"),
+  availability: z.enum(["in_stock", "on_order"]).default("in_stock"),
+  quantity: z.coerce.number().int().min(1, "أدخل الكمية"),
   hours_used: z.coerce.number().int().min(0).optional(),
   location: z.string().optional(),
   description: z.string().min(20, "أضف وصفًا لا يقل عن 20 حرفًا"),
@@ -46,6 +48,7 @@ function SellPage() {
   const navigate = useNavigate();
   const [files, setFiles] = useState<FileList | null>(null);
   const [busy, setBusy] = useState(false);
+  const [availability, setAvailability] = useState<"in_stock" | "on_order">("in_stock");
 
   if (!loading && !user) {
     return (
@@ -129,6 +132,25 @@ function SellPage() {
         <Field name="condition" label="الحالة" placeholder="مستعمل - ممتاز" />
         <Field name="price_usd" label="السعر (USDT) *" type="number" step="0.01" />
         <Field name="warranty_months" label="الضمان (شهور) *" type="number" />
+        <div>
+          <Label className="mb-2 block">نوع التوفر *</Label>
+          <select
+            name="availability"
+            value={availability}
+            onChange={(e) => setAvailability(e.target.value as "in_stock" | "on_order")}
+            className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+          >
+            <option value="in_stock">متوفر الآن</option>
+            <option value="on_order">حسب الطلب</option>
+          </select>
+        </div>
+        <Field
+          name="quantity"
+          label={availability === "on_order" ? "الكمية القابلة للتوريد *" : "الكمية المتوفرة *"}
+          type="number"
+          min={1}
+          defaultValue={1}
+        />
         <Field name="hours_used" label="ساعات التشغيل (اختياري)" type="number" />
         <Field name="location" label="الموقع (اختياري)" placeholder="طرابلس" />
 

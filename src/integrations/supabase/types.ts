@@ -197,6 +197,7 @@ export type Database = {
       listings: {
         Row: {
           algorithm: string | null
+          availability: string
           brand: string
           condition: string
           created_at: string
@@ -209,6 +210,7 @@ export type Database = {
           model: string
           power_watts: number
           price_usd: number
+          quantity: number
           seller_id: string
           status: Database["public"]["Enums"]["listing_status"]
           title: string
@@ -216,6 +218,7 @@ export type Database = {
         }
         Insert: {
           algorithm?: string | null
+          availability?: string
           brand: string
           condition: string
           created_at?: string
@@ -228,6 +231,7 @@ export type Database = {
           model: string
           power_watts: number
           price_usd: number
+          quantity?: number
           seller_id: string
           status?: Database["public"]["Enums"]["listing_status"]
           title: string
@@ -235,6 +239,7 @@ export type Database = {
         }
         Update: {
           algorithm?: string | null
+          availability?: string
           brand?: string
           condition?: string
           created_at?: string
@@ -247,6 +252,7 @@ export type Database = {
           model?: string
           power_watts?: number
           price_usd?: number
+          quantity?: number
           seller_id?: string
           status?: Database["public"]["Enums"]["listing_status"]
           title?: string
@@ -294,6 +300,7 @@ export type Database = {
           fee: number
           id: string
           listing_id: string
+          quantity: number
           seller_id: string
           shipping_address: string | null
           shipping_carrier: string | null
@@ -308,6 +315,7 @@ export type Database = {
           fee?: number
           id?: string
           listing_id: string
+          quantity?: number
           seller_id: string
           shipping_address?: string | null
           shipping_carrier?: string | null
@@ -322,6 +330,7 @@ export type Database = {
           fee?: number
           id?: string
           listing_id?: string
+          quantity?: number
           seller_id?: string
           shipping_address?: string | null
           shipping_carrier?: string | null
@@ -607,7 +616,11 @@ export type Database = {
         Returns: undefined
       }
       create_escrow_order: {
-        Args: { _listing_id: string; _shipping_address: string }
+        Args: {
+          _listing_id: string
+          _quantity?: number
+          _shipping_address: string
+        }
         Returns: string
       }
       credit_deposit: {
