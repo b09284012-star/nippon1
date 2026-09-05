@@ -433,3 +433,112 @@ function WithdrawalRow({ w, onDone }: { w: WithdrawalRowData; onDone: () => void
     </div>
   );
 }
+
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  live,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+  live?: boolean;
+}) {
+  return (
+    <div className="glass card-3d rounded-2xl p-5">
+      <div className="flex items-center gap-2">
+        <Icon className="size-5 text-primary" />
+        {live && <span className="size-2 animate-pulse rounded-full bg-primary" />}
+      </div>
+      <div className="mt-3 text-xs text-muted-foreground">{label}</div>
+      <div className="mt-1 font-display text-2xl font-black">{value}</div>
+    </div>
+  );
+}
+
+type DepositRowData = {
+  id: string;
+  display_name: string | null;
+  email: string | null;
+  amount: number;
+  txid: string;
+  status: string;
+  admin_note: string | null;
+  created_at: string;
+};
+
+function DepositRow({ d, onDone }: { d: DepositRowData; onDone: () => void }) {
+  const [reason, setReason] = useState("");
+  const [showReason, setShowReason] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  return (
+    <div className="glass rounded-2xl p-5">
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="font-display font-bold">{d.display_name ?? d.email}</span>
+        <Badge variant={d.status === "pending" ? "default" : "secondary"}>
+          {WD_STATUS[d.status] ?? d.status}
+        </Badge>
+        <span className="ms-auto font-display text-lg font-black">{formatUsd(d.amount)}</span>
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">{d.email}</p>
+      <code className="mt-2 block overflow-x-auto whitespace-nowrap rounded-lg bg-background/70 px-3 py-2 text-xs">
+        TxID: {d.txid}
+      </code>
+      <p className="mt-2 text-xs text-muted-foreground">{formatDate(d.created_at)}</p>
+      {d.admin_note && <p className="mt-2 text-xs text-destructive">ملاحظة: {d.admin_note}</p>}
+
+      {d.status === "pending" && (
+        <div className="mt-4 grid gap-3">
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true);
+                const { error } = await supabase.rpc("approve_deposit", { _id: d.id });
+                setBusy(false);
+                if (error) toast.error(error.message);
+                else {
+                  toast.success("تم اعتماد الإيداع وإضافة الرصيد");
+                  onDone();
+                }
+              }}
+            >
+              اعتماد وإضافة الرصيد
+            </Button>
+            <Button size="sm" variant="destructive" onClick={() => setShowReason((v) => !v)}>
+              رفض
+            </Button>
+          </div>
+          {showReason && (
+            <div className="flex gap-2">
+              <Input placeholder="سبب الرفض" value={reason} onChange={(e) => setReason(e.target.value)} />
+              <Button
+                size="sm"
+                variant="destructive"
+                disabled={busy || reason.trim().length < 3}
+                onClick={async () => {
+                  setBusy(true);
+                  const { error } = await supabase.rpc("reject_deposit", {
+                    _id: d.id,
+                    _reason: reason.trim(),
+                  });
+                  setBusy(false);
+                  if (error) toast.error(error.message);
+                  else {
+                    toast.success("تم رفض طلب الإيداع");
+                    onDone();
+                  }
+                }}
+              >
+                تأكيد الرفض
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
