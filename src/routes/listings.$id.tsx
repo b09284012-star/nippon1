@@ -2,11 +2,12 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Cpu, Zap, ShieldCheck, Clock, MapPin, Star, MessagesSquare } from "lucide-react";
+import { Cpu, Zap, ShieldCheck, Clock, MapPin, Star, MessagesSquare, Minus, Plus, Boxes } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
@@ -41,6 +42,7 @@ function ListingDetail() {
   const { user, profile } = useAuth();
   const [address, setAddress] = useState("");
   const [buying, setBuying] = useState(false);
+  const [qty, setQty] = useState(1);
   const [open, setOpen] = useState(false);
 
   const { data: listing, refetch } = useQuery({
@@ -96,6 +98,7 @@ function ListingDetail() {
     const { error } = await supabase.rpc("create_escrow_order", {
       _listing_id: id,
       _shipping_address: address.trim(),
+      _quantity: qty,
     });
     setBuying(false);
     if (error) { toast.error(error.message); return; }
@@ -106,6 +109,9 @@ function ListingDetail() {
   };
 
   if (!listing) return <div className="mx-auto max-w-7xl px-4 py-20">جاري التحميل…</div>;
+
+  const onOrder = listing.availability === "on_order";
+  const maxQty = onOrder ? 0 : (listing.quantity ?? 1);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
@@ -144,6 +150,11 @@ function ListingDetail() {
             />
             <Spec icon={MapPin} label="الموقع" value={listing.location ?? "—"} />
             <Spec icon={Cpu} label="الخوارزمية" value={listing.algorithm ?? "—"} />
+            <Spec
+              icon={Boxes}
+              label="التوفر"
+              value={onOrder ? "حسب الطلب" : `متوفر: ${maxQty} قطعة`}
+            />
           </div>
 
           <div className="glass mt-6 rounded-2xl p-4">
