@@ -124,6 +124,7 @@ function AdminPage() {
   }
 
   const pendingCount = (withdrawals.data ?? []).filter((w) => w.status === "pending").length;
+  const pendingDeposits = (deposits.data ?? []).filter((d) => d.status === "pending").length;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
@@ -134,12 +135,27 @@ function AdminPage() {
             <BellRing className="size-3.5" /> {pendingCount} طلب سحب جديد
           </Badge>
         )}
+        {pendingDeposits > 0 && (
+          <Badge className="gap-1" variant="secondary">
+            <ArrowDownToLine className="size-3.5" /> {pendingDeposits} تأكيد إيداع
+          </Badge>
+        )}
+      </div>
+
+      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard icon={Radio} label="المستخدمون المتصلون الآن" value={String(onlineCount)} live />
+        <StatCard icon={Users} label="إجمالي المستخدمين" value={String(stats.data?.total_users ?? 0)} />
+        <StatCard icon={UserPlus} label="حسابات جديدة (7 أيام)" value={String(stats.data?.new_users_7d ?? 0)} />
+        <StatCard icon={Package} label="العروض / الطلبات" value={`${stats.data?.total_listings ?? 0} / ${stats.data?.total_orders ?? 0}`} />
       </div>
 
       <Tabs defaultValue="withdrawals" className="mt-8">
         <TabsList className="flex-wrap">
           <TabsTrigger value="withdrawals">
             <Wallet2 className="size-4" /> طلبات السحب
+          </TabsTrigger>
+          <TabsTrigger value="deposits">
+            <ArrowDownToLine className="size-4" /> تأكيدات الإيداع
           </TabsTrigger>
           <TabsTrigger value="users">
             <Users className="size-4" /> إدارة المستخدمين
