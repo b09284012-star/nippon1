@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { BellRing, ShieldCheck, Users, Wallet2, Gavel } from "lucide-react";
+import { BellRing, ShieldCheck, Users, Wallet2, Gavel, ArrowDownToLine, Radio, UserPlus, Package } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth";
 import { formatDate, formatUsd } from "@/lib/media";
+import { useOnlineCount } from "@/lib/presence";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -59,6 +60,30 @@ function AdminPage() {
       return data ?? [];
     },
   });
+
+  const deposits = useQuery({
+    queryKey: ["admin-deposits"],
+    enabled: isAdmin,
+    refetchInterval: 20000,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_list_deposits");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const stats = useQuery({
+    queryKey: ["admin-stats"],
+    enabled: isAdmin,
+    refetchInterval: 60000,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_platform_stats");
+      if (error) throw error;
+      return data?.[0] ?? null;
+    },
+  });
+
+  const onlineCount = useOnlineCount(isAdmin);
 
   const kyc = useQuery({
     queryKey: ["admin-kyc"],
