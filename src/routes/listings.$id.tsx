@@ -173,10 +173,51 @@ function ListingDetail() {
                 <DialogHeader>
                   <DialogTitle>تأكيد الشراء عبر الضمان</DialogTitle>
                   <DialogDescription>
-                    سيُخصم {formatUsd(listing.price_usd)} من محفظتك ويُحجز في نيبون. لن يستلمه
+                    سيُخصم {formatUsd(listing.price_usd * qty)} من محفظتك ويُحجز في نيبون. لن يستلمه
                     البائع إلا بعد تأكيدك استلام الجهاز.
                   </DialogDescription>
                 </DialogHeader>
+                <div>
+                  <Label className="mb-2 block">الكمية</Label>
+                  <div className="flex items-center gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setQty((q) => Math.max(1, q - 1))}
+                    >
+                      <Minus className="size-4" />
+                    </Button>
+                    <Input
+                      type="number"
+                      min={1}
+                      {...(maxQty ? { max: maxQty } : {})}
+                      value={qty}
+                      onChange={(e) => {
+                        const v = Math.max(1, Number(e.target.value) || 1);
+                        setQty(maxQty ? Math.min(v, maxQty) : v);
+                      }}
+                      className="w-24 text-center"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setQty((q) => (maxQty ? Math.min(maxQty, q + 1) : q + 1))}
+                    >
+                      <Plus className="size-4" />
+                    </Button>
+                    <span className="text-xs text-muted-foreground">
+                      {maxQty ? `المتوفر: ${maxQty}` : "حسب الطلب"}
+                    </span>
+                  </div>
+                  <div className="mt-3 text-sm">
+                    الإجمالي:{" "}
+                    <span className="font-display font-black">
+                      {formatUsd(listing.price_usd * qty)}
+                    </span>
+                  </div>
+                </div>
                 <div>
                   <Label className="mb-2 block">عنوان الشحن</Label>
                   <Textarea
