@@ -58,7 +58,7 @@ function ListingDetail() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, display_name, avatar_url, bio, country, rating, sales_count")
         .eq("id", listing!.seller_id)
         .maybeSingle();
       return data;
