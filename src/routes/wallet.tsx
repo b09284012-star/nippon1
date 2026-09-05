@@ -50,6 +50,8 @@ function WalletPage() {
   const navigate = useNavigate();
   const [wdAmount, setWdAmount] = useState("");
   const [wdAddress, setWdAddress] = useState("");
+  const [depAmount, setDepAmount] = useState("");
+  const [depTxid, setDepTxid] = useState("");
   const fetchWallet = useServerFn(getMyWallet);
   const qc = useQueryClient();
 
@@ -71,6 +73,37 @@ function WalletPage() {
       if (error) throw error;
       return rows ?? [];
     },
+  });
+
+  const deposits = useQuery({
+    queryKey: ["my-deposit-requests"],
+    enabled: Boolean(user),
+    queryFn: async () => {
+      const { data: rows, error } = await supabase
+        .from("deposit_requests")
+        .select("id, amount, txid, status, admin_note, created_at")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      return rows ?? [];
+    },
+  });
+
+  const confirmDeposit = useMutation({
+    mutationFn: async (vars: { amount: number; txid: string }) => {
+      const { error } = await supabase.rpc("submit_deposit_confirmation", {
+        _amount: vars.amount,
+        _txid: vars.txid,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("تم إرسال تأكيد الإيداع للمراجعة");
+      setDepAmount("");
+      setDepTxid("");
+      void qc.invalidateQueries({ queryKey: ["my-deposit-requests"] });
+    },
+    onError: (e: Error) => toast.error(e.message || "تعذر إرسال تأكيد الإيداع"),
   });
 
   const withdraw = useMutation({
