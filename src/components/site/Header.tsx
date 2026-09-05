@@ -10,6 +10,7 @@ const links = [
   { to: "/market", label: "السوق" },
   { to: "/sell", label: "أضف عرض" },
   { to: "/chat", label: "الدردشة" },
+  { to: "/forum", label: "المنتدى" },
   { to: "/orders", label: "طلباتي" },
   { to: "/wallet", label: "المحفظة" },
   { to: "/verify", label: "توثيق الهوية" },
