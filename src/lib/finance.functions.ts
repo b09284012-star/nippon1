@@ -2,13 +2,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const BINANCE_HOSTS = [
+  "https://api-gcp.binance.com",
   "https://api.binance.com",
   "https://api1.binance.com",
   "https://api2.binance.com",
   "https://api3.binance.com",
   "https://api4.binance.com",
 ];
-const BINANCE_API = BINANCE_HOSTS[0];
 
 type Signed = { urls: string[]; headers: Record<string, string> };
 
@@ -39,22 +39,54 @@ async function signedRequest(path: string, params: Record<string, string | numbe
   };
 }
 
-/** Try every Binance API host until one answers; returns the response or throws the last error body. */
+function describeBinanceError(status: number, body: string): string {
+  const normalized = body.trim();
+  if (normalized.startsWith("<") || normalized.toLowerCase().includes("<!doctype html")) {
+    return `HTTP ${status}: تم رفض الاتصال من موقع الخادم`;
+  }
+
+  try {
+    const parsed = JSON.parse(normalized) as { code?: number; msg?: string };
+    if (parsed.msg) return `HTTP ${status}: ${parsed.msg}${parsed.code ? ` (${parsed.code})` : ""}`;
+  } catch {
+    // Keep a short plain-text provider response when it is not JSON.
+  }
+  return `HTTP ${status}: ${normalized.slice(0, 200)}`;
+}
+
+/** Try every official Binance API host until one answers. */
 async function binanceFetch(signed: Signed): Promise<Response> {
-  let lastError = "";
+  const errors: string[] = [];
   for (const url of signed.urls) {
     try {
       const res = await fetch(url, { headers: signed.headers });
       if (res.ok) return res;
-      const text = (await res.text()).slice(0, 200);
-      lastError = `HTTP ${res.status}: ${text}`;
-      // Signature/permission errors won't change by host — stop early.
-      if (res.status === 401 || res.status === 403) break;
+      const text = await res.text();
+      const description = describeBinanceError(res.status, text);
+      errors.push(description);
+
+      // JSON responses are account/signature errors and will not change by host.
+      // HTML 403 responses are regional gateway blocks, so continue to the next host.
+      const isHtmlBlock = text.trim().startsWith("<") || text.toLowerCase().includes("<!doctype html");
+      if ((res.status === 401 || res.status === 403) && !isHtmlBlock) break;
     } catch (e) {
-      lastError = e instanceof Error ? e.message : "network error";
+      errors.push(e instanceof Error ? e.message : "network error");
     }
   }
-  throw new Error(`BINANCE_ERROR ${lastError}`);
+  const uniqueErrors = [...new Set(errors)];
+  throw new Error(`BINANCE_ERROR ${uniqueErrors.at(-1) ?? "تعذر الوصول إلى جميع خوادم باينانس"}`);
+}
+
+async function binancePublicFetch(path: string): Promise<Response | null> {
+  for (const host of BINANCE_HOSTS) {
+    try {
+      const response = await fetch(`${host}${path}`);
+      if (response.ok) return response;
+    } catch {
+      // Try the next official endpoint.
+    }
+  }
+  return null;
 }
 
 async function assertAdmin(context: { supabase: { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown }> }; userId: string }) {
@@ -78,8 +110,8 @@ export const getBinanceOverview = createServerFn({ method: "GET" })
       const res = await binanceFetch(account);
       const acc = (await res.json()) as { balances: { asset: string; free: string; locked: string }[] };
 
-      const priceRes = await fetch(`${BINANCE_API}/api/v3/ticker/price`);
-      const prices = priceRes.ok ? ((await priceRes.json()) as { symbol: string; price: string }[]) : [];
+      const priceRes = await binancePublicFetch("/api/v3/ticker/price");
+      const prices = priceRes ? ((await priceRes.json()) as { symbol: string; price: string }[]) : [];
       const priceMap = new Map(prices.map((p) => [p.symbol, Number(p.price)]));
 
       const balances: Balance[] = acc.balances
@@ -148,13 +180,13 @@ export const getBinanceOverview = createServerFn({ method: "GET" })
 /** Public crypto market prices + mining/crypto headlines for the forum news tab. */
 export const getMarketNews = createServerFn({ method: "GET" }).handler(async () => {
   const [priceRes, newsRes] = await Promise.all([
-    fetch(`${BINANCE_API}/api/v3/ticker/24hr`),
+    binancePublicFetch("/api/v3/ticker/24hr"),
     fetch("https://min-api.cryptocompare.com/data/v2/news/?lang=EN&categories=Mining,BTC,ETH,Market"),
   ]);
 
   const watch = ["BTCUSDT", "ETHUSDT", "LTCUSDT", "DOGEUSDT", "KASUSDT", "BNBUSDT"];
   let tickers: { symbol: string; price: number; change: number }[] = [];
-  if (priceRes.ok) {
+  if (priceRes) {
     const all = (await priceRes.json()) as { symbol: string; lastPrice: string; priceChangePercent: string }[];
     tickers = all
       .filter((t) => watch.includes(t.symbol))
