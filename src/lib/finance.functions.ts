@@ -103,8 +103,8 @@ export const getBinanceOverview = createServerFn({ method: "GET" })
         signedRequest("/sapi/v1/capital/withdraw/history", { startTime: since }),
       ]);
       const [depRes, wdRes] = await Promise.all([
-        fetch(dep.url, { headers: dep.headers }),
-        fetch(wd.url, { headers: wd.headers }),
+        binanceFetch(dep).catch(() => null),
+        binanceFetch(wd).catch(() => null),
       ]);
 
       const deposits = depRes.ok
