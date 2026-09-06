@@ -107,10 +107,10 @@ export const getBinanceOverview = createServerFn({ method: "GET" })
         binanceFetch(wd).catch(() => null),
       ]);
 
-      const deposits = depRes.ok
+      const deposits = depRes?.ok
         ? ((await depRes.json()) as { amount: string; coin: string; network: string; status: number; address: string; txId: string; insertTime: number }[])
         : [];
-      const withdrawals = wdRes.ok
+      const withdrawals = wdRes?.ok
         ? ((await wdRes.json()) as { amount: string; coin: string; network: string; status: number; address: string; txId?: string; applyTime: string }[])
         : [];
 
