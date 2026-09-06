@@ -1,19 +1,26 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const BINANCE_API = "https://api.binance.com";
+const BINANCE_HOSTS = [
+  "https://api.binance.com",
+  "https://api1.binance.com",
+  "https://api2.binance.com",
+  "https://api3.binance.com",
+  "https://api4.binance.com",
+];
+const BINANCE_API = BINANCE_HOSTS[0];
 
-type Signed = { url: string; headers: Record<string, string> };
+type Signed = { urls: string[]; headers: Record<string, string> };
 
 async function signedRequest(path: string, params: Record<string, string | number>): Promise<Signed> {
-  const apiKey = process.env["BINANCE_API_KEY"];
-  const secret = process.env["BINANCE_SECRET_KEY"];
+  const apiKey = (process.env["BINANCE_API_KEY"] ?? "").trim();
+  const secret = (process.env["BINANCE_SECRET_KEY"] ?? "").trim();
   if (!apiKey || !secret) throw new Error("BINANCE_KEYS_MISSING");
 
   const query = new URLSearchParams({
     ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])),
     timestamp: String(Date.now()),
-    recvWindow: "20000",
+    recvWindow: "60000",
   });
 
   const key = await crypto.subtle.importKey(
@@ -27,9 +34,27 @@ async function signedRequest(path: string, params: Record<string, string | numbe
   const hex = [...new Uint8Array(sig)].map((b) => b.toString(16).padStart(2, "0")).join("");
 
   return {
-    url: `${BINANCE_API}${path}?${query.toString()}&signature=${hex}`,
+    urls: BINANCE_HOSTS.map((h) => `${h}${path}?${query.toString()}&signature=${hex}`),
     headers: { "X-MBX-APIKEY": apiKey },
   };
+}
+
+/** Try every Binance API host until one answers; returns the response or throws the last error body. */
+async function binanceFetch(signed: Signed): Promise<Response> {
+  let lastError = "";
+  for (const url of signed.urls) {
+    try {
+      const res = await fetch(url, { headers: signed.headers });
+      if (res.ok) return res;
+      const text = (await res.text()).slice(0, 200);
+      lastError = `HTTP ${res.status}: ${text}`;
+      // Signature/permission errors won't change by host — stop early.
+      if (res.status === 401 || res.status === 403) break;
+    } catch (e) {
+      lastError = e instanceof Error ? e.message : "network error";
+    }
+  }
+  throw new Error(`BINANCE_ERROR ${lastError}`);
 }
 
 async function assertAdmin(context: { supabase: { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown }> }; userId: string }) {
