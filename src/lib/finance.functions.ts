@@ -75,12 +75,7 @@ export const getBinanceOverview = createServerFn({ method: "GET" })
 
     try {
       const account = await signedRequest("/api/v3/account", {});
-      const res = await fetch(account.url, { headers: account.headers });
-      if (!res.ok) {
-        const text = await res.text();
-        console.error("binance account error", res.status, text);
-        return { connected: false, error: "BINANCE_ERROR", balances: [], totalUsd: 0, deposits: [], withdrawals: [] };
-      }
+      const res = await binanceFetch(account);
       const acc = (await res.json()) as { balances: { asset: string; free: string; locked: string }[] };
 
       const priceRes = await fetch(`${BINANCE_API}/api/v3/ticker/price`);
