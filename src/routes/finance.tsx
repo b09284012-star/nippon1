@@ -77,7 +77,12 @@ function FinancePage() {
         <div className="glass mt-6 rounded-2xl p-5 text-sm text-muted-foreground">
           {data.error === "BINANCE_KEYS_MISSING"
             ? "لم يتم حفظ مفاتيح باينانس بعد. أضف مفتاح الـ API والمفتاح السري (صلاحية قراءة فقط) لتظهر الأرصدة والحوالات هنا."
-            : "تعذر الاتصال بباينانس حاليًا. تأكد من صلاحية المفاتيح وأن عنوان الخادم مسموح في إعدادات المفتاح."}
+            : "تعذر الاتصال بباينانس. السبب الظاهر من باينانس:"}
+          {data.error && data.error !== "BINANCE_KEYS_MISSING" && (
+            <code className="mt-3 block overflow-x-auto whitespace-nowrap rounded-lg bg-background/70 px-3 py-2 text-xs" dir="ltr">
+              {data.error}
+            </code>
+          )}
         </div>
       )}
 
