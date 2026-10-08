@@ -2,7 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Cpu, Zap, ShieldCheck, Clock, MapPin, Star, MessagesSquare, Minus, Plus, Boxes } from "lucide-react";
+import { Cpu, Zap, ShieldCheck, Clock, MapPin, Star, MessagesSquare, Minus, Plus, Boxes, BadgeCheck, Pencil, Trash2 } from "lucide-react";
+import { useIsOnline } from "@/lib/presence";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -39,7 +40,8 @@ export const Route = createFileRoute("/listings/$id")({
 function ListingDetail() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const { user, profile } = useAuth();
+  const { user, isAdmin } = useAuth();
+  const [editOpen, setEditOpen] = useState(false);
   const [address, setAddress] = useState("");
   const [buying, setBuying] = useState(false);
   const [qty, setQty] = useState(1);
@@ -60,7 +62,7 @@ function ListingDetail() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("id, display_name, avatar_url, bio, country, rating, sales_count")
+        .select("id, display_name, avatar_url, bio, country, rating, sales_count, is_verified_seller")
         .eq("id", listing!.seller_id)
         .maybeSingle();
       return data;
@@ -91,8 +93,6 @@ function ListingDetail() {
 
   const buy = async () => {
     if (!user) { navigate({ to: "/auth" }); return; }
-    if (profile?.kyc_status !== "approved")
-      { toast.error("يجب توثيق هويتك قبل الشراء", { description: "افتح صفحة توثيق الهوية" }); return; }
     if (address.trim().length < 10) { toast.error("أدخل عنوان شحن صحيح"); return; }
     setBuying(true);
     const { error } = await supabase.rpc("create_escrow_order", {
@@ -109,6 +109,19 @@ function ListingDetail() {
   };
 
   if (!listing) return <div className="mx-auto max-w-7xl px-4 py-20">جاري التحميل…</div>;
+
+  const isOwner = user?.id === listing.seller_id || isAdmin;
+
+  const removeListing = async () => {
+    if (!confirm("حذف هذا المنشور نهائيًا؟")) return;
+    const { error } = await supabase.from("listings").delete().eq("id", listing.id);
+    if (error) {
+      const { error: e2 } = await supabase.from("listings").update({ status: "paused" }).eq("id", listing.id);
+      if (e2) { toast.error(e2.message); return; }
+      toast.success("المنشور مرتبط بطلبات سابقة، تم إخفاؤه من السوق");
+    } else toast.success("تم حذف المنشور");
+    navigate({ to: "/market" });
+  };
 
   const onOrder = listing.availability === "on_order";
   const maxQty = onOrder ? 0 : (listing.quantity ?? 1);
@@ -161,7 +174,13 @@ function ListingDetail() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-xs text-muted-foreground">البائع</div>
-                <div className="font-bold">{seller?.display_name ?? "—"}</div>
+                <div className="flex items-center gap-2 font-bold">
+                  {seller?.display_name ?? "—"}
+                  {seller?.is_verified_seller && (
+                    <Badge className="gap-1"><BadgeCheck className="size-3.5" /> بائع معتمد</Badge>
+                  )}
+                </div>
+                <OnlineStatus userId={listing.seller_id} />
               </div>
               <div className="flex items-center gap-1 text-warning">
                 <Star className="size-4 fill-current" />
@@ -172,6 +191,23 @@ function ListingDetail() {
               </div>
             </div>
           </div>
+
+          {isOwner && (
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button variant="outline" onClick={() => setEditOpen(true)}>
+                <Pencil className="size-4" /> تعديل المنشور
+              </Button>
+              <Button variant="destructive" onClick={() => void removeListing()}>
+                <Trash2 className="size-4" /> حذف المنشور
+              </Button>
+              <EditListingDialog
+                open={editOpen}
+                onOpenChange={setEditOpen}
+                listing={listing}
+                onSaved={() => void refetch()}
+              />
+            </div>
+          )}
 
           <div className="mt-6 flex flex-wrap gap-3">
             <Dialog open={open} onOpenChange={setOpen}>
@@ -276,5 +312,96 @@ function Spec({
       </div>
       <div className="mt-1 font-bold">{value}</div>
     </div>
+  );
+}
+
+function OnlineStatus({ userId }: { userId: string }) {
+  const online = useIsOnline(userId);
+  return (
+    <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+      <span className={online ? "size-2 rounded-full bg-primary" : "size-2 rounded-full bg-muted-foreground/50"} />
+      {online ? "متصل الآن" : "غير متصل"}
+    </div>
+  );
+}
+
+type EditableListing = {
+  id: string;
+  title: string;
+  price_usd: number;
+  warranty_months: number;
+  quantity: number;
+  description: string;
+  condition: string;
+  status: "active" | "sold" | "paused";
+};
+
+function EditListingDialog({
+  open,
+  onOpenChange,
+  listing,
+  onSaved,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  listing: EditableListing;
+  onSaved: () => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const title = String(fd.get("title") ?? "").trim();
+    const price = Number(fd.get("price_usd"));
+    const warranty = Number(fd.get("warranty_months"));
+    const quantity = Number(fd.get("quantity"));
+    const description = String(fd.get("description") ?? "").trim();
+    const condition = String(fd.get("condition") ?? "").trim();
+    const status = String(fd.get("status")) as EditableListing["status"];
+    if (title.length < 6 || !(price > 0) || warranty < 0 || quantity < 0 || description.length < 20) {
+      toast.error("تحقق من الحقول (العنوان 6 أحرف، الوصف 20 حرفًا، السعر أكبر من صفر)");
+      return;
+    }
+    setBusy(true);
+    const { error } = await supabase
+      .from("listings")
+      .update({ title, price_usd: price, warranty_months: warranty, quantity, description, condition, status })
+      .eq("id", listing.id);
+    setBusy(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("تم حفظ التعديلات");
+    onOpenChange(false);
+    onSaved();
+  };
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>تعديل المنشور</DialogTitle>
+          <DialogDescription>عدّل السعر أو الكمية أو الوصف ثم احفظ.</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={onSubmit} className="grid gap-3">
+          <div><Label className="mb-1 block">العنوان</Label><Input name="title" defaultValue={listing.title} /></div>
+          <div className="grid grid-cols-3 gap-3">
+            <div><Label className="mb-1 block">السعر</Label><Input name="price_usd" type="number" step="0.01" defaultValue={listing.price_usd} /></div>
+            <div><Label className="mb-1 block">الضمان (شهر)</Label><Input name="warranty_months" type="number" defaultValue={listing.warranty_months} /></div>
+            <div><Label className="mb-1 block">الكمية</Label><Input name="quantity" type="number" defaultValue={listing.quantity} /></div>
+          </div>
+          <div><Label className="mb-1 block">الحالة</Label><Input name="condition" defaultValue={listing.condition} /></div>
+          <div>
+            <Label className="mb-1 block">حالة العرض</Label>
+            <select name="status" defaultValue={listing.status} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+              <option value="active">معروض</option>
+              <option value="paused">مخفي مؤقتًا</option>
+              <option value="sold">تم البيع</option>
+            </select>
+          </div>
+          <div><Label className="mb-1 block">الوصف</Label><Textarea name="description" defaultValue={listing.description} /></div>
+          <DialogFooter>
+            <Button type="submit" disabled={busy}>{busy ? "جارٍ الحفظ…" : "حفظ"}</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

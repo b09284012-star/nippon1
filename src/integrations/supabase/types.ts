@@ -356,6 +356,7 @@ export type Database = {
           created_at: string
           display_name: string
           id: string
+          is_verified_seller: boolean
           kyc_status: Database["public"]["Enums"]["kyc_status"]
           rating: number
           sales_count: number
@@ -367,6 +368,7 @@ export type Database = {
           created_at?: string
           display_name?: string
           id: string
+          is_verified_seller?: boolean
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
           rating?: number
           sales_count?: number
@@ -378,6 +380,7 @@ export type Database = {
           created_at?: string
           display_name?: string
           id?: string
+          is_verified_seller?: boolean
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
           rating?: number
           sales_count?: number
@@ -418,6 +421,44 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_private_info: {
+        Row: {
+          address: string
+          city: string | null
+          country: string | null
+          full_name: string
+          phone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string
+          city?: string | null
+          country?: string | null
+          full_name?: string
+          phone?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          city?: string | null
+          country?: string | null
+          full_name?: string
+          phone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_private_info_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -511,6 +552,7 @@ export type Database = {
           address: string
           amount: number
           created_at: string
+          fee: number
           id: string
           network: string
           processed_at: string | null
@@ -524,6 +566,7 @@ export type Database = {
           address: string
           amount: number
           created_at?: string
+          fee?: number
           id?: string
           network?: string
           processed_at?: string | null
@@ -537,6 +580,7 @@ export type Database = {
           address?: string
           amount?: number
           created_at?: string
+          fee?: number
           id?: string
           network?: string
           processed_at?: string | null
@@ -553,6 +597,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_finance_summary: {
+        Args: never
+        Returns: {
+          earned_fees: number
+          expected_fees: number
+          held_fees: number
+          listed_count: number
+          listed_value: number
+          withdrawal_fees: number
+        }[]
+      }
       admin_list_deposits: {
         Args: never
         Returns: {
@@ -610,6 +665,29 @@ export type Database = {
         Args: { _make_admin: boolean; _user_id: string }
         Returns: undefined
       }
+      admin_set_verified_seller: {
+        Args: { _user_id: string; _verified: boolean }
+        Returns: undefined
+      }
+      admin_users_full: {
+        Args: never
+        Returns: {
+          address: string
+          balance: number
+          city: string
+          country: string
+          created_at: string
+          deposit_tag: string
+          display_name: string
+          email: string
+          full_name: string
+          held: number
+          id: string
+          is_admin: boolean
+          is_verified_seller: boolean
+          phone: string
+        }[]
+      }
       approve_deposit: { Args: { _id: string }; Returns: undefined }
       approve_withdrawal: {
         Args: { _id: string; _tx_hash?: string }
@@ -655,6 +733,19 @@ export type Database = {
       request_withdrawal: {
         Args: { _address: string; _amount: number }
         Returns: string
+      }
+      search_user_by_wallet: {
+        Args: { _tag: string }
+        Returns: {
+          avatar_url: string
+          created_at: string
+          deposit_tag: string
+          display_name: string
+          id: string
+          is_verified_seller: boolean
+          rating: number
+          sales_count: number
+        }[]
       }
       set_deposit_address: {
         Args: {

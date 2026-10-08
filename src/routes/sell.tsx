@@ -44,7 +44,7 @@ const schema = z.object({
 });
 
 function SellPage() {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const [files, setFiles] = useState<FileList | null>(null);
   const [busy, setBusy] = useState(false);
@@ -62,7 +62,7 @@ function SellPage() {
     );
   }
 
-  const verified = profile?.kyc_status === "approved";
+  const verified = Boolean(profile?.is_verified_seller) || isAdmin;
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -110,15 +110,14 @@ function SellPage() {
         أضف <span className="neon-text">عرض</span>
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        السعر ومدة الضمان حقول إلزامية، والنشر متاح للحسابات الموثّقة فقط.
+        السعر ومدة الضمان حقول إلزامية، والنشر متاح للبائعين المعتمدين من الإدارة فقط.
       </p>
 
       {!verified && (
         <div className="glass mt-6 rounded-2xl border border-accent/40 p-5">
-          <p className="text-sm">يجب توثيق هويتك قبل نشر أي عرض.</p>
-          <Button className="mt-3" size="sm" onClick={() => navigate({ to: "/verify" })}>
-            توثيق الهوية
-          </Button>
+          <p className="text-sm">
+            حسابك ليس بائعًا معتمدًا بعد. تواصل مع الدعم ليعتمدك فريق الإدارة كبائع موثوق ثم يمكنك النشر.
+          </p>
         </div>
       )}
 

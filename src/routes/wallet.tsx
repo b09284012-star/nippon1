@@ -260,7 +260,7 @@ function WalletPage() {
           <ArrowUpFromLine className="size-5 text-primary" /> سحب الرصيد
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          يُخصم المبلغ فور إرسال الطلب ويُراجع يدويًا من الإدارة. في حال الرفض يُعاد المبلغ لرصيدك.
+          رسوم السحب 2.5 دولار تُضاف على المبلغ. يُخصم المبلغ مع الرسوم فور إرسال الطلب ويُراجع من الإدارة، وفي حال الرفض يُعاد كاملًا.
         </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-[10rem_1fr_auto] sm:items-end">
           <div>
@@ -288,8 +288,8 @@ function WalletPage() {
                 toast.error("أقل مبلغ للسحب 10 USDT");
                 return;
               }
-              if (n > Number(wallet?.balance ?? 0)) {
-                toast.error("الرصيد المتاح غير كافٍ");
+              if (n + 2.5 > Number(wallet?.balance ?? 0)) {
+                toast.error("الرصيد غير كافٍ (المبلغ + رسوم 2.5 دولار)");
                 return;
               }
               if (wdAddress.length < 20) {

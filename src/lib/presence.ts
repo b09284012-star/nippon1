@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const CHANNEL = "online-users";
 
-type Listener = (count: number) => void;
+type Listener = (count: number, keys: Set<string>) => void;
 
 let channel: RealtimeChannel | null = null;
 let refs = 0;
@@ -14,8 +14,8 @@ let payload: Record<string, unknown> = {};
 
 function emit() {
   if (!channel) return;
-  const count = Object.keys(channel.presenceState()).length;
-  listeners.forEach((l) => l(count));
+  const keys = new Set(Object.keys(channel.presenceState()));
+  listeners.forEach((l) => l(keys.size, keys));
 }
 
 /** Creates (once) the shared presence channel with all handlers before subscribe. */
@@ -81,4 +81,21 @@ export function useOnlineCount(enabled: boolean) {
   }, [enabled]);
 
   return count;
+}
+
+/** Whether a specific user is currently online (Instagram-style indicator). */
+export function useIsOnline(userId: string | null | undefined) {
+  const [online, setOnline] = useState(false);
+  useEffect(() => {
+    if (!userId) return;
+    acquire(`watch-${Math.random().toString(36).slice(2, 10)}`);
+    const listener: Listener = (_n, keys) => setOnline(keys.has(userId));
+    listeners.add(listener);
+    emit();
+    return () => {
+      listeners.delete(listener);
+      release();
+    };
+  }, [userId]);
+  return online;
 }
