@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791422305504,
+      "tag": "0000_remove_kyc_verified_sellers_fees",
+      "breakpoints": true
+    }
+  ]
+}
