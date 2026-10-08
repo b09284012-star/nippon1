@@ -17,6 +17,7 @@ import { Route as ForumRouteImport } from './routes/forum'
 import { Route as MarketRouteImport } from './routes/market'
 import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as SellRouteImport } from './routes/sell'
+import { Route as UsersRouteImport } from './routes/users'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as ChatIndexRouteImport } from './routes/chat.index'
 import { Route as ChatIdRouteImport } from './routes/chat.$id'
@@ -63,6 +64,11 @@ const SellRoute = SellRouteImport.update({
   path: '/sell',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UsersRoute = UsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WalletRoute = WalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/market': typeof MarketRoute
   '/orders': typeof OrdersRoute
   '/sell': typeof SellRoute
+  '/users': typeof UsersRoute
   '/wallet': typeof WalletRoute
   '/chat/$id': typeof ChatIdRoute
   '/listings/$id': typeof ListingsIdRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   '/market': typeof MarketRoute
   '/orders': typeof OrdersRoute
   '/sell': typeof SellRoute
+  '/users': typeof UsersRoute
   '/wallet': typeof WalletRoute
   '/chat/$id': typeof ChatIdRoute
   '/listings/$id': typeof ListingsIdRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/market': typeof MarketRoute
   '/orders': typeof OrdersRoute
   '/sell': typeof SellRoute
+  '/users': typeof UsersRoute
   '/wallet': typeof WalletRoute
   '/chat/$id': typeof ChatIdRoute
   '/listings/$id': typeof ListingsIdRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '/market'
     | '/orders'
     | '/sell'
+    | '/users'
     | '/wallet'
     | '/chat/$id'
     | '/listings/$id'
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
     | '/market'
     | '/orders'
     | '/sell'
+    | '/users'
     | '/wallet'
     | '/chat/$id'
     | '/listings/$id'
@@ -176,6 +187,7 @@ export interface FileRouteTypes {
     | '/market'
     | '/orders'
     | '/sell'
+    | '/users'
     | '/wallet'
     | '/chat/$id'
     | '/listings/$id'
@@ -192,6 +204,7 @@ export interface RootRouteChildren {
   MarketRoute: typeof MarketRoute
   OrdersRoute: typeof OrdersRoute
   SellRoute: typeof SellRoute
+  UsersRoute: typeof UsersRoute
   WalletRoute: typeof WalletRoute
   ChatIdRoute: typeof ChatIdRoute
   ListingsIdRoute: typeof ListingsIdRoute
@@ -257,6 +270,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SellRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/users': {
+      id: '/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof UsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/wallet': {
       id: '/wallet'
       path: '/wallet'
@@ -304,6 +324,7 @@ const rootRouteChildren: RootRouteChildren = {
   MarketRoute: MarketRoute,
   OrdersRoute: OrdersRoute,
   SellRoute: SellRoute,
+  UsersRoute: UsersRoute,
   WalletRoute: WalletRoute,
   ChatIdRoute: ChatIdRoute,
   ListingsIdRoute: ListingsIdRoute,
