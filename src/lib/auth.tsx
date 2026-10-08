@@ -11,6 +11,7 @@ export type Profile = {
   kyc_status: "none" | "pending" | "approved" | "rejected";
   rating: number;
   sales_count: number;
+  is_verified_seller: boolean;
 };
 
 type AuthValue = {
