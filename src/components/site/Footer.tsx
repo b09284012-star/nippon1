@@ -31,7 +31,7 @@ export function Footer() {
           <h4 className="text-sm font-bold">الأمان</h4>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             <li>
-              <Link to="/verify">توثيق الهوية</Link>
+              <Link to="/market">السوق</Link>
             </li>
             <li>
               <Link to="/orders">حماية المشتري</Link>

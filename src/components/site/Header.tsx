@@ -13,7 +13,6 @@ const links = [
   { to: "/forum", label: "المنتدى" },
   { to: "/orders", label: "طلباتي" },
   { to: "/wallet", label: "المحفظة" },
-  { to: "/verify", label: "توثيق الهوية" },
 ] as const;
 
 export function Header() {
