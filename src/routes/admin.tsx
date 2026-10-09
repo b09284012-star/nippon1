@@ -19,7 +19,7 @@ export const Route = createFileRoute("/admin")({
       { title: "لوحة الإدارة | Nippon" },
       {
         name: "description",
-        content: "مراجعة طلبات السحب، توثيق الهوية، النزاعات، وإدارة صلاحيات المستخدمين في Nippon.",
+        content: "مراجعة طلبات السحب، البائعين المعتمدين، النزاعات، وإدارة صلاحيات المستخدمين في Nippon.",
       },
       { property: "og:title", content: "لوحة الإدارة | Nippon" },
       { property: "og:description", content: "إدارة كاملة لمنصة Nippon لبيع أجهزة التعدين." },
@@ -55,7 +55,7 @@ function AdminPage() {
     queryKey: ["admin-users"],
     enabled: isAdmin,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_list_users");
+      const { data, error } = await supabase.rpc("admin_users_full");
       if (error) throw error;
       return data ?? [];
     },
@@ -85,17 +85,7 @@ function AdminPage() {
 
   const onlineCount = useOnlineCount(isAdmin);
 
-  const kyc = useQuery({
-    queryKey: ["admin-kyc"],
-    enabled: isAdmin,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("kyc_submissions")
-        .select("*")
-        .order("created_at", { ascending: false });
-      return data ?? [];
-    },
-  });
+  const [q, setQ] = useState("");
 
   const disputes = useQuery({
     queryKey: ["admin-disputes"],
@@ -160,9 +150,6 @@ function AdminPage() {
           <TabsTrigger value="users">
             <Users className="size-4" /> إدارة المستخدمين
           </TabsTrigger>
-          <TabsTrigger value="kyc">
-            <ShieldCheck className="size-4" /> توثيق الهوية
-          </TabsTrigger>
           <TabsTrigger value="disputes">
             <Gavel className="size-4" /> النزاعات
           </TabsTrigger>
@@ -187,110 +174,62 @@ function AdminPage() {
         </TabsContent>
 
 
-        <TabsContent value="users" className="mt-6 overflow-x-auto">
-          <table className="w-full min-w-[640px] text-sm">
-            <thead className="text-start text-xs text-muted-foreground">
-              <tr>
-                <th className="p-3 text-start">الاسم</th>
-                <th className="p-3 text-start">البريد الإلكتروني</th>
-                <th className="p-3 text-start">الرصيد</th>
-                <th className="p-3 text-start">الصلاحية</th>
-                <th className="p-3 text-start">مدير</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/60">
-              {(users.data ?? []).map((u) => (
-                <tr key={u.id} className="glass">
-                  <td className="p-3">{u.display_name ?? "—"}</td>
-                  <td className="p-3 text-muted-foreground">{u.email}</td>
-                  <td className="p-3">{formatUsd(u.balance ?? 0)}</td>
-                  <td className="p-3">
-                    <Badge variant={u.is_admin ? "default" : "secondary"}>
-                      {u.is_admin ? "مدير" : "مستخدم"}
-                    </Badge>
-                  </td>
-                  <td className="p-3">
+        <TabsContent value="users" className="mt-6 grid gap-3">
+          <Input
+            value={q}
+            onChange={(e) => setQ(e.target.value.slice(0, 60))}
+            placeholder="ابحث بمعرّف المحفظة (NPN-...) أو الاسم أو البريد أو الهاتف"
+          />
+          {(users.data ?? [])
+            .filter((u) => {
+              const t = q.trim().toLowerCase();
+              if (!t) return true;
+              return [u.deposit_tag, u.display_name, u.full_name, u.email, u.phone].some((v) => (v ?? "").toLowerCase().includes(t));
+            })
+            .map((u) => (
+              <div key={u.id} className="glass rounded-2xl p-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-display font-bold">{u.display_name ?? "—"}</span>
+                  {u.is_admin && <Badge>مدير</Badge>}
+                  {u.is_verified_seller && <Badge variant="secondary" className="gap-1"><ShieldCheck className="size-3.5" /> بائع معتمد</Badge>}
+                  <code className="ms-auto text-xs" dir="ltr">{u.deposit_tag}</code>
+                </div>
+                <div className="mt-3 grid gap-1 text-xs text-muted-foreground sm:grid-cols-2">
+                  <span>الاسم الحقيقي: {u.full_name || "—"}</span>
+                  <span>البريد: {u.email}</span>
+                  <span>الهاتف: {u.phone || "—"}</span>
+                  <span>الدولة/المدينة: {[u.country, u.city].filter(Boolean).join(" - ") || "—"}</span>
+                  <span className="sm:col-span-2">العنوان: {u.address || "—"}</span>
+                  <span>الرصيد: {formatUsd(u.balance ?? 0)} • محجوز: {formatUsd(u.held ?? 0)}</span>
+                  <span>التسجيل: {formatDate(u.created_at)}</span>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-6 text-sm">
+                  <label className="flex items-center gap-2">
+                    <Switch
+                      checked={Boolean(u.is_verified_seller)}
+                      onCheckedChange={async (v) => {
+                        const { error } = await supabase.rpc("admin_set_verified_seller", { _user_id: u.id, _verified: v });
+                        if (error) toast.error(error.message);
+                        else { toast.success(v ? "تم اعتماده كبائع" : "تم إلغاء الاعتماد"); void users.refetch(); }
+                      }}
+                    />
+                    بائع معتمد
+                  </label>
+                  <label className="flex items-center gap-2">
                     <Switch
                       checked={Boolean(u.is_admin)}
                       disabled={u.id === user.id}
                       onCheckedChange={async (v) => {
-                        const { error } = await supabase.rpc("admin_set_user_role", {
-                          _user_id: u.id,
-                          _make_admin: v,
-                        });
+                        const { error } = await supabase.rpc("admin_set_user_role", { _user_id: u.id, _make_admin: v });
                         if (error) toast.error(error.message);
-                        else {
-                          toast.success("تم تحديث الصلاحية");
-                          void users.refetch();
-                        }
+                        else { toast.success("تم تحديث الصلاحية"); void users.refetch(); }
                       }}
                     />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </TabsContent>
-
-        <TabsContent value="kyc" className="mt-6 grid gap-4">
-          {(kyc.data ?? []).length === 0 && (
-            <p className="text-sm text-muted-foreground">لا طلبات توثيق.</p>
-          )}
-          {(kyc.data ?? []).map((k) => (
-            <div key={k.id} className="glass rounded-2xl p-5">
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="font-display font-bold">{k.full_name}</span>
-                <Badge variant="secondary">{k.status}</Badge>
-                <span className="text-xs text-muted-foreground">{formatDate(k.created_at)}</span>
-              </div>
-              <p className="mt-2 text-xs text-muted-foreground">
-                رقم المستند: {k.document_number} — {k.country ?? "—"}
-              </p>
-              {k.status === "pending" && (
-                <div className="mt-4 flex gap-2">
-                  <Button
-                    size="sm"
-                    onClick={async () => {
-                      const [a, b] = await Promise.all([
-                        supabase
-                          .from("kyc_submissions")
-                          .update({ status: "approved", reviewed_at: new Date().toISOString() })
-                          .eq("id", k.id),
-                        supabase.from("profiles").update({ kyc_status: "approved" }).eq("id", k.user_id),
-                      ]);
-                      if (a.error || b.error) toast.error(a.error?.message ?? b.error?.message ?? "");
-                      else {
-                        toast.success("تم القبول");
-                        void kyc.refetch();
-                      }
-                    }}
-                  >
-                    قبول
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={async () => {
-                      const [a, b] = await Promise.all([
-                        supabase
-                          .from("kyc_submissions")
-                          .update({ status: "rejected", reviewed_at: new Date().toISOString() })
-                          .eq("id", k.id),
-                        supabase.from("profiles").update({ kyc_status: "rejected" }).eq("id", k.user_id),
-                      ]);
-                      if (a.error || b.error) toast.error(a.error?.message ?? b.error?.message ?? "");
-                      else {
-                        toast.success("تم الرفض");
-                        void kyc.refetch();
-                      }
-                    }}
-                  >
-                    رفض
-                  </Button>
+                    مدير
+                  </label>
                 </div>
-              )}
-            </div>
-          ))}
+              </div>
+            ))}
         </TabsContent>
 
         <TabsContent value="disputes" className="mt-6 grid gap-4">
