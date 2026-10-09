@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth";
 import { formatDate, formatUsd } from "@/lib/media";
 import { getBinanceOverview } from "@/lib/finance.functions";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/finance")({
   head: () => ({
@@ -36,6 +37,28 @@ function FinancePage() {
     enabled: isAdmin,
     refetchInterval: 60000,
     queryFn: () => fetchOverview(),
+  });
+
+  const summary = useQuery({
+    queryKey: ["finance-summary"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_finance_summary");
+      if (error) throw error;
+      return data?.[0] ?? null;
+    },
+  });
+  const ledger = useQuery({
+    queryKey: ["finance-ledger"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const [d, w] = await Promise.all([supabase.rpc("admin_list_deposits"), supabase.rpc("admin_list_withdrawals")]);
+      const rows = [
+        ...(d.data ?? []).map((x) => ({ id: x.id, kind: "إيداع", name: x.display_name ?? x.email, email: x.email, amount: Number(x.amount), status: x.status, ref: x.txid, at: x.created_at })),
+        ...(w.data ?? []).map((x) => ({ id: x.id, kind: "سحب", name: x.display_name ?? x.email, email: x.email, amount: Number(x.amount), status: x.status, ref: x.address, at: x.created_at })),
+      ];
+      return rows.sort((a, b) => b.at.localeCompare(a.at));
+    },
   });
 
   if (loading) return <div className="px-4 py-20 text-center text-muted-foreground">جارٍ التحميل…</div>;
@@ -92,6 +115,21 @@ function FinancePage() {
         <div className="mt-1 font-display text-4xl font-black">{formatUsd(data?.totalUsd ?? 0)}</div>
       </div>
 
+      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          ["قيمة الأجهزة المعروضة", formatUsd(Number(summary.data?.listed_value ?? 0)), `${summary.data?.listed_count ?? 0} عرض نشط`],
+          ["أرباح متوقعة (2.5%)", formatUsd(Number(summary.data?.expected_fees ?? 0)), "من الأجهزة المعروضة"],
+          ["أرباح محققة", formatUsd(Number(summary.data?.earned_fees ?? 0)), `+ ${formatUsd(Number(summary.data?.held_fees ?? 0))} في الضمان`],
+          ["رسوم السحب", formatUsd(Number(summary.data?.withdrawal_fees ?? 0)), "2.5$ لكل سحب مكتمل"],
+        ].map(([l, v, h]) => (
+          <div key={l} className="glass card-3d rounded-2xl p-5">
+            <div className="text-xs text-muted-foreground">{l}</div>
+            <div className="mt-1 font-display text-2xl font-black">{v}</div>
+            <div className="mt-1 text-xs text-muted-foreground">{h}</div>
+          </div>
+        ))}
+      </div>
+
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {(data?.balances ?? []).map((b) => (
           <div key={b.asset} className="glass card-3d rounded-2xl p-4">
@@ -109,8 +147,9 @@ function FinancePage() {
         ))}
       </div>
 
-      <Tabs defaultValue="deposits" className="mt-10">
+      <Tabs defaultValue="ledger" className="mt-10">
         <TabsList>
+          <TabsTrigger value="ledger">سجل المستخدمين</TabsTrigger>
           <TabsTrigger value="deposits">
             <ArrowDownToLine className="size-4" /> الإيداعات
           </TabsTrigger>
@@ -118,6 +157,25 @@ function FinancePage() {
             <ArrowUpFromLine className="size-4" /> السحوبات
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="ledger" className="mt-6 grid gap-3">
+          {(ledger.data ?? []).length === 0 && <p className="text-sm text-muted-foreground">لا عمليات بعد.</p>}
+          {(ledger.data ?? []).map((r) => (
+            <div key={r.id} className="glass rounded-2xl p-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <Badge variant={r.kind === "إيداع" ? "default" : "secondary"}>{r.kind}</Badge>
+                <span className="font-bold">{r.name}</span>
+                <span className="text-xs text-muted-foreground">{r.email}</span>
+                <span className="ms-auto font-display font-black">{formatUsd(r.amount)}</span>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted-foreground">
+                <span>{r.status === "completed" ? "مكتمل" : r.status === "rejected" ? "مرفوض" : "قيد الانتظار"}</span>
+                <code className="truncate" dir="ltr">{r.ref}</code>
+                <span className="ms-auto">{formatDate(r.at)}</span>
+              </div>
+            </div>
+          ))}
+        </TabsContent>
 
         <TabsContent value="deposits" className="mt-6 grid gap-3">
           {(data?.deposits ?? []).length === 0 && (

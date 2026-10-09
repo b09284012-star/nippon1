@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/media";
+import { useIsOnline } from "@/lib/presence";
 
 export const Route = createFileRoute("/chat/$id")({
   head: () => ({
@@ -32,6 +33,19 @@ function ChatRoomPage() {
   const navigate = useNavigate();
   const [text, setText] = useState("");
   const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  const { data: other } = useQuery({
+    queryKey: ["conv-other", id, user?.id],
+    enabled: Boolean(user),
+    queryFn: async () => {
+      const { data: c } = await supabase.from("conversations").select("buyer_id, seller_id").eq("id", id).maybeSingle();
+      if (!c) return null;
+      const otherId = c.buyer_id === user!.id ? c.seller_id : c.buyer_id;
+      const { data: p } = await supabase.from("profiles").select("id, display_name").eq("id", otherId).maybeSingle();
+      return p;
+    },
+  });
+  const otherOnline = useIsOnline(other?.id);
 
   const { data: messages, refetch } = useQuery({
     queryKey: ["messages", id],
@@ -92,7 +106,16 @@ function ChatRoomPage() {
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col px-4 py-10">
-      <h1 className="font-display text-2xl font-black">المحادثة</h1>
+      <div className="flex items-center gap-3">
+        <div className="relative grid size-11 place-items-center rounded-full bg-secondary font-bold">
+          {(other?.display_name ?? "؟").slice(0, 1)}
+          <span className={cn("absolute bottom-0 end-0 size-3 rounded-full border-2 border-background", otherOnline ? "bg-primary" : "bg-muted-foreground/50")} />
+        </div>
+        <div>
+          <h1 className="font-display text-xl font-black">{other?.display_name ?? "المحادثة"}</h1>
+          <p className="text-xs text-muted-foreground">{otherOnline ? "نشط الآن" : "غير متصل"}</p>
+        </div>
+      </div>
       <div className="glass mt-6 grid max-h-[60vh] gap-3 overflow-y-auto rounded-3xl p-5">
         {(messages ?? []).length === 0 && (
           <p className="text-sm text-muted-foreground">ابدأ المحادثة برسالة.</p>

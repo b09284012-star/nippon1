@@ -11,7 +11,6 @@ const links = [
   { to: "/sell", label: "أضف عرض" },
   { to: "/chat", label: "الدردشة" },
   { to: "/forum", label: "المنتدى" },
-  { to: "/users", label: "بحث مستخدم" },
   { to: "/orders", label: "طلباتي" },
   { to: "/wallet", label: "المحفظة" },
 ] as const;

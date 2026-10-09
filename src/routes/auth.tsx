@@ -34,6 +34,11 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [country, setCountry] = useState("");
+  const [city, setCity] = useState("");
+  const [addr, setAddr] = useState("");
 
   useEffect(() => {
     if (user) void navigate({ to: "/market" });
@@ -52,13 +57,17 @@ function AuthPage() {
   const signUp = async () => {
     const parsed = schema.safeParse({ email, password, name });
     if (!parsed.success) { toast.error(parsed.error.issues[0]?.message); return; }
+    if (fullName.trim().length < 5) { toast.error("أدخل الاسم الحقيقي الكامل"); return; }
+    if (phone.trim().length < 7) { toast.error("أدخل رقم هاتف صحيح"); return; }
+    if (country.trim().length < 2 || city.trim().length < 2) { toast.error("أدخل الدولة والمدينة"); return; }
+    if (addr.trim().length < 8) { toast.error("أدخل العنوان بالتفصيل"); return; }
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/market`,
-        data: { display_name: name },
+        data: { display_name: name, full_name: fullName.trim(), phone: phone.trim(), country: country.trim(), city: city.trim(), address: addr.trim() },
       },
     });
     setLoading(false);
@@ -100,7 +109,15 @@ function AuthPage() {
           </TabsContent>
 
           <TabsContent value="signup" className="space-y-4 pt-4">
-            <Field label="الاسم الظاهر" value={name} onChange={setName} />
+            <Field label="الاسم الظاهر للمستخدمين (يمكن أن يكون وهميًا)" value={name} onChange={setName} />
+            <Field label="الاسم الحقيقي الكامل" value={fullName} onChange={setFullName} />
+            <Field label="رقم الهاتف" value={phone} onChange={setPhone} type="tel" />
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="الدولة" value={country} onChange={setCountry} />
+              <Field label="المدينة" value={city} onChange={setCity} />
+            </div>
+            <Field label="العنوان بالتفصيل" value={addr} onChange={setAddr} />
+            <p className="text-xs text-muted-foreground">بياناتك الحقيقية تظهر للإدارة فقط، والآخرون يرون الاسم الظاهر فقط.</p>
             <Field label="البريد الإلكتروني" value={email} onChange={setEmail} type="email" />
             <Field
               label="كلمة المرور"
