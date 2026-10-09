@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Cpu, Zap, ShieldCheck, Clock, MapPin, Star, MessagesSquare, Minus, Plus, Boxes, BadgeCheck, Pencil, Trash2 } from "lucide-react";
@@ -40,6 +40,7 @@ export const Route = createFileRoute("/listings/$id")({
 function ListingDetail() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user, isAdmin } = useAuth();
   const [editOpen, setEditOpen] = useState(false);
   const [address, setAddress] = useState("");
@@ -120,6 +121,8 @@ function ListingDetail() {
       if (e2) { toast.error(e2.message); return; }
       toast.success("المنشور مرتبط بطلبات سابقة، تم إخفاؤه من السوق");
     } else toast.success("تم حذف المنشور");
+    await queryClient.invalidateQueries({ queryKey: ["listings"] });
+    await queryClient.invalidateQueries({ queryKey: ["latest-listings"] });
     navigate({ to: "/market" });
   };
 
