@@ -8,6 +8,13 @@
       "when": 1791422305504,
       "tag": "0000_remove_kyc_verified_sellers_fees",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791514911908,
+      "tag": "0001_restrict_public_reads_to_authenticated",
+      "breakpoints": true
     }
   ]
 }
