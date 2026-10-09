@@ -40,6 +40,7 @@ export const Route = createFileRoute("/listings/$id")({
 function ListingDetail() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user, isAdmin } = useAuth();
   const [editOpen, setEditOpen] = useState(false);
   const [address, setAddress] = useState("");
