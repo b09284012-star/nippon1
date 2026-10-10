@@ -55,11 +55,11 @@ function describeBinanceError(status: number, body: string): string {
 }
 
 /** Try every official Binance API host until one answers. */
-async function binanceFetch(signed: Signed): Promise<Response> {
+async function binanceFetch(signed: Signed, method: "GET" | "POST" = "GET"): Promise<Response> {
   const errors: string[] = [];
   for (const url of signed.urls) {
     try {
-      const res = await fetch(url, { headers: signed.headers });
+      const res = await fetch(url, { method, headers: signed.headers });
       if (res.ok) return res;
       const text = await res.text();
       const description = describeBinanceError(res.status, text);
@@ -114,16 +114,38 @@ export const getBinanceOverview = createServerFn({ method: "GET" })
       const prices = priceRes ? ((await priceRes.json()) as { symbol: string; price: string }[]) : [];
       const priceMap = new Map(prices.map((p) => [p.symbol, Number(p.price)]));
 
-      const balances: Balance[] = acc.balances
-        .map((b) => {
-          const free = Number(b.free);
-          const locked = Number(b.locked);
+      // Merge Spot + Funding wallet (USDT deposits usually land in Funding).
+      const totals = new Map<string, { free: number; locked: number }>();
+      const add = (asset: string, free: number, locked: number) => {
+        const cur = totals.get(asset) ?? { free: 0, locked: 0 };
+        totals.set(asset, { free: cur.free + free, locked: cur.locked + locked });
+      };
+      for (const b of acc.balances) add(b.asset, Number(b.free), Number(b.locked));
+      try {
+        const fundingReq = await signedRequest("/sapi/v1/asset/get-funding-asset", {});
+        const fRes = await binanceFetch(fundingReq, "POST");
+        const funding = (await fRes.json()) as { asset: string; free: string; locked: string; freeze: string }[];
+        for (const f of funding) add(f.asset, Number(f.free), Number(f.locked) + Number(f.freeze ?? 0));
+      } catch {
+        // Funding wallet optional.
+      }
+      try {
+        const earnReq = await signedRequest("/sapi/v1/simple-earn/flexible/position", { size: 100 });
+        const eRes = await binanceFetch(earnReq);
+        const earn = (await eRes.json()) as { rows?: { asset: string; totalAmount: string }[] };
+        for (const r of earn.rows ?? []) add(r.asset, 0, Number(r.totalAmount));
+      } catch {
+        // Earn optional.
+      }
+
+      const balances: Balance[] = [...totals.entries()]
+        .map(([asset, { free, locked }]) => {
           const total = free + locked;
           const usd =
-            b.asset === "USDT" || b.asset === "BUSD" || b.asset === "USDC"
+            asset === "USDT" || asset === "BUSD" || asset === "USDC" || asset === "FDUSD"
               ? total
-              : total * (priceMap.get(`${b.asset}USDT`) ?? 0);
-          return { asset: b.asset, free, locked, usdValue: usd };
+              : total * (priceMap.get(`${asset}USDT`) ?? 0);
+          return { asset, free, locked, usdValue: usd };
         })
         .filter((b) => b.free + b.locked > 0)
         .sort((a, b) => b.usdValue - a.usdValue)

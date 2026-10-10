@@ -53,6 +53,12 @@ export function Header() {
               >
                 اللوحة المالية
               </Link>
+              <Link
+                to="/profits"
+                className="rounded-lg px-3 py-2 text-sm text-accent transition-colors hover:bg-secondary"
+              >
+                الأرباح
+              </Link>
             </>
           )}
         </nav>
@@ -108,6 +114,9 @@ export function Header() {
               </Link>
               <Link to="/finance" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm text-accent">
                 اللوحة المالية
+              </Link>
+              <Link to="/profits" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm text-accent">
+                الأرباح
               </Link>
             </>
           )}
