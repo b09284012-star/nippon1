@@ -7,7 +7,7 @@ export function Footer() {
     <footer className="mt-24 border-t border-border/60 bg-card/40">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <img src={logo.url} alt="شعار Nippon Mining" className="h-12 w-auto" />
+          <img src={logo.url} alt="شعار Nippon Mining" className="h-12 w-auto brightness-125 drop-shadow-[0_0_10px_var(--color-primary)]" />
           <p className="mt-3 text-sm text-muted-foreground">
             سوق موثوق لبيع وشراء أجهزة تعدين العملات الرقمية المستعملة، مع حماية كاملة للمشتري
             وتوثيق للهوية.
