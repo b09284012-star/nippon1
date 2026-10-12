@@ -24,7 +24,7 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
         <Link to="/" className="flex items-center gap-2">
-          <img src={logo.url} alt="شعار Nippon Mining" className="h-9 w-auto" />
+          <img src={logo.url} alt="شعار Nippon Mining" className="h-10 w-auto brightness-125 drop-shadow-[0_0_10px_var(--color-primary)]" />
           <span className="font-display text-xl font-extrabold tracking-tight">Nippon</span>
         </Link>
 
@@ -51,13 +51,7 @@ export function Header() {
                 to="/finance"
                 className="rounded-lg px-3 py-2 text-sm text-accent transition-colors hover:bg-secondary"
               >
-                اللوحة المالية
-              </Link>
-              <Link
-                to="/profits"
-                className="rounded-lg px-3 py-2 text-sm text-accent transition-colors hover:bg-secondary"
-              >
-                الأرباح
+                المالية والمبيعات
               </Link>
             </>
           )}
@@ -113,10 +107,7 @@ export function Header() {
                 الإدارة
               </Link>
               <Link to="/finance" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm text-accent">
-                اللوحة المالية
-              </Link>
-              <Link to="/profits" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm text-accent">
-                الأرباح
+                المالية والمبيعات
               </Link>
             </>
           )}

@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth";
 import { formatDate, formatUsd } from "@/lib/media";
 import { getBinanceOverview } from "@/lib/finance.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { ProfitsAnalytics } from "@/components/site/ProfitsAnalytics";
 
 export const Route = createFileRoute("/finance")({
   head: () => ({
@@ -81,7 +82,7 @@ function FinancePage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="font-display text-3xl font-black">اللوحة المالية</h1>
+        <h1 className="font-display text-3xl font-black">لوحة البيانات المالية</h1>
         <Badge variant={data?.connected ? "default" : "secondary"}>
           {data?.connected ? "متصل بباينانس" : "غير متصل"}
         </Badge>
@@ -111,7 +112,7 @@ function FinancePage() {
 
       <div className="glass mt-8 rounded-3xl p-6">
         <Coins className="size-5 text-primary" />
-        <div className="mt-3 text-xs text-muted-foreground">القيمة الإجمالية للأصول</div>
+        <div className="mt-3 text-xs text-muted-foreground">إجمالي رصيد باينانس (بالدولار)</div>
         <div className="mt-1 font-display text-4xl font-black">{formatUsd(data?.totalUsd ?? 0)}</div>
       </div>
 
@@ -131,21 +132,17 @@ function FinancePage() {
       </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {(data?.balances ?? []).map((b) => (
+        {(data?.balances ?? []).filter((b) => b.usdValue >= 0.01).map((b) => (
           <div key={b.asset} className="glass card-3d rounded-2xl p-4">
             <div className="flex items-center justify-between">
-              <span className="font-display text-lg font-black">{b.asset}</span>
-              <span className="text-sm text-muted-foreground">{formatUsd(b.usdValue)}</span>
-            </div>
-            <div className="mt-2 text-sm">
-              متاح: {b.free.toLocaleString("en-US", { maximumFractionDigits: 8 })}
-            </div>
-            <div className="text-xs text-muted-foreground">
-              محجوز: {b.locked.toLocaleString("en-US", { maximumFractionDigits: 8 })}
+              <span className="text-sm text-muted-foreground">{b.asset}</span>
+              <span className="font-display text-lg font-black text-primary">{formatUsd(b.usdValue)}</span>
             </div>
           </div>
         ))}
       </div>
+
+      <ProfitsAnalytics />
 
       <Tabs defaultValue="ledger" className="mt-10">
         <TabsList>
@@ -238,7 +235,7 @@ function TxRow({
     <div className="glass rounded-2xl p-4">
       <div className="flex flex-wrap items-center gap-3">
         <span className="font-display text-lg font-black">
-          {amount} {coin}
+          {coin === "USDT" || coin === "USDC" ? formatUsd(amount) : `${amount} ${coin}`}
         </span>
         <Badge variant={ok ? "default" : "secondary"}>{ok ? "مكتمل" : "قيد المعالجة"}</Badge>
         <span className="text-xs text-muted-foreground">{network}</span>
