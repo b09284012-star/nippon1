@@ -67,7 +67,8 @@ function Home() {
     <div>
       <section className="relative overflow-hidden">
         <div className="grid-floor pointer-events-none absolute inset-0" />
-        <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 lg:grid-cols-2 lg:py-24">
+        <div className="pointer-events-none absolute -top-32 start-1/3 h-72 w-72 rounded-full bg-primary/25 blur-[120px]" />
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-16 lg:grid-cols-2 lg:py-24">
           <div className="relative z-10">
             <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 text-xs text-primary">
               <ShieldCheck className="size-3.5" /> نظام حماية المشتري مفعّل على كل صفقة
@@ -104,15 +105,31 @@ function Home() {
           </div>
 
           <div className="relative">
-            <div className="float-slow glass card-3d overflow-hidden rounded-3xl p-3 shadow-[var(--shadow-violet)]">
+            <div className="absolute -inset-5 rounded-[2.75rem] bg-[image:var(--gradient-neon)] opacity-25 blur-3xl" />
+            <figure className="glass relative overflow-hidden rounded-3xl p-2 shadow-[var(--shadow-violet)]">
               <img
-                src={heroMiner}
-                alt="جهاز تعدين كريبتو ثلاثي الأبعاد بإضاءة نيون"
-                width={1280}
-                height={960}
-                className="w-full rounded-2xl object-cover"
+                src={heroMiners.url}
+                alt="صف من أجهزة تعدين ANTMINER مستعملة بإضاءة نيون"
+                width={1600}
+                height={1008}
+                className="w-full rounded-[1.35rem] object-cover"
               />
-            </div>
+              <span className="absolute start-5 top-5 inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/70 px-3 py-1.5 text-[11px] font-semibold backdrop-blur-md">
+                <BadgeCheck className="size-3.5 text-success" /> كل جهاز يُفحص قبل النشر
+              </span>
+              <figcaption className="absolute inset-x-2 bottom-2 flex items-center justify-between gap-3 rounded-[1.15rem] border border-border/50 bg-background/75 px-4 py-3 backdrop-blur-md">
+                <span className="flex items-center gap-2 text-xs font-semibold">
+                  <span className="relative flex size-2.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-70" />
+                    <span className="relative inline-flex size-2.5 rounded-full bg-success" />
+                  </span>
+                  أجهزة تعمل الآن ومعروضة للبيع
+                </span>
+                <span className="hidden text-[11px] text-muted-foreground sm:inline">
+                  ANTMINER • بحالة تشغيل موثّقة
+                </span>
+              </figcaption>
+            </figure>
           </div>
         </div>
       </section>
