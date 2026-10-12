@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { TrendingUp, ShoppingCart, Coins, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatUsd } from "@/lib/media";
+import { AnalyticsCharts, analyticsDollar as formatUsd } from "@/components/site/AnalyticsCharts";
 import { supabase } from "@/integrations/supabase/client";
 
 const RANGES = [
@@ -15,6 +15,7 @@ const RANGES = [
 export function ProfitsAnalytics() {
   const isAdmin = true;
   const [days, setDays] = useState<number>(30);
+  const [metric, setMetric] = useState<"volume" | "fee">("volume");
 
   const q = useQuery({
     queryKey: ["profits-orders"],
@@ -25,6 +26,7 @@ export function ProfitsAnalytics() {
         supabase.rpc("admin_list_withdrawals"),
       ]);
       if (error) throw error;
+      if (wd.error) throw wd.error;
       return { orders: orders ?? [], withdrawals: wd.data ?? [] };
     },
   });
@@ -45,7 +47,21 @@ export function ProfitsAnalytics() {
       const c = byDay.get(d) ?? { volume: 0, fee: 0 };
       byDay.set(d, { volume: c.volume + Number(o.amount), fee: c.fee + Number(o.fee) });
     }
-    const series = [...byDay.entries()].sort((a, b) => a[0].localeCompare(b[0])).slice(-30);
+    // Include zero-sale days and bucket long ranges by month without truncating the period.
+    const monthly = days > 30;
+    const bucketed = new Map<string, { volume: number; fee: number }>();
+    const start = new Date(days === 3650 && orders.length ? Math.min(...orders.map((o) => new Date(o.created_at).getTime())) : since);
+    start.setUTCHours(0, 0, 0, 0);
+    if (monthly) start.setUTCDate(1);
+    for (const cursor = new Date(start); cursor.getTime() <= Date.now(); monthly ? cursor.setUTCMonth(cursor.getUTCMonth() + 1) : cursor.setUTCDate(cursor.getUTCDate() + 1)) {
+      bucketed.set(cursor.toISOString().slice(0, 10), { volume: 0, fee: 0 });
+    }
+    for (const [date, values] of byDay) {
+      const key = monthly ? `${date.slice(0, 7)}-01` : date;
+      const previous = bucketed.get(key) ?? { volume: 0, fee: 0 };
+      bucketed.set(key, { volume: previous.volume + values.volume, fee: previous.fee + values.fee });
+    }
+    const series = [...bucketed.entries()].sort((a, b) => a[0].localeCompare(b[0]));
 
     const byProduct = new Map<string, { qty: number; volume: number; fee: number }>();
     for (const o of done) {
@@ -57,24 +73,22 @@ export function ProfitsAnalytics() {
     const top = [...byProduct.entries()].sort((a, b) => b[1].volume - a[1].volume).slice(0, 10);
 
     const statusCount = orders.reduce<Record<string, number>>((m, o) => ((m[o.status] = (m[o.status] ?? 0) + 1), m), {});
-    return { earned, pending, volume, wdFees, count: done.length, total: orders.length, avg: done.length ? volume / done.length : 0, series, top, statusCount };
+    return { earned, pending, volume, wdFees, count: done.length, total: orders.length, avg: done.length ? volume / done.length : 0, series: done.length ? series : [], top, statusCount };
   }, [q.data, days]);
-
-  const maxFee = Math.max(1, ...stats.series.map(([, v]) => v.volume));
-  const statusLabels: Record<string, string> = {
-    completed: "مكتمل", escrow_held: "في الضمان", shipped: "تم الشحن", disputed: "نزاع", refunded: "مسترد", cancelled: "ملغى", awaiting_payment: "بانتظار الدفع",
-  };
 
   return (
     <div className="mt-10">
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="font-display text-2xl font-black">تحليل الأرباح والمبيعات</h1>
+        <h2 className="font-display text-2xl font-black">تحليل الأرباح والمبيعات</h2>
         <div className="ms-auto flex flex-wrap gap-1">
           {RANGES.map((r) => (
             <Button key={r.k} size="sm" variant={days === r.k ? "default" : "outline"} onClick={() => setDays(r.k)}>{r.l}</Button>
           ))}
         </div>
       </div>
+
+      {q.isPending && <p role="status" className="mt-6 text-sm text-muted-foreground">جارٍ تحميل التحليل…</p>}
+      {q.isError && <div role="alert" className="mt-6 flex flex-wrap items-center gap-3 text-sm text-destructive">تعذر تحميل بيانات التحليل.<Button size="sm" variant="outline" onClick={() => void q.refetch()}>إعادة المحاولة</Button></div>}
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
@@ -95,51 +109,11 @@ export function ProfitsAnalytics() {
         })}
       </div>
 
-      <div className="glass mt-6 rounded-3xl p-6">
-        <h2 className="font-display text-lg font-black">المبيعات اليومية</h2>
-        {stats.series.length === 0 ? (
-          <p className="mt-4 text-sm text-muted-foreground">لا مبيعات مكتملة في هذه الفترة.</p>
-        ) : (
-          <div className="mt-6 flex h-48 items-end gap-1" dir="ltr">
-            {stats.series.map(([d, v]) => (
-              <div key={d} className="group flex flex-1 flex-col items-center gap-1">
-                <div className="w-full rounded-t-md bg-primary/80 transition-colors group-hover:bg-primary" style={{ height: `${(v.volume / maxFee) * 100}%`, minHeight: 4 }} title={`${d}: ${formatUsd(v.volume)} — ربح ${formatUsd(v.fee)}`} />
-                <span className="text-[9px] text-muted-foreground">{d.slice(5)}</span>
-              </div>
-            ))}
-          </div>
-        )}
+      <div className="mt-6 flex gap-2" role="group" aria-label="نوع التحليل">
+        <Button size="sm" variant={metric === "volume" ? "default" : "outline"} aria-pressed={metric === "volume"} onClick={() => setMetric("volume")}><ShoppingCart className="size-4" /> المبيعات</Button>
+        <Button size="sm" variant={metric === "fee" ? "default" : "outline"} aria-pressed={metric === "fee"} onClick={() => setMetric("fee")}><TrendingUp className="size-4" /> الأرباح</Button>
       </div>
-
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        <div className="glass rounded-3xl p-6 lg:col-span-2">
-          <h2 className="font-display text-lg font-black">الأجهزة الأكثر مبيعًا</h2>
-          <div className="mt-4 grid gap-2">
-            {stats.top.length === 0 && <p className="text-sm text-muted-foreground">لا بيانات بعد.</p>}
-            {stats.top.map(([name, v], i) => (
-              <div key={name} className="flex items-center gap-3 rounded-xl bg-background/50 p-3 text-sm">
-                <span className="font-display font-black text-primary">#{i + 1}</span>
-                <span className="font-bold">{name}</span>
-                <span className="text-xs text-muted-foreground">{v.qty} قطعة</span>
-                <span className="ms-auto font-display font-black">{formatUsd(v.volume)}</span>
-                <span className="text-xs text-accent">+{formatUsd(v.fee)}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="glass rounded-3xl p-6">
-          <h2 className="font-display text-lg font-black">حالة الطلبات</h2>
-          <div className="mt-4 grid gap-2 text-sm">
-            {Object.keys(stats.statusCount).length === 0 && <p className="text-muted-foreground">لا طلبات.</p>}
-            {Object.entries(stats.statusCount).map(([s, n]) => (
-              <div key={s} className="flex justify-between rounded-xl bg-background/50 p-3">
-                <span>{statusLabels[s] ?? s}</span>
-                <span className="font-display font-black">{n}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      {q.isSuccess && <AnalyticsCharts series={stats.series} top={stats.top} statusCount={stats.statusCount} metric={metric} />}
     </div>
   );
 }
