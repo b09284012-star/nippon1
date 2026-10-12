@@ -136,6 +136,9 @@ function Home() {
 
       <section className="mx-auto max-w-7xl px-4 py-14">
         <h2 className="font-display text-3xl font-black">كيف يعمل نظام الضمان؟</h2>
+        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+          أربع خطوات فقط: توثيق، تفاوض، دفع محجوز، ثم تسليم. المبلغ لا يصل للبائع إلا بعد تأكيدك.
+        </p>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((s, i) => (
             <div key={s.title} className="glass card-3d card-3d-hover rounded-2xl p-6">
@@ -152,13 +155,30 @@ function Home() {
 
       <section className="mx-auto max-w-7xl px-4 py-8">
         <div className="flex items-end justify-between">
-          <h2 className="font-display text-3xl font-black">أحدث الأجهزة</h2>
+          <div>
+            <h2 className="font-display text-3xl font-black">أحدث الأجهزة</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              أجهزة معروضة الآن بحالة تشغيل موثّقة وأسعار قابلة للتفاوض مع البائع.
+            </p>
+          </div>
           <Link to="/market" className="text-sm text-primary hover:underline">
             عرض الكل
           </Link>
         </div>
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {listings?.map((l) => <ListingCard key={l.id} listing={l} />)}
+          {listings?.length ? (
+            listings.map((l) => <ListingCard key={l.id} listing={l} />)
+          ) : (
+            <div className="glass col-span-full rounded-2xl p-10 text-center">
+              <p className="font-display text-lg font-bold">لا توجد أجهزة معروضة الآن</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                كن أول من ينشر جهازه على نيبون — النشر مجاني، والعمولة 2.5% فقط عند إتمام البيع.
+              </p>
+              <Button className="mt-6" asChild>
+                <Link to="/sell">أضف عرضك</Link>
+              </Button>
+            </div>
+          )}
         </div>
       </section>
     </div>
