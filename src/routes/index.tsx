@@ -77,7 +77,7 @@ function Home() {
               سوق <span className="neon-text">Nippon</span> لأجهزة التعدين المستعملة
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-              اشترِ أجهزة ASIC وGPU مستعملة من بائعين موثقين، مع حجز المبلغ في المنصة حتى استلام
+              اشترِ أجهزة ASIC و GPU مستعملة من بائعين موثقين، مع حجز المبلغ في المنصة حتى استلام
               الجهاز، ودردشة مباشرة، ومحفظة كريبتو داخلية.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
