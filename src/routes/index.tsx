@@ -28,8 +28,8 @@ export const Route = createFileRoute("/")({
 const steps = [
   {
     icon: BadgeCheck,
-    title: "وثّق هويتك",
-    text: "رفع الهوية والسيلفي ومراجعة إدارية سريعة قبل السماح بالنشر أو البيع.",
+    title: "أنشئ حسابك",
+    text: "سجّل ببياناتك الكاملة، ثم تراجع الإدارة الطلب وتمنح البائع شارة «بائع معتمد» قبل النشر.",
   },
   {
     icon: MessagesSquare,
