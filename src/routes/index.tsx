@@ -4,7 +4,7 @@ import { ShieldCheck, MessagesSquare, Wallet2, BadgeCheck, ArrowLeft } from "luc
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ListingCard, type ListingRow } from "@/components/site/ListingCard";
-import heroMiner from "@/assets/hero-miner.jpg";
+import heroMiners from "@/assets/hero-miners.jpeg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
