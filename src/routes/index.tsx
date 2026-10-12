@@ -161,9 +161,11 @@ function Home() {
               أجهزة معروضة الآن بحالة تشغيل موثّقة وأسعار قابلة للتفاوض مع البائع.
             </p>
           </div>
-          <Link to="/market" className="text-sm text-primary hover:underline">
-            عرض الكل
-          </Link>
+          {listings?.length ? (
+            <Link to="/market" className="text-sm text-primary hover:underline">
+              عرض الكل
+            </Link>
+          ) : null}
         </div>
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {listings?.length ? (
