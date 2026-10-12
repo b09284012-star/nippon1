@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import heroMiner from "@/assets/hero-miner.jpg";
+import heroMiners from "@/assets/hero-miners.jpeg.asset.json";
 
-export const FALLBACK_IMAGE = heroMiner;
+export const FALLBACK_IMAGE = heroMiners.url;
 
 export function useStorageUrl(bucket: string, path?: string | null) {
   return useQuery({
