@@ -11,7 +11,8 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth";
 import { formatDate, formatUsd } from "@/lib/media";
-import { useOnlineCount } from "@/lib/presence";
+import { useOnlineKeys } from "@/lib/presence";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -83,7 +84,7 @@ function AdminPage() {
     },
   });
 
-  const onlineCount = useOnlineCount(isAdmin);
+  const onlineKeys = useOnlineKeys(isAdmin);
 
   const [q, setQ] = useState("");
 
@@ -133,7 +134,7 @@ function AdminPage() {
       </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={Radio} label="المستخدمون المتصلون الآن" value={String(onlineCount)} live />
+        <StatCard icon={Radio} label="المستخدمون المتصلون الآن" value={String(onlineKeys.size)} live />
         <StatCard icon={Users} label="إجمالي المستخدمين" value={String(stats.data?.total_users ?? 0)} />
         <StatCard icon={UserPlus} label="حسابات جديدة (7 أيام)" value={String(stats.data?.new_users_7d ?? 0)} />
         <StatCard icon={Package} label="العروض / الطلبات" value={`${stats.data?.total_listings ?? 0} / ${stats.data?.total_orders ?? 0}`} />
@@ -180,56 +181,82 @@ function AdminPage() {
             onChange={(e) => setQ(e.target.value.slice(0, 60))}
             placeholder="ابحث بمعرّف المحفظة (NPN-...) أو الاسم أو البريد أو الهاتف"
           />
-          {(users.data ?? [])
-            .filter((u) => {
-              const t = q.trim().toLowerCase();
-              if (!t) return true;
-              return [u.deposit_tag, u.display_name, u.full_name, u.email, u.phone].some((v) => (v ?? "").toLowerCase().includes(t));
-            })
-            .map((u) => (
-              <div key={u.id} className="glass rounded-2xl p-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-display font-bold">{u.display_name ?? "—"}</span>
-                  {u.is_admin && <Badge>مدير</Badge>}
-                  {u.is_verified_seller && <Badge variant="secondary" className="gap-1"><ShieldCheck className="size-3.5" /> بائع معتمد</Badge>}
-                  <code className="ms-auto text-xs" dir="ltr">{u.deposit_tag}</code>
+          {(["online", "offline"] as const).map((group) => {
+            const list = (users.data ?? [])
+              .filter((u) => {
+                const t = q.trim().toLowerCase();
+                if (!t) return true;
+                return [u.deposit_tag, u.display_name, u.full_name, u.email, u.phone].some((v) => (v ?? "").toLowerCase().includes(t));
+              })
+              .filter((u) => (group === "online" ? onlineKeys.has(u.id) : !onlineKeys.has(u.id)));
+
+            if (list.length === 0) return null;
+
+            return (
+              <div key={group} className="grid gap-3">
+                <div className="flex items-center gap-2 px-1 text-xs font-bold text-muted-foreground">
+                  <span
+                    className={cn(
+                      "size-2 rounded-full",
+                      group === "online" ? "animate-pulse bg-primary" : "bg-muted-foreground/50",
+                    )}
+                  />
+                  {group === "online" ? `متصلون الآن (${list.length})` : `غير متصلين (${list.length})`}
                 </div>
-                <div className="mt-3 grid gap-1 text-xs text-muted-foreground sm:grid-cols-2">
-                  <span>الاسم الحقيقي: {u.full_name || "—"}</span>
-                  <span>البريد: {u.email}</span>
-                  <span>الهاتف: {u.phone || "—"}</span>
-                  <span>الدولة/المدينة: {[u.country, u.city].filter(Boolean).join(" - ") || "—"}</span>
-                  <span className="sm:col-span-2">العنوان: {u.address || "—"}</span>
-                  <span>الرصيد: {formatUsd(u.balance ?? 0)} • محجوز: {formatUsd(u.held ?? 0)}</span>
-                  <span>التسجيل: {formatDate(u.created_at)}</span>
-                </div>
-                <div className="mt-3 flex flex-wrap gap-6 text-sm">
-                  <label className="flex items-center gap-2">
-                    <Switch
-                      checked={Boolean(u.is_verified_seller)}
-                      onCheckedChange={async (v) => {
-                        const { error } = await supabase.rpc("admin_set_verified_seller", { _user_id: u.id, _verified: v });
-                        if (error) toast.error(error.message);
-                        else { toast.success(v ? "تم اعتماده كبائع" : "تم إلغاء الاعتماد"); void users.refetch(); }
-                      }}
-                    />
-                    بائع معتمد
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <Switch
-                      checked={Boolean(u.is_admin)}
-                      disabled={u.id === user.id}
-                      onCheckedChange={async (v) => {
-                        const { error } = await supabase.rpc("admin_set_user_role", { _user_id: u.id, _make_admin: v });
-                        if (error) toast.error(error.message);
-                        else { toast.success("تم تحديث الصلاحية"); void users.refetch(); }
-                      }}
-                    />
-                    مدير
-                  </label>
-                </div>
+                {list.map((u) => (
+                  <div key={u.id} className="glass rounded-2xl p-4">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span
+                        className={cn(
+                          "size-2 rounded-full",
+                          onlineKeys.has(u.id) ? "bg-primary" : "bg-muted-foreground/50",
+                        )}
+                      />
+                      <span className="font-display font-bold">{u.display_name ?? "—"}</span>
+                      {onlineKeys.has(u.id) && <Badge className="bg-primary/15 text-primary">متصل الآن</Badge>}
+                      {u.is_admin && <Badge>مدير</Badge>}
+                      {u.is_verified_seller && <Badge variant="secondary" className="gap-1"><ShieldCheck className="size-3.5" /> بائع معتمد</Badge>}
+                      <code className="ms-auto text-xs" dir="ltr">{u.deposit_tag}</code>
+                    </div>
+                    <div className="mt-3 grid gap-1 text-xs text-muted-foreground sm:grid-cols-2">
+                      <span>الاسم الحقيقي: {u.full_name || "—"}</span>
+                      <span>البريد: {u.email}</span>
+                      <span>الهاتف: {u.phone || "—"}</span>
+                      <span>الدولة/المدينة: {[u.country, u.city].filter(Boolean).join(" - ") || "—"}</span>
+                      <span className="sm:col-span-2">العنوان: {u.address || "—"}</span>
+                      <span>الرصيد: {formatUsd(u.balance ?? 0)} • محجوز: {formatUsd(u.held ?? 0)}</span>
+                      <span>التسجيل: {formatDate(u.created_at)}</span>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-6 text-sm">
+                      <label className="flex items-center gap-2">
+                        <Switch
+                          checked={Boolean(u.is_verified_seller)}
+                          onCheckedChange={async (v) => {
+                            const { error } = await supabase.rpc("admin_set_verified_seller", { _user_id: u.id, _verified: v });
+                            if (error) toast.error(error.message);
+                            else { toast.success(v ? "تم اعتماده كبائع" : "تم إلغاء الاعتماد"); void users.refetch(); }
+                          }}
+                        />
+                        بائع معتمد
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <Switch
+                          checked={Boolean(u.is_admin)}
+                          disabled={u.id === user.id}
+                          onCheckedChange={async (v) => {
+                            const { error } = await supabase.rpc("admin_set_user_role", { _user_id: u.id, _make_admin: v });
+                            if (error) toast.error(error.message);
+                            else { toast.success("تم تحديث الصلاحية"); void users.refetch(); }
+                          }}
+                        />
+                        مدير
+                      </label>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            );
+          })}
         </TabsContent>
 
         <TabsContent value="disputes" className="mt-6 grid gap-4">
