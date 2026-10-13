@@ -83,6 +83,25 @@ export function useOnlineCount(enabled: boolean) {
   return count;
 }
 
+/** Live set of presence keys (user IDs) currently online. */
+export function useOnlineKeys(enabled: boolean) {
+  const [keys, setKeys] = useState<Set<string>>(() => new Set());
+
+  useEffect(() => {
+    if (!enabled) return;
+    acquire(`watch-${Math.random().toString(36).slice(2, 10)}`);
+    const listener: Listener = (_n, k) => setKeys(new Set(k));
+    listeners.add(listener);
+    emit();
+    return () => {
+      listeners.delete(listener);
+      release();
+    };
+  }, [enabled]);
+
+  return keys;
+}
+
 /** Whether a specific user is currently online (Instagram-style indicator). */
 export function useIsOnline(userId: string | null | undefined) {
   const [online, setOnline] = useState(false);
