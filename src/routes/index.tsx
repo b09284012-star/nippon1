@@ -65,72 +65,50 @@ function Home() {
 
   return (
     <div>
-      <section className="relative overflow-hidden">
-        <div className="grid-floor pointer-events-none absolute inset-0" />
-        <div className="pointer-events-none absolute -top-32 start-1/3 h-72 w-72 rounded-full bg-primary/25 blur-[120px]" />
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-16 lg:grid-cols-2 lg:py-24">
-          <div className="relative z-10">
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 text-xs text-primary">
-              <ShieldCheck className="size-3.5" /> نظام حماية المشتري مفعّل على كل صفقة
-            </span>
-            <h1 className="mt-6 font-display text-4xl leading-tight font-black sm:text-6xl">
-              سوق <span className="neon-text">Nippon</span> لأجهزة التعدين المستعملة
-            </h1>
-            <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-              اشترِ أجهزة ASIC و GPU مستعملة من بائعين موثقين، مع حجز المبلغ في المنصة حتى استلام
-              الجهاز، ودردشة مباشرة، ومحفظة كريبتو داخلية.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button size="lg" asChild>
-                <Link to="/market">
-                  تصفح الأجهزة <ArrowLeft className="size-4" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link to="/sell">أضف عرضك</Link>
-              </Button>
-            </div>
-            <dl className="mt-10 grid max-w-lg grid-cols-3 gap-4">
-              {[
-                ["2.5%", "عمولة المنصة"],
-                ["100%", "مبالغ محجوزة بالضمان"],
-                ["24/7", "دعم النزاعات"],
-              ].map(([v, l]) => (
-                <div key={l} className="glass rounded-xl p-4 text-center">
-                  <dt className="font-display text-2xl font-black text-primary">{v}</dt>
-                  <dd className="mt-1 text-xs text-muted-foreground">{l}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
+      <section className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden">
+        <img
+          src={heroMiners.url}
+          alt="صف من أجهزة تعدين ANTMINER مستعملة"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-background/85" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,var(--background)_95%)]" />
 
-          <div className="relative">
-            <div className="absolute -inset-5 rounded-[2.75rem] bg-[image:var(--gradient-neon)] opacity-25 blur-3xl" />
-            <figure className="glass relative overflow-hidden rounded-3xl p-2 shadow-[var(--shadow-violet)]">
-              <img
-                src={heroMiners.url}
-                alt="صف من أجهزة تعدين ANTMINER مستعملة بإضاءة نيون"
-                width={1600}
-                height={1008}
-                className="w-full rounded-[1.35rem] object-cover"
-              />
-              <span className="absolute start-5 top-5 inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/70 px-3 py-1.5 text-[11px] font-semibold backdrop-blur-md">
-                <BadgeCheck className="size-3.5 text-success" /> كل جهاز يُفحص قبل النشر
-              </span>
-              <figcaption className="absolute inset-x-2 bottom-2 flex items-center justify-between gap-3 rounded-[1.15rem] border border-border/50 bg-background/75 px-4 py-3 backdrop-blur-md">
-                <span className="flex items-center gap-2 text-xs font-semibold">
-                  <span className="relative flex size-2.5">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-70" />
-                    <span className="relative inline-flex size-2.5 rounded-full bg-success" />
-                  </span>
-                  أجهزة تعمل الآن ومعروضة للبيع
-                </span>
-                <span className="hidden text-[11px] text-muted-foreground sm:inline">
-                  ANTMINER • بحالة تشغيل موثّقة
-                </span>
-              </figcaption>
-            </figure>
+        <div className="relative z-10 mx-auto max-w-4xl px-4 py-24 text-center">
+          <p className="text-sm font-bold tracking-[0.35em] text-primary uppercase">
+            سوق موثوق لأجهزة التعدين
+          </p>
+          <h1 className="mt-6 font-display text-5xl leading-[1.1] font-black tracking-tight sm:text-7xl">
+            اشترِ بثقة.
+            <br />
+            <span className="text-primary">بِع بأمان.</span>
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
+            أجهزة ASIC و GPU مستعملة من بائعين معتمدين — المبلغ يبقى محجوزًا في نيبون
+            حتى تستلم جهازك، مع دردشة مباشرة ومحفظة كريبتو داخلية.
+          </p>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <Button size="lg" className="px-8 text-base" asChild>
+              <Link to="/market">
+                تصفح الأجهزة <ArrowLeft className="size-4" />
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" className="px-8 text-base" asChild>
+              <Link to="/sell">أضف عرضك</Link>
+            </Button>
           </div>
+          <dl className="mx-auto mt-14 grid max-w-xl grid-cols-3 gap-4">
+            {[
+              ["2.5%", "عمولة المنصة"],
+              ["100%", "مبالغ محجوزة بالضمان"],
+              ["24/7", "دعم النزاعات"],
+            ].map(([v, l]) => (
+              <div key={l} className="rounded-xl border border-border/50 bg-background/60 p-4 backdrop-blur-md">
+                <dt className="font-display text-2xl font-black text-primary">{v}</dt>
+                <dd className="mt-1 text-xs text-muted-foreground">{l}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
 
