@@ -11,7 +11,8 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth";
 import { formatDate, formatUsd } from "@/lib/media";
-import { useOnlineCount } from "@/lib/presence";
+import { useOnlineKeys } from "@/lib/presence";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -83,7 +84,7 @@ function AdminPage() {
     },
   });
 
-  const onlineCount = useOnlineCount(isAdmin);
+  const onlineKeys = useOnlineKeys(isAdmin);
 
   const [q, setQ] = useState("");
 
@@ -133,7 +134,7 @@ function AdminPage() {
       </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={Radio} label="المستخدمون المتصلون الآن" value={String(onlineCount)} live />
+        <StatCard icon={Radio} label="المستخدمون المتصلون الآن" value={String(onlineKeys.size)} live />
         <StatCard icon={Users} label="إجمالي المستخدمين" value={String(stats.data?.total_users ?? 0)} />
         <StatCard icon={UserPlus} label="حسابات جديدة (7 أيام)" value={String(stats.data?.new_users_7d ?? 0)} />
         <StatCard icon={Package} label="العروض / الطلبات" value={`${stats.data?.total_listings ?? 0} / ${stats.data?.total_orders ?? 0}`} />
