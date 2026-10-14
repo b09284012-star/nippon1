@@ -38,11 +38,14 @@ function ChatRoomPage() {
     queryKey: ["conv-other", id, user?.id],
     enabled: Boolean(user),
     queryFn: async () => {
+      if (!user) return null;
       const { data: c } = await supabase.from("conversations").select("buyer_id, seller_id").eq("id", id).maybeSingle();
       if (!c) return null;
-      const isParty = c.buyer_id === user!.id || c.seller_id === user!.id;
-      const otherId = c.buyer_id === user!.id ? c.seller_id : c.buyer_id;
-      const { data: p } = await supabase.from("profiles").select("id, display_name").eq("id", otherId).maybeSingle();
+      const isParty = c.buyer_id === user.id || c.seller_id === user.id;
+      const otherId = c.buyer_id === user.id ? c.seller_id : c.buyer_id;
+      const { data, error } = await supabase.rpc("public_profile_names", { _ids: [otherId] });
+      if (error) throw error;
+      const p = data?.[0];
       return p ? { ...p, buyer_id: c.buyer_id, seller_id: c.seller_id, isParty } : null;
     },
   });
@@ -92,12 +95,13 @@ function ChatRoomPage() {
   }
 
   const send = async () => {
+    if (!user) return;
     const body = text.trim();
     if (body.length === 0) return;
     setText("");
     const { error } = await supabase
       .from("messages")
-      .insert({ conversation_id: id, sender_id: user!.id, body: body.slice(0, 2000) });
+      .insert({ conversation_id: id, sender_id: user.id, body: body.slice(0, 2000) });
     if (error) {
       toast.error(error.message);
       return;

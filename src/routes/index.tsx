@@ -20,6 +20,10 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "منصة موثوقة لتداول أجهزة التعدين المستعملة مع نظام حماية المشتري.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:image", content: heroMiners.url },
+      { name: "twitter:image", content: heroMiners.url },
     ],
   }),
   component: Home,
@@ -80,8 +84,7 @@ function Home() {
           </p>
           <h1 className="mt-6 font-display text-5xl leading-[1.1] font-black tracking-tight sm:text-7xl">
             اشترِ بثقة.
-            <br />
-            <span className="text-primary">بِع بأمان.</span>
+            <span className="mt-3 block text-primary sm:mt-4">بِع بأمان.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
             أجهزة ASIC و GPU مستعملة من بائعين معتمدين — المبلغ يبقى محجوزًا في نيبون
