@@ -762,6 +762,13 @@ export type Database = {
         Args: { _order_id: string; _reason: string }
         Returns: string
       }
+      public_profile_names: {
+        Args: { _ids: string[] }
+        Returns: {
+          display_name: string
+          id: string
+        }[]
+      }
       refund_escrow: { Args: { _order_id: string }; Returns: undefined }
       reject_deposit: {
         Args: { _id: string; _reason: string }
