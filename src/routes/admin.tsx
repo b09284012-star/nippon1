@@ -197,6 +197,9 @@ function AdminPage() {
           <TabsTrigger value="disputes">
             <Gavel className="size-4" /> النزاعات
           </TabsTrigger>
+          <TabsTrigger value="notify">
+            <BellRing className="size-4" /> إرسال إشعار
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="withdrawals" className="mt-6 grid gap-4">
@@ -314,6 +317,18 @@ function AdminPage() {
                 <span className="text-xs text-muted-foreground">{formatDate(d.created_at)}</span>
               </div>
               <p className="mt-2 text-sm">{d.reason}</p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="mt-3"
+                onClick={async () => {
+                  const { data, error } = await supabase.rpc("admin_dispute_conversation", { _order_id: d.order_id });
+                  if (error || !data) toast.error(error?.message ?? "تعذر فتح الدردشة");
+                  else void navigate({ to: "/chat/$id", params: { id: data } });
+                }}
+              >
+                دخول دردشة البائع والمشتري
+              </Button>
               {d.status === "open" && (
                 <div className="mt-4 flex gap-2">
                   <Button
@@ -347,6 +362,10 @@ function AdminPage() {
               )}
             </div>
           ))}
+        </TabsContent>
+
+        <TabsContent value="notify" className="mt-6">
+          <SendNotification users={(users.data ?? []) as { id: string; display_name: string; email: string | null }[]} />
         </TabsContent>
       </Tabs>
     </div>
