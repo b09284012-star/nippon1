@@ -597,6 +597,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_credit_user: {
+        Args: { _amount: number; _note: string; _user_id: string }
+        Returns: undefined
+      }
       admin_finance_summary: {
         Args: never
         Returns: {
