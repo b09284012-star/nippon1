@@ -17,6 +17,8 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "أنشئ حساب نيبون أو سجّل الدخول للبيع والشراء بحماية." },
       { property: "og:title", content: "الدخول والتسجيل | Nippon" },
       { property: "og:description", content: "حساب موثق للبيع والشراء على منصة نيبون." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AuthPage,

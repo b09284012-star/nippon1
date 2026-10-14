@@ -25,6 +25,8 @@ export const Route = createFileRoute("/market")({
       },
       { property: "og:title", content: "السوق | أجهزة تعدين مستعملة على Nippon" },
       { property: "og:description", content: "فلترة الأجهزة حسب السعر والضمان والحالة والماركة." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Market,
