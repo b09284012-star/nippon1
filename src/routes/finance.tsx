@@ -142,6 +142,8 @@ function FinancePage() {
         ))}
       </div>
 
+      <ManualCredit />
+
       <ProfitsAnalytics />
 
       <Tabs defaultValue="ledger" className="mt-10">
