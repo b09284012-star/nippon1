@@ -22,8 +22,6 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:image", content: heroMiners.url },
-      { name: "twitter:image", content: heroMiners.url },
     ],
   }),
   component: Home,
