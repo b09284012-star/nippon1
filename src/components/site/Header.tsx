@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Menu, ShieldCheck, Wallet2, LogOut } from "lucide-react";
+import { Menu, ShieldCheck, Wallet2, LogOut, UserRound } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
@@ -64,7 +64,10 @@ export function Header() {
               >
                 <Wallet2 className="size-4" /> محفظتي
               </Button>
-              <Button variant="outline" size="sm" onClick={() => void signOut()}>
+              <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/profile" })}>
+                <UserRound className="size-4" /> حسابي
+              </Button>
+              <Button variant="outline" size="sm" className="hidden sm:inline-flex" onClick={() => void signOut()}>
                 <LogOut className="size-4" /> خروج
               </Button>
             </>

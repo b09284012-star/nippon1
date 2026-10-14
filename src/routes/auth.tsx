@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth";
+import { ForgotPassword } from "@/components/site/ForgotPassword";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -39,6 +40,7 @@ function AuthPage() {
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
   const [addr, setAddr] = useState("");
+  const [forgot, setForgot] = useState(false);
 
   useEffect(() => {
     if (user) void navigate({ to: "/market" });
@@ -85,6 +87,7 @@ function AuthPage() {
           سجّل للوصول إلى الدردشة والمحفظة ونظام حماية المشتري.
         </p>
 
+        {forgot ? <ForgotPassword onClose={() => setForgot(false)} /> : (
         <Tabs defaultValue="signin" className="mt-6">
           <TabsList className="w-full">
             <TabsTrigger value="signin" className="flex-1">
@@ -106,6 +109,7 @@ function AuthPage() {
             <Button className="w-full" onClick={() => void signIn()} disabled={loading}>
               دخول
             </Button>
+            <button type="button" className="text-sm text-primary" onClick={() => setForgot(true)}>نسيت كلمة المرور؟</button>
           </TabsContent>
 
           <TabsContent value="signup" className="space-y-4 pt-4">
@@ -130,6 +134,7 @@ function AuthPage() {
             </Button>
           </TabsContent>
         </Tabs>
+        )}
 
       </div>
     </div>
