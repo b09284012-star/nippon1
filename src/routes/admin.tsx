@@ -252,6 +252,7 @@ function AdminPage() {
                         مدير
                       </label>
                     </div>
+                    {u.id !== user.id && <AccountActions userId={u.id} bannedUntil={bans.data?.[u.id]} onDone={() => { void bans.refetch(); void users.refetch(); }} />}
                   </div>
                 ))}
               </div>
