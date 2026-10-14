@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as FinanceRouteImport } from './routes/finance'
 import { Route as ForumRouteImport } from './routes/forum'
 import { Route as MarketRouteImport } from './routes/market'
+import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProfitsRouteImport } from './routes/profits'
@@ -54,6 +55,11 @@ const ForumRoute = ForumRouteImport.update({
 const MarketRoute = MarketRouteImport.update({
   id: '/market',
   path: '/market',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrdersRoute = OrdersRouteImport.update({
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/finance': typeof FinanceRoute
   '/forum': typeof ForumRoute
   '/market': typeof MarketRoute
+  '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
   '/profile': typeof ProfileRoute
   '/profits': typeof ProfitsRoute
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/finance': typeof FinanceRoute
   '/forum': typeof ForumRoute
   '/market': typeof MarketRoute
+  '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
   '/profile': typeof ProfileRoute
   '/profits': typeof ProfitsRoute
@@ -151,6 +159,7 @@ export interface FileRoutesById {
   '/finance': typeof FinanceRoute
   '/forum': typeof ForumRoute
   '/market': typeof MarketRoute
+  '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
   '/profile': typeof ProfileRoute
   '/profits': typeof ProfitsRoute
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/finance'
     | '/forum'
     | '/market'
+    | '/notifications'
     | '/orders'
     | '/profile'
     | '/profits'
@@ -189,6 +199,7 @@ export interface FileRouteTypes {
     | '/finance'
     | '/forum'
     | '/market'
+    | '/notifications'
     | '/orders'
     | '/profile'
     | '/profits'
@@ -207,6 +218,7 @@ export interface FileRouteTypes {
     | '/finance'
     | '/forum'
     | '/market'
+    | '/notifications'
     | '/orders'
     | '/profile'
     | '/profits'
@@ -226,6 +238,7 @@ export interface RootRouteChildren {
   FinanceRoute: typeof FinanceRoute
   ForumRoute: typeof ForumRoute
   MarketRoute: typeof MarketRoute
+  NotificationsRoute: typeof NotificationsRoute
   OrdersRoute: typeof OrdersRoute
   ProfileRoute: typeof ProfileRoute
   ProfitsRoute: typeof ProfitsRoute
@@ -280,6 +293,13 @@ declare module '@tanstack/react-router' {
       path: '/market'
       fullPath: '/market'
       preLoaderRoute: typeof MarketRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/orders': {
@@ -362,6 +382,7 @@ const rootRouteChildren: RootRouteChildren = {
   FinanceRoute: FinanceRoute,
   ForumRoute: ForumRoute,
   MarketRoute: MarketRoute,
+  NotificationsRoute: NotificationsRoute,
   OrdersRoute: OrdersRoute,
   ProfileRoute: ProfileRoute,
   ProfitsRoute: ProfitsRoute,
