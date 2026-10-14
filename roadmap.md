@@ -1,0 +1,3 @@
+- [x] Replace the notification popup with a full-page inbox showing each notification's timestamp.
+- [x] Verify the inbox with an authenticated account.
+- [ ] Resolve the flagged profile-read exposure after the owner's access decision.
