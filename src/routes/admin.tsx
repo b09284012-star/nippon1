@@ -13,6 +13,47 @@ import { useAuth } from "@/lib/auth";
 import { formatDate, formatUsd } from "@/lib/media";
 import { useOnlineKeys } from "@/lib/presence";
 import { cn } from "@/lib/utils";
+import { useServerFn } from "@tanstack/react-start";
+import { adminAccountAction, adminListBans } from "@/lib/account.functions";
+
+function AccountActions({ userId, bannedUntil, onDone }: { userId: string; bannedUntil?: string | undefined; onDone: () => void }) {
+  const act = useServerFn(adminAccountAction);
+  const [days, setDays] = useState("7");
+  const [busy, setBusy] = useState(false);
+  const run = async (action: "ban" | "suspend" | "unban" | "delete", msg: string) => {
+    if (action === "delete" && !confirm("حذف الحساب نهائيًا؟ لا يمكن التراجع.")) return;
+    if (action === "ban" && !confirm("حظر الحساب بشكل دائم؟")) return;
+    setBusy(true);
+    try {
+      await act({ data: { userId, action, days: Number(days) || 7 } });
+      toast.success(msg);
+      onDone();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "تعذر التنفيذ");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border/40 pt-3 text-sm">
+      {bannedUntil ? (
+        <>
+          <Badge variant="destructive">
+            {new Date(bannedUntil).getFullYear() > 2100 ? "محظور" : `معلّق حتى ${formatDate(bannedUntil)}`}
+          </Badge>
+          <Button size="sm" variant="outline" disabled={busy} onClick={() => void run("unban", "تم رفع الحظر")}>رفع الحظر</Button>
+        </>
+      ) : (
+        <>
+          <Input className="h-8 w-20" type="number" min={1} max={365} value={days} onChange={(e) => setDays(e.target.value)} />
+          <Button size="sm" variant="outline" disabled={busy} onClick={() => void run("suspend", "تم تعليق الحساب")}>تعليق (أيام)</Button>
+          <Button size="sm" variant="outline" disabled={busy} onClick={() => void run("ban", "تم حظر الحساب")}>حظر دائم</Button>
+        </>
+      )}
+      <Button size="sm" variant="destructive" disabled={busy} onClick={() => void run("delete", "تم حذف الحساب")}>حذف الحساب</Button>
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -61,6 +102,8 @@ function AdminPage() {
       return data ?? [];
     },
   });
+  const listBans = useServerFn(adminListBans);
+  const bans = useQuery({ queryKey: ["admin-bans"], enabled: isAdmin, queryFn: () => listBans() });
 
   const deposits = useQuery({
     queryKey: ["admin-deposits"],
@@ -252,6 +295,7 @@ function AdminPage() {
                         مدير
                       </label>
                     </div>
+                    {u.id !== user.id && <AccountActions userId={u.id} bannedUntil={bans.data?.[u.id]} onDone={() => { void bans.refetch(); void users.refetch(); }} />}
                   </div>
                 ))}
               </div>

@@ -15,6 +15,13 @@
       "when": 1791514911908,
       "tag": "0001_restrict_public_reads_to_authenticated",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791936462887,
+      "tag": "0002_admin_manual_credit",
+      "breakpoints": true
     }
   ]
 }

@@ -1,4 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Coins, ArrowDownToLine, ArrowUpFromLine, RefreshCw, Lock } from "lucide-react";
@@ -142,6 +145,8 @@ function FinancePage() {
         ))}
       </div>
 
+      <ManualCredit />
+
       <ProfitsAnalytics />
 
       <Tabs defaultValue="ledger" className="mt-10">
@@ -249,6 +254,61 @@ function TxRow({
           TxID: {txId}
         </code>
       )}
+    </div>
+  );
+}
+
+function ManualCredit() {
+  const [q, setQ] = useState("");
+  const [target, setTarget] = useState<{ id: string; label: string } | null>(null);
+  const [amount, setAmount] = useState("");
+  const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
+  const users = useQuery({
+    queryKey: ["finance-users"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_users_full");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const s = q.trim().toLowerCase();
+  const matches = s.length < 2 ? [] : (users.data ?? []).filter((u) =>
+    [u.email, u.display_name, u.full_name, u.deposit_tag, u.phone].some((v) => (v ?? "").toLowerCase().includes(s)),
+  ).slice(0, 6);
+
+  const submit = async () => {
+    const n = Number(amount);
+    if (!target || !Number.isFinite(n) || n === 0) { toast.error("اختر مستخدمًا وأدخل مبلغًا صحيحًا"); return; }
+    setBusy(true);
+    const { error } = await supabase.rpc("admin_credit_user", { _user_id: target.id, _amount: n, _note: note.trim() || "إضافة يدوية" });
+    setBusy(false);
+    if (error) { toast.error(error.message === "NEGATIVE_BALANCE" ? "الرصيد لا يكفي للخصم" : error.message); return; }
+    toast.success(n > 0 ? `تمت إضافة ${formatUsd(n)}` : `تم خصم ${formatUsd(-n)}`);
+    setAmount(""); setNote(""); void users.refetch();
+  };
+
+  return (
+    <div className="glass mt-8 rounded-2xl p-6">
+      <h2 className="font-display text-xl font-bold">إضافة رصيد يدويًا</h2>
+      <p className="mt-1 text-sm text-muted-foreground">ابحث بالاسم أو البريد أو معرّف المحفظة. استخدم مبلغًا سالبًا للخصم.</p>
+      <Input className="mt-4" placeholder="بحث عن مستخدم..." value={q} onChange={(e) => setQ(e.target.value)} />
+      {matches.length > 0 && (
+        <div className="mt-2 grid gap-1">
+          {matches.map((u) => (
+            <button key={u.id} type="button" onClick={() => { setTarget({ id: u.id, label: `${u.display_name} — ${u.email}` }); setQ(""); }}
+              className="rounded-lg px-3 py-2 text-start text-sm hover:bg-secondary">
+              {u.display_name} • {u.email} • {u.deposit_tag} • {formatUsd(Number(u.balance ?? 0))}
+            </button>
+          ))}
+        </div>
+      )}
+      {target && <p className="mt-3 text-sm">المستخدم: <span className="font-semibold text-primary">{target.label}</span></p>}
+      <div className="mt-3 grid gap-3 sm:grid-cols-[160px_1fr_auto]">
+        <Input type="number" placeholder="المبلغ $" value={amount} onChange={(e) => setAmount(e.target.value)} />
+        <Input placeholder="ملاحظة (اختياري)" value={note} maxLength={120} onChange={(e) => setNote(e.target.value)} />
+        <Button disabled={busy || !target} onClick={() => void submit()}>تنفيذ</Button>
+      </div>
     </div>
   );
 }

@@ -16,7 +16,9 @@ import { Route as FinanceRouteImport } from './routes/finance'
 import { Route as ForumRouteImport } from './routes/forum'
 import { Route as MarketRouteImport } from './routes/market'
 import { Route as OrdersRouteImport } from './routes/orders'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProfitsRouteImport } from './routes/profits'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as ChatIndexRouteImport } from './routes/chat.index'
@@ -59,9 +61,19 @@ const OrdersRoute = OrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfitsRoute = ProfitsRouteImport.update({
   id: '/profits',
   path: '/profits',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SellRoute = SellRouteImport.update({
@@ -103,7 +115,9 @@ export interface FileRoutesByFullPath {
   '/forum': typeof ForumRoute
   '/market': typeof MarketRoute
   '/orders': typeof OrdersRoute
+  '/profile': typeof ProfileRoute
   '/profits': typeof ProfitsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRoute
   '/chat/$id': typeof ChatIdRoute
@@ -119,7 +133,9 @@ export interface FileRoutesByTo {
   '/forum': typeof ForumRoute
   '/market': typeof MarketRoute
   '/orders': typeof OrdersRoute
+  '/profile': typeof ProfileRoute
   '/profits': typeof ProfitsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRoute
   '/chat/$id': typeof ChatIdRoute
@@ -136,7 +152,9 @@ export interface FileRoutesById {
   '/forum': typeof ForumRoute
   '/market': typeof MarketRoute
   '/orders': typeof OrdersRoute
+  '/profile': typeof ProfileRoute
   '/profits': typeof ProfitsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRoute
   '/chat/$id': typeof ChatIdRoute
@@ -154,7 +172,9 @@ export interface FileRouteTypes {
     | '/forum'
     | '/market'
     | '/orders'
+    | '/profile'
     | '/profits'
+    | '/reset-password'
     | '/sell'
     | '/wallet'
     | '/chat/$id'
@@ -170,7 +190,9 @@ export interface FileRouteTypes {
     | '/forum'
     | '/market'
     | '/orders'
+    | '/profile'
     | '/profits'
+    | '/reset-password'
     | '/sell'
     | '/wallet'
     | '/chat/$id'
@@ -186,7 +208,9 @@ export interface FileRouteTypes {
     | '/forum'
     | '/market'
     | '/orders'
+    | '/profile'
     | '/profits'
+    | '/reset-password'
     | '/sell'
     | '/wallet'
     | '/chat/$id'
@@ -203,7 +227,9 @@ export interface RootRouteChildren {
   ForumRoute: typeof ForumRoute
   MarketRoute: typeof MarketRoute
   OrdersRoute: typeof OrdersRoute
+  ProfileRoute: typeof ProfileRoute
   ProfitsRoute: typeof ProfitsRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SellRoute: typeof SellRoute
   WalletRoute: typeof WalletRoute
   ChatIdRoute: typeof ChatIdRoute
@@ -263,11 +289,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profits': {
       id: '/profits'
       path: '/profits'
       fullPath: '/profits'
       preLoaderRoute: typeof ProfitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sell': {
@@ -323,7 +363,9 @@ const rootRouteChildren: RootRouteChildren = {
   ForumRoute: ForumRoute,
   MarketRoute: MarketRoute,
   OrdersRoute: OrdersRoute,
+  ProfileRoute: ProfileRoute,
   ProfitsRoute: ProfitsRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SellRoute: SellRoute,
   WalletRoute: WalletRoute,
   ChatIdRoute: ChatIdRoute,
