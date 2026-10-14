@@ -292,6 +292,36 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          is_read: boolean
+          link: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           amount: number
@@ -601,6 +631,10 @@ export type Database = {
         Args: { _amount: number; _note: string; _user_id: string }
         Returns: undefined
       }
+      admin_dispute_conversation: {
+        Args: { _order_id: string }
+        Returns: string
+      }
       admin_finance_summary: {
         Args: never
         Returns: {
@@ -664,6 +698,10 @@ export type Database = {
           total_orders: number
           total_users: number
         }[]
+      }
+      admin_send_notification: {
+        Args: { _body: string; _link: string; _title: string; _user_id: string }
+        Returns: number
       }
       admin_set_user_role: {
         Args: { _make_admin: boolean; _user_id: string }

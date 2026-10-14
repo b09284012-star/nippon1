@@ -197,6 +197,9 @@ function AdminPage() {
           <TabsTrigger value="disputes">
             <Gavel className="size-4" /> النزاعات
           </TabsTrigger>
+          <TabsTrigger value="notify">
+            <BellRing className="size-4" /> إرسال إشعار
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="withdrawals" className="mt-6 grid gap-4">
@@ -314,6 +317,18 @@ function AdminPage() {
                 <span className="text-xs text-muted-foreground">{formatDate(d.created_at)}</span>
               </div>
               <p className="mt-2 text-sm">{d.reason}</p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="mt-3"
+                onClick={async () => {
+                  const { data, error } = await supabase.rpc("admin_dispute_conversation", { _order_id: d.order_id });
+                  if (error || !data) toast.error(error?.message ?? "تعذر فتح الدردشة");
+                  else void navigate({ to: "/chat/$id", params: { id: data } });
+                }}
+              >
+                دخول دردشة البائع والمشتري
+              </Button>
               {d.status === "open" && (
                 <div className="mt-4 flex gap-2">
                   <Button
@@ -347,6 +362,10 @@ function AdminPage() {
               )}
             </div>
           ))}
+        </TabsContent>
+
+        <TabsContent value="notify" className="mt-6">
+          <SendNotification users={(users.data ?? []) as { id: string; display_name: string; email: string | null }[]} />
         </TabsContent>
       </Tabs>
     </div>
@@ -549,6 +568,56 @@ function DepositRow({ d, onDone }: { d: DepositRowData; onDone: () => void }) {
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+function SendNotification({ users }: { users: { id: string; display_name: string; email: string | null }[] }) {
+  const [target, setTarget] = useState<string>("all");
+  const [search, setSearch] = useState("");
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [busy, setBusy] = useState(false);
+  const s = search.trim().toLowerCase();
+  const matches = s
+    ? users.filter((u) => u.display_name?.toLowerCase().includes(s) || u.email?.toLowerCase().includes(s)).slice(0, 8)
+    : [];
+  const selected = users.find((u) => u.id === target);
+
+  const send = async () => {
+    if (title.trim().length < 2) { toast.error("اكتب عنوان الإشعار"); return; }
+    setBusy(true);
+    const { data, error } = await supabase.rpc("admin_send_notification", {
+      _user_id: (target === "all" ? null : target) as string,
+      _title: title.trim(),
+      _body: body.trim(),
+      _link: null as unknown as string,
+    });
+    setBusy(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`تم الإرسال إلى ${data} مستخدم`);
+    setTitle(""); setBody("");
+  };
+
+  return (
+    <div className="glass grid max-w-xl gap-3 rounded-2xl p-5">
+      <div className="flex flex-wrap gap-2">
+        <Button size="sm" variant={target === "all" ? "default" : "outline"} onClick={() => setTarget("all")}>كل المستخدمين</Button>
+        <Input className="flex-1" placeholder="أو ابحث عن مستخدم بالاسم أو البريد" value={search} onChange={(e) => setSearch(e.target.value)} />
+      </div>
+      {matches.length > 0 && (
+        <div className="grid gap-1">
+          {matches.map((u) => (
+            <button key={u.id} className={cn("rounded-lg p-2 text-start text-sm hover:bg-secondary", target === u.id && "bg-primary/15")} onClick={() => { setTarget(u.id); setSearch(""); }}>
+              {u.display_name} <span className="text-xs text-muted-foreground" dir="ltr">{u.email}</span>
+            </button>
+          ))}
+        </div>
+      )}
+      <p className="text-xs text-muted-foreground">المستلم: {target === "all" ? "كل المستخدمين" : selected?.display_name ?? "—"}</p>
+      <Input placeholder="عنوان الإشعار" value={title} onChange={(e) => setTitle(e.target.value.slice(0, 120))} />
+      <Input placeholder="نص الإشعار" value={body} onChange={(e) => setBody(e.target.value.slice(0, 1000))} />
+      <Button disabled={busy} onClick={() => void send()}>إرسال الإشعار</Button>
     </div>
   );
 }

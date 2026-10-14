@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/nippon-logo.png.asset.json";
+import { NotificationsBell } from "@/components/site/NotificationsBell";
 
 const links = [
   { to: "/market", label: "السوق" },
@@ -64,6 +65,7 @@ export function Header() {
               >
                 <Wallet2 className="size-4" /> محفظتي
               </Button>
+              <NotificationsBell />
               <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/profile" })}>
                 <UserRound className="size-4" /> حسابي
               </Button>
