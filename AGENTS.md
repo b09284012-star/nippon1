@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Financial visualizations use the shared AnalyticsCharts module and semantic chart tokens so sales and profit views retain consistent axes, tooltips, and status colors.
+- Notifications use one user-scoped shared query for the header badge and full-page inbox so read state and incoming alerts stay synchronized.
