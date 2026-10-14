@@ -40,9 +40,10 @@ function ChatRoomPage() {
     queryFn: async () => {
       const { data: c } = await supabase.from("conversations").select("buyer_id, seller_id").eq("id", id).maybeSingle();
       if (!c) return null;
+      const isParty = c.buyer_id === user!.id || c.seller_id === user!.id;
       const otherId = c.buyer_id === user!.id ? c.seller_id : c.buyer_id;
       const { data: p } = await supabase.from("profiles").select("id, display_name").eq("id", otherId).maybeSingle();
-      return p;
+      return p ? { ...p, buyer_id: c.buyer_id, seller_id: c.seller_id, isParty } : null;
     },
   });
   const otherOnline = useIsOnline(other?.id);
@@ -112,7 +113,7 @@ function ChatRoomPage() {
           <span className={cn("absolute bottom-0 end-0 size-3 rounded-full border-2 border-background", otherOnline ? "bg-primary" : "bg-muted-foreground/50")} />
         </div>
         <div>
-          <h1 className="font-display text-xl font-black">{other?.display_name ?? "المحادثة"}</h1>
+          <h1 className="font-display text-xl font-black">{other && !other.isParty ? "دردشة النزاع (الإدارة)" : other?.display_name ?? "المحادثة"}</h1>
           <p className="text-xs text-muted-foreground">{otherOnline ? "نشط الآن" : "غير متصل"}</p>
         </div>
       </div>
@@ -130,6 +131,12 @@ function ChatRoomPage() {
                 mine ? "ms-auto bg-primary text-primary-foreground" : "bg-secondary",
               )}
             >
+              {other && m.sender_id !== other.buyer_id && m.sender_id !== other.seller_id && (
+                <span className="mb-1 block text-[10px] font-bold">الإدارة</span>
+              )}
+              {other && !other.isParty && !mine && (
+                <span className="mb-1 block text-[10px] font-bold">{m.sender_id === other.buyer_id ? "المشتري" : "البائع"}</span>
+              )}
               <p className="whitespace-pre-wrap">{m.body}</p>
               <span className="mt-1 block text-[10px] opacity-70">{formatDate(m.created_at)}</span>
             </div>
