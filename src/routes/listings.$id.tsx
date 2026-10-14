@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Cpu, Zap, ShieldCheck, Clock, MapPin, Star, MessagesSquare, Minus, Plus, Boxes, BadgeCheck, Pencil, Trash2 } from "lucide-react";
+import { Cpu, Zap, ShieldCheck, Clock, MapPin, MessagesSquare, Minus, Plus, Boxes, Pencil, Trash2 } from "lucide-react";
 import { useIsOnline } from "@/lib/presence";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,8 @@ export const Route = createFileRoute("/listings/$id")({
       },
       { property: "og:title", content: "تفاصيل الجهاز | Nippon" },
       { property: "og:description", content: "شراء أجهزة تعدين مستعملة بحماية المشتري على نيبون." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ListingDetail,
@@ -61,12 +63,10 @@ function ListingDetail() {
     queryKey: ["seller", listing?.seller_id],
     enabled: Boolean(listing?.seller_id),
     queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, display_name, avatar_url, bio, country, rating, sales_count, is_verified_seller")
-        .eq("id", listing!.seller_id)
-        .maybeSingle();
-      return data;
+      if (!listing?.seller_id) return null;
+      const { data, error } = await supabase.rpc("public_profile_names", { _ids: [listing.seller_id] });
+      if (error) throw error;
+      return data?.[0] ?? null;
     },
   });
 
@@ -179,18 +179,8 @@ function ListingDetail() {
                 <div className="text-xs text-muted-foreground">البائع</div>
                 <div className="flex items-center gap-2 font-bold">
                   {seller?.display_name ?? "—"}
-                  {seller?.is_verified_seller && (
-                    <Badge className="gap-1"><BadgeCheck className="size-3.5" /> بائع معتمد</Badge>
-                  )}
                 </div>
                 <OnlineStatus userId={listing.seller_id} />
-              </div>
-              <div className="flex items-center gap-1 text-warning">
-                <Star className="size-4 fill-current" />
-                <span className="text-sm">{Number(seller?.rating ?? 0).toFixed(1)}</span>
-                <span className="text-xs text-muted-foreground">
-                  ({seller?.sales_count ?? 0} صفقة)
-                </span>
               </div>
             </div>
           </div>

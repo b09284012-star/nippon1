@@ -36,7 +36,7 @@ type Post = {
   author_id: string;
   body: string;
   created_at: string;
-  profiles?: { display_name: string; avatar_url: string | null } | null;
+  profiles?: { display_name: string } | null;
 };
 
 function ForumPage() {
@@ -141,16 +141,20 @@ function Channel({ channel }: { channel: "general" | "announcements" }) {
   const canPost = Boolean(user) && (channel === "general" || isAdmin);
 
   const posts = useQuery({
-    queryKey: ["forum", channel],
+    queryKey: ["forum", channel, user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("forum_posts")
-        .select("id, channel, author_id, body, created_at, profiles(display_name, avatar_url)")
+        .select("id, channel, author_id, body, created_at")
         .eq("channel", channel)
         .order("created_at", { ascending: false })
         .limit(100);
       if (error) throw error;
-      return (data ?? []) as unknown as Post[];
+      if (!data?.length) return [] as Post[];
+      const { data: names, error: namesError } = await supabase.rpc("public_profile_names", { _ids: [...new Set(data.map((p) => p.author_id))] });
+      if (namesError) throw namesError;
+      const byId = new Map((names ?? []).map((p) => [p.id, p.display_name]));
+      return data.map((p) => ({ ...p, profiles: { display_name: byId.get(p.author_id) ?? "مستخدم" } }));
     },
   });
 
