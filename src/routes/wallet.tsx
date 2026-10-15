@@ -234,7 +234,7 @@ function WalletPage() {
               <Input
                 value={depTxid}
                 onChange={(e) => setDepTxid(e.target.value.trim())}
-                placeholder="hash التحويل على شبكة TRC20"
+                placeholder={`hash التحويل على شبكة ${network}`}
               />
             </div>
             <Button
@@ -249,7 +249,7 @@ function WalletPage() {
                   toast.error("رقم المعاملة غير صحيح");
                   return;
                 }
-                confirmDeposit.mutate({ amount: n, txid: depTxid });
+                confirmDeposit.mutate({ amount: n, txid: `${network}:${depTxid}` });
               }}
             >
               {confirmDeposit.isPending ? "جارٍ الإرسال…" : "تأكيد الإيداع"}
