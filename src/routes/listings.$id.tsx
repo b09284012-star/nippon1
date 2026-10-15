@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Cpu, Zap, ShieldCheck, Clock, MapPin, MessagesSquare, Minus, Plus, Boxes, Pencil, Trash2 } from "lucide-react";
+import { Cpu, Zap, ShieldCheck, Clock, MapPin, MessagesSquare, Minus, Plus, Boxes, Pencil, Trash2, Star } from "lucide-react";
 import { useIsOnline } from "@/lib/presence";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -71,6 +71,35 @@ function ListingDetail() {
   });
 
   const { data: imageUrl } = useStorageUrl("listing-images", listing?.images?.[0]);
+
+  const { data: reviews } = useQuery({
+    queryKey: ["seller-reviews", listing?.seller_id],
+    enabled: Boolean(listing?.seller_id),
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("reviews")
+        .select("id, rating, comment, created_at, reviewer_id")
+        .eq("seller_id", listing!.seller_id)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      return data ?? [];
+    },
+  });
+
+  const { data: reviewerNames } = useQuery({
+    queryKey: ["reviewer-names", (reviews ?? []).map((r) => r.reviewer_id).join(",")],
+    enabled: (reviews ?? []).length > 0,
+    queryFn: async () => {
+      const ids = [...new Set((reviews ?? []).map((r) => r.reviewer_id))];
+      const { data } = await supabase.rpc("public_profile_names", { _ids: ids });
+      return new Map((data ?? []).map((p) => [p.id, p.display_name]));
+    },
+  });
+
+  const avgRating =
+    reviews && reviews.length > 0
+      ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
+      : null;
 
   const startChat = async () => {
     if (!user) { navigate({ to: "/auth" }); return; }
@@ -180,6 +209,15 @@ function ListingDetail() {
                 <div className="flex items-center gap-2 font-bold">
                   {seller?.display_name ?? "—"}
                 </div>
+                {avgRating !== null && (
+                  <div className="mt-1 flex items-center gap-1.5 text-sm">
+                    <Star className="size-4 fill-primary text-primary" />
+                    <span className="font-bold">{avgRating.toFixed(1)}</span>
+                    <span className="text-xs text-muted-foreground">
+                      ({reviews?.length} تقييم)
+                    </span>
+                  </div>
+                )}
                 <OnlineStatus userId={listing.seller_id} />
               </div>
             </div>
@@ -284,6 +322,43 @@ function ListingDetail() {
       <div className="glass mt-10 rounded-2xl p-6">
         <h2 className="font-display text-xl font-bold">الوصف</h2>
         <p className="mt-3 whitespace-pre-line text-muted-foreground">{listing.description}</p>
+      </div>
+
+      <div className="glass mt-6 rounded-2xl p-6">
+        <h2 className="font-display text-xl font-bold">تقييمات البائع</h2>
+        {(reviews ?? []).length === 0 ? (
+          <p className="mt-3 text-sm text-muted-foreground">لا توجد تقييمات بعد لهذا البائع.</p>
+        ) : (
+          <div className="mt-4 grid gap-3">
+            {(reviews ?? []).map((r) => (
+              <div key={r.id} className="rounded-xl border border-border/50 p-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-bold">
+                    {reviewerNames?.get(r.reviewer_id) ?? "مشتري"}
+                  </span>
+                  <span className="inline-flex items-center gap-0.5">
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <Star
+                        key={n}
+                        className={
+                          n <= r.rating
+                            ? "size-4 fill-primary text-primary"
+                            : "size-4 text-muted-foreground/40"
+                        }
+                      />
+                    ))}
+                  </span>
+                  <span className="ms-auto text-xs text-muted-foreground">
+                    {new Date(r.created_at).toLocaleDateString("ar")}
+                  </span>
+                </div>
+                {r.comment && (
+                  <p className="mt-2 text-sm text-muted-foreground">{r.comment}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

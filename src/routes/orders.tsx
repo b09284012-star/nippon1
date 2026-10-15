@@ -2,9 +2,11 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth";
 import { formatDate, formatUsd } from "@/lib/media";
@@ -150,6 +152,15 @@ function OrdersPage() {
                   </Button>
                 )}
 
+                {isBuyer && o.status === "completed" && (
+                  <ReviewForm
+                    orderId={o.id}
+                    sellerId={o.seller_id}
+                    reviewerId={user!.id}
+                    onDone={() => void refetch()}
+                  />
+                )}
+
                 {o.status !== "completed" && o.status !== "refunded" && o.status !== "disputed" && (
                   <Button
                     size="sm"
@@ -172,5 +183,112 @@ function OrdersPage() {
         })}
       </div>
     </div>
+  );
+}
+
+function ReviewForm({
+  orderId,
+  sellerId,
+  reviewerId,
+  onDone,
+}: {
+  orderId: string;
+  sellerId: string;
+  reviewerId: string;
+  onDone: () => void;
+}) {
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const { data: existing } = useQuery({
+    queryKey: ["my-review", orderId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("reviews")
+        .select("id, rating, comment")
+        .eq("order_id", orderId)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  if (existing) {
+    return (
+      <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+        <span>تقييمك:</span>
+        <Stars value={existing.rating} />
+        {existing.comment ? <span>— {existing.comment}</span> : null}
+      </div>
+    );
+  }
+
+  const submit = async () => {
+    if (rating < 1) {
+      toast.error("اختر عدد النجوم أولًا");
+      return;
+    }
+    setBusy(true);
+    const { error } = await supabase.from("reviews").insert({
+      order_id: orderId,
+      seller_id: sellerId,
+      reviewer_id: reviewerId,
+      rating,
+      comment: comment.trim() || null,
+    });
+    setBusy(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("شكرًا! تم إرسال تقييمك للبائع");
+    onDone();
+  };
+
+  return (
+    <div className="glass mt-3 rounded-xl p-3">
+      <div className="text-sm font-bold">قيّم البائع بعد اكتمال الصفقة</div>
+      <div className="mt-2 flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button
+            key={n}
+            type="button"
+            aria-label={`${n} نجوم`}
+            onClick={() => setRating(n)}
+            className="p-0.5"
+          >
+            <Star
+              className={
+                n <= rating ? "size-6 fill-primary text-primary" : "size-6 text-muted-foreground/40"
+              }
+            />
+          </button>
+        ))}
+      </div>
+      <Textarea
+        className="mt-2"
+        placeholder="اكتب تجربتك مع البائع (اختياري)"
+        value={comment}
+        onChange={(e) => setComment(e.target.value.slice(0, 500))}
+      />
+      <Button size="sm" className="mt-2" onClick={() => void submit()} disabled={busy}>
+        {busy ? "جارٍ الإرسال…" : "إرسال التقييم"}
+      </Button>
+    </div>
+  );
+}
+
+function Stars({ value }: { value: number }) {
+  return (
+    <span className="inline-flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <Star
+          key={n}
+          className={
+            n <= value ? "size-4 fill-primary text-primary" : "size-4 text-muted-foreground/40"
+          }
+        />
+      ))}
+    </span>
   );
 }
