@@ -2,9 +2,11 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth";
 import { formatDate, formatUsd } from "@/lib/media";
@@ -148,6 +150,10 @@ function OrdersPage() {
                   >
                     تأكيد الاستلام وتحرير المبلغ
                   </Button>
+                )}
+
+                {isBuyer && o.status === "completed" && (
+                  <ReviewForm orderId={o.id} sellerId={o.seller_id} onDone={() => void refetch()} />
                 )}
 
                 {o.status !== "completed" && o.status !== "refunded" && o.status !== "disputed" && (
