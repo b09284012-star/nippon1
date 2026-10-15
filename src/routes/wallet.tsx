@@ -113,8 +113,8 @@ function WalletPage() {
       const { error } = await supabase.rpc("submit_deposit_confirmation", {
         _amount: vars.amount,
         _txid: vars.txid,
-        _receipt_number: vars.receipt || null,
-        _receipt_path: receiptPath,
+        _receipt_number: vars.receipt || undefined,
+        _receipt_path: receiptPath ?? undefined,
       });
       if (error) throw error;
     },
