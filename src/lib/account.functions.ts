@@ -36,6 +36,32 @@ export const adminAccountAction = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const adminCreateCompany = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { email: string; password: string; companyName: string }) => {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)) throw new Error("بريد إلكتروني غير صالح");
+    if (!input.password || input.password.length < 6) throw new Error("كلمة المرور 6 أحرف على الأقل");
+    if (!input.companyName?.trim()) throw new Error("اسم الشركة مطلوب");
+    return input;
+  })
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!isAdmin) throw new Error("FORBIDDEN");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
+      email: data.email.trim().toLowerCase(),
+      password: data.password,
+      email_confirm: true,
+      user_metadata: { display_name: data.companyName.trim() },
+    });
+    if (error) throw new Error(error.message);
+    const uid = created.user?.id;
+    if (!uid) throw new Error("تعذر إنشاء الحساب");
+    const { error: pErr } = await supabaseAdmin.from("profiles").update({ is_company: true, display_name: data.companyName.trim() }).eq("id", uid);
+    if (pErr) throw new Error(pErr.message);
+    return { ok: true, userId: uid };
+  });
+
 export const adminListBans = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
