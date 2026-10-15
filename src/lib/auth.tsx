@@ -12,6 +12,7 @@ export type Profile = {
   rating: number;
   sales_count: number;
   is_verified_seller: boolean;
+  is_company: boolean;
 };
 
 type AuthValue = {

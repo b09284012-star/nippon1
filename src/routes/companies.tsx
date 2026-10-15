@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -8,7 +8,11 @@ import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ListingCard, type ListingRow } from "@/components/site/ListingCard";
+import { type ListingRow } from "@/components/site/ListingCard";
+import { CompanyListingCard } from "@/components/site/CompanyListingCard";
+import { CompanyIdentity } from "@/components/site/CompanyIdentity";
+import { CompanyProfileEditor } from "@/components/site/CompanyProfileEditor";
+import { useCompanies } from "@/lib/companies";
 
 export const Route = createFileRoute("/companies")({
   head: () => ({
@@ -27,13 +31,15 @@ export const Route = createFileRoute("/companies")({
 const WA = "https://wa.me/447723335221?text=" + encodeURIComponent("مرحبًا، أريد توثيق حساب شركتي على Nippon. البريد المسجل: ");
 
 function Companies() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const companies = useCompanies();
 
   const me = useQuery({
     queryKey: ["my-company", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("is_company,is_verified_seller").eq("id", user!.id).maybeSingle();
+      if (!user) return null;
+      const { data } = await supabase.from("profiles").select("is_company,is_verified_seller").eq("id", user.id).maybeSingle();
       return data;
     },
   });
@@ -62,6 +68,12 @@ function Companies() {
       <p className="mt-2 text-muted-foreground">أجهزة من شركات موثقة برخصة تجارية.</p>
 
       {!user && <CompanySignup />}
+      {user && me.data?.is_company && (
+        <div className="mt-6">
+          <CompanyProfileEditor userId={user.id} defaultName={profile?.display_name ?? ""} />
+          {me.data.is_verified_seller && <Button asChild className="mt-4"><Link to="/sell">نشر عرض شركة</Link></Button>}
+        </div>
+      )}
 
       {user && me.data?.is_company && !me.data.is_verified_seller && (
         <div className="glass mt-6 rounded-2xl p-5">
@@ -78,9 +90,18 @@ function Companies() {
       )}
 
       {user && (
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {listings.data?.map((l) => <ListingCard key={l.id} listing={l} />)}
-          {!listings.isLoading && !listings.data?.length && (
+        <div className="mt-8 space-y-10">
+          {(listings.isLoading || companies.isLoading) && <p className="text-muted-foreground">جارٍ تحميل الشركات…</p>}
+          {(listings.isError || companies.isError) && <p className="text-destructive">تعذر تحميل عروض الشركات.</p>}
+          {companies.data?.map((company) => {
+            const offers = (listings.data ?? []).filter((listing) => listing.seller_id === company.user_id);
+            return <section key={company.user_id} className="border-t border-border pt-6">
+              <CompanyIdentity company={company} />
+              <div className="mt-5 space-y-4">{offers.map((listing) => <CompanyListingCard key={listing.id} listing={listing} />)}</div>
+              {!listings.isLoading && !offers.length && <p className="mt-4 text-sm text-muted-foreground">لا توجد عروض متاحة لهذه الشركة حاليًا.</p>}
+            </section>;
+          })}
+          {!listings.isLoading && !companies.isLoading && !companies.isError && !companies.data?.length && (
             <p className="text-muted-foreground">لا توجد عروض من الشركات حاليًا.</p>
           )}
         </div>

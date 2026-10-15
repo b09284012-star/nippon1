@@ -67,6 +67,7 @@ function SellPage() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!user) return;
     const fd = new FormData(e.currentTarget);
     const parsed = schema.safeParse(Object.fromEntries(fd.entries()));
     if (!parsed.success) {
@@ -77,7 +78,7 @@ function SellPage() {
     try {
       const paths: string[] = [];
       for (const file of Array.from(files ?? [])) {
-        const path = `${user!.id}/${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}`;
         const { error } = await supabase.storage.from("listing-images").upload(path, file);
         if (error) throw error;
         paths.push(path);
@@ -91,7 +92,7 @@ function SellPage() {
           hours_used: hours_used ?? null,
           location: location ?? null,
           images: paths,
-          seller_id: user!.id,
+          seller_id: user.id,
         })
         .select("id")
         .single();
@@ -108,7 +109,7 @@ function SellPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
       <h1 className="font-display text-3xl font-black">
-        أضف <span className="neon-text">عرض</span>
+        أضف <span className="neon-text">{profile?.is_company ? "عرض شركة" : "عرض"}</span>
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
         السعر ومدة الضمان حقول إلزامية، والنشر متاح للبائعين المعتمدين من الإدارة فقط.

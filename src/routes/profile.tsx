@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth";
 import { deleteMyAccount } from "@/lib/account.functions";
+import { CompanyProfileEditor } from "@/components/site/CompanyProfileEditor";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -65,7 +66,8 @@ function ProfilePage() {
       supabase.from("user_private_info").upsert({ user_id: user.id, full_name: f.full_name.trim(), phone: f.phone.trim(), country: f.country.trim() || null, city: f.city.trim() || null, address: f.address.trim() }),
     ]);
     setBusy(false);
-    if (a.error || b.error) { toast.error((a.error ?? b.error)!.message); return; }
+    const error = a.error ?? b.error;
+    if (error) { toast.error(error.message); return; }
     toast.success("تم حفظ البيانات");
     void refreshProfile();
   };
@@ -103,6 +105,8 @@ function ProfilePage() {
           {profile?.is_verified_seller && <Badge variant="secondary" className="mt-1">بائع معتمد</Badge>}
         </div>
       </div>
+
+      {profile?.is_company && <CompanyProfileEditor userId={user.id} defaultName={profile.display_name} />}
 
       <section className="glass grid gap-4 rounded-3xl p-6">
         <h2 className="font-display text-lg font-bold">البيانات الشخصية</h2>
