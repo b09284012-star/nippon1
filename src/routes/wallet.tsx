@@ -107,7 +107,7 @@ function WalletPage() {
         receiptPath = `${user!.id}/${crypto.randomUUID()}.${ext}`;
         const { error: upErr } = await supabase.storage
           .from("deposit-receipts")
-          .upload(receiptPath, vars.file, { contentType: vars.file.type || undefined });
+          .upload(receiptPath, vars.file, vars.file.type ? { contentType: vars.file.type } : {});
         if (upErr) throw upErr;
       }
       const { error } = await supabase.rpc("submit_deposit_confirmation", {
