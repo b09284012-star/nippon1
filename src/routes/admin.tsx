@@ -14,7 +14,44 @@ import { formatDate, formatUsd } from "@/lib/media";
 import { useOnlineKeys } from "@/lib/presence";
 import { cn } from "@/lib/utils";
 import { useServerFn } from "@tanstack/react-start";
-import { adminAccountAction, adminListBans } from "@/lib/account.functions";
+import { adminAccountAction, adminCreateCompany, adminListBans } from "@/lib/account.functions";
+
+function CreateCompanyForm({ onDone }: { onDone: () => void }) {
+  const create = useServerFn(adminCreateCompany);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const submit = async () => {
+    setBusy(true);
+    try {
+      await create({ data: { email, password, companyName: name } });
+      toast.success("تم إنشاء حساب الشركة");
+      setName(""); setEmail(""); setPassword("");
+      onDone();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "تعذر إنشاء الحساب");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="glass rounded-2xl p-4">
+      <div className="mb-3 flex items-center gap-2 font-display font-bold">
+        <UserPlus className="size-4 text-primary" /> إنشاء حساب تجاري (شركة)
+      </div>
+      <div className="grid gap-2 sm:grid-cols-3">
+        <Input value={name} onChange={(e) => setName(e.target.value.slice(0, 60))} placeholder="اسم الشركة" />
+        <Input value={email} onChange={(e) => setEmail(e.target.value.slice(0, 120))} placeholder="البريد الإلكتروني" dir="ltr" type="email" />
+        <Input value={password} onChange={(e) => setPassword(e.target.value.slice(0, 72))} placeholder="كلمة المرور" dir="ltr" type="text" />
+      </div>
+      <Button className="mt-3" size="sm" disabled={busy || !name.trim() || !email.trim() || password.length < 6} onClick={() => void submit()}>
+        إنشاء الحساب
+      </Button>
+      <p className="mt-2 text-xs text-muted-foreground">يُنشأ الحساب مفعّلًا مباشرة وموسومًا كشركة، ويظهر في صفحة «شراء من الشركات» بعد اعتماده كبائع.</p>
+    </div>
+  );
+}
 
 function AccountActions({ userId, bannedUntil, onDone }: { userId: string; bannedUntil?: string | undefined; onDone: () => void }) {
   const act = useServerFn(adminAccountAction);
@@ -230,6 +267,7 @@ function AdminPage() {
 
 
         <TabsContent value="users" className="mt-6 grid gap-3">
+          <CreateCompanyForm onDone={() => { void users.refetch(); void companies.refetch(); }} />
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value.slice(0, 60))}
