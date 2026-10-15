@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth";
-import { formatDate, formatUsd } from "@/lib/media";
+import { formatDate, formatUsd, useStorageUrl } from "@/lib/media";
 import { useOnlineKeys } from "@/lib/presence";
 import { cn } from "@/lib/utils";
 import { useServerFn } from "@tanstack/react-start";
