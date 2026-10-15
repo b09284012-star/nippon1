@@ -38,7 +38,6 @@ function Market() {
   const [condition, setCondition] = useState("all");
   const [maxPrice, setMaxPrice] = useState(8000);
   const [warranty, setWarranty] = useState("all");
-  const [country, setCountry] = useState("all");
 
   const { data, isLoading } = useQuery({
     queryKey: ["listings"],
