@@ -64,6 +64,13 @@
       "when": 1792091543866,
       "tag": "0008_company_branding_separate_market",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792103649317,
+      "tag": "0009_deposit_receipt_number_and_screenshot",
+      "breakpoints": true
     }
   ]
 }

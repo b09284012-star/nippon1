@@ -94,6 +94,8 @@ export type Database = {
           created_at: string
           id: string
           processed_at: string | null
+          receipt_image_path: string | null
+          receipt_number: string | null
           status: Database["public"]["Enums"]["withdrawal_status"]
           txid: string
           user_id: string
@@ -104,6 +106,8 @@ export type Database = {
           created_at?: string
           id?: string
           processed_at?: string | null
+          receipt_image_path?: string | null
+          receipt_number?: string | null
           status?: Database["public"]["Enums"]["withdrawal_status"]
           txid: string
           user_id: string
@@ -114,6 +118,8 @@ export type Database = {
           created_at?: string
           id?: string
           processed_at?: string | null
+          receipt_image_path?: string | null
+          receipt_number?: string | null
           status?: Database["public"]["Enums"]["withdrawal_status"]
           txid?: string
           user_id?: string
@@ -706,6 +712,8 @@ export type Database = {
           email: string
           id: string
           processed_at: string
+          receipt_image_path: string
+          receipt_number: string
           status: Database["public"]["Enums"]["withdrawal_status"]
           txid: string
           user_id: string
@@ -902,7 +910,12 @@ export type Database = {
         Returns: undefined
       }
       submit_deposit_confirmation: {
-        Args: { _amount: number; _txid: string }
+        Args: {
+          _amount: number
+          _receipt_number?: string
+          _receipt_path?: string
+          _txid: string
+        }
         Returns: string
       }
       verified_company_ids: { Args: never; Returns: string[] }
