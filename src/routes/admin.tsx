@@ -178,7 +178,7 @@ function AdminPage() {
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard icon={Radio} label="المستخدمون المتصلون الآن" value={String(onlineKeys.size)} live />
-        <StatCard icon={Users} label="إجمالي المستخدمين" value={String(stats.data?.total_users ?? 0)} />
+        <StatCard icon={Users} label="إجمالي المستخدمين" value={String(users.data?.length ?? stats.data?.total_users ?? 0)} />
         <StatCard icon={UserPlus} label="حسابات جديدة (7 أيام)" value={String(stats.data?.new_users_7d ?? 0)} />
         <StatCard icon={Package} label="العروض / الطلبات" value={`${stats.data?.total_listings ?? 0} / ${stats.data?.total_orders ?? 0}`} />
       </div>
