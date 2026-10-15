@@ -99,10 +99,22 @@ function WalletPage() {
   });
 
   const confirmDeposit = useMutation({
-    mutationFn: async (vars: { amount: number; txid: string }) => {
+    mutationFn: async (vars: { amount: number; txid: string; receipt: string; file: File | null }) => {
+      let receiptPath: string | null = null;
+      if (vars.file) {
+        if (vars.file.size > 10 * 1024 * 1024) throw new Error("حجم الصورة أكبر من 10MB");
+        const ext = vars.file.name.split(".").pop() ?? "jpg";
+        receiptPath = `${user!.id}/${crypto.randomUUID()}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("deposit-receipts")
+          .upload(receiptPath, vars.file, { contentType: vars.file.type || undefined });
+        if (upErr) throw upErr;
+      }
       const { error } = await supabase.rpc("submit_deposit_confirmation", {
         _amount: vars.amount,
         _txid: vars.txid,
+        _receipt_number: vars.receipt || null,
+        _receipt_path: receiptPath,
       });
       if (error) throw error;
     },
@@ -110,6 +122,8 @@ function WalletPage() {
       toast.success("تم إرسال تأكيد الإيداع للمراجعة");
       setDepAmount("");
       setDepTxid("");
+      setDepReceipt("");
+      setDepFile(null);
       void qc.invalidateQueries({ queryKey: ["my-deposit-requests"] });
     },
     onError: (e: Error) => toast.error(e.message || "تعذر إرسال تأكيد الإيداع"),
