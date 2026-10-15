@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth";
 import { ForgotPassword } from "@/components/site/ForgotPassword";
+import { COUNTRIES } from "@/lib/countries";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -119,7 +121,19 @@ function AuthPage() {
             <Field label="الاسم الحقيقي الكامل" value={fullName} onChange={setFullName} />
             <Field label="رقم الهاتف" value={phone} onChange={setPhone} type="tel" />
             <div className="grid grid-cols-2 gap-3">
-              <Field label="الدولة" value={country} onChange={setCountry} />
+              <div>
+                <Label className="mb-1.5 block text-sm">الدولة</Label>
+                <Select value={country} onValueChange={setCountry}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر الدولة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {COUNTRIES.map((c) => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <Field label="المدينة" value={city} onChange={setCity} />
             </div>
             <Field label="العنوان بالتفصيل" value={addr} onChange={setAddr} />
