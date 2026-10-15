@@ -550,7 +550,6 @@ type DepositRowData = {
   email: string | null;
   amount: number;
   txid: string;
-  receipt_number: string | null;
   receipt_image_path: string | null;
   status: string;
   admin_note: string | null;
@@ -573,14 +572,9 @@ function DepositRow({ d, onDone }: { d: DepositRowData; onDone: () => void }) {
         <span className="ms-auto font-display text-lg font-black">{formatUsd(d.amount)}</span>
       </div>
       <p className="mt-2 text-xs text-muted-foreground">{d.email}</p>
-      <code className="mt-2 block overflow-x-auto whitespace-nowrap rounded-lg bg-background/70 px-3 py-2 text-xs">
-        TxID: {d.txid}
+      <code className="mt-2 block overflow-x-auto whitespace-nowrap rounded-lg bg-background/70 px-3 py-2 text-xs" dir="ltr">
+        مرجع الطلب: {d.txid}
       </code>
-      {d.receipt_number && (
-        <p className="mt-2 text-xs">
-          رقم إيصال التحويل: <span className="font-semibold" dir="ltr">{d.receipt_number}</span>
-        </p>
-      )}
       {d.receipt_image_path && (
         <a href={receiptUrl.data ?? undefined} target="_blank" rel="noreferrer" className="mt-2 block">
           {receiptUrl.data ? (

@@ -71,6 +71,13 @@
       "when": 1792103649317,
       "tag": "0009_deposit_receipt_number_and_screenshot",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792104046391,
+      "tag": "0010_drop_deposit_txid_and_receipt_inputs",
+      "breakpoints": true
     }
   ]
 }

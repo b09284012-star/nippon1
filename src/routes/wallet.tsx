@@ -57,8 +57,6 @@ function WalletPage() {
   const [wdAmount, setWdAmount] = useState("");
   const [wdAddress, setWdAddress] = useState("");
   const [depAmount, setDepAmount] = useState("");
-  const [depTxid, setDepTxid] = useState("");
-  const [depReceipt, setDepReceipt] = useState("");
   const [depFile, setDepFile] = useState<File | null>(null);
   const [network, setNetwork] = useState<string>("TRC20");
   const fetchWallet = useServerFn(getMyWallet);
@@ -90,7 +88,7 @@ function WalletPage() {
     queryFn: async () => {
       const { data: rows, error } = await supabase
         .from("deposit_requests")
-        .select("id, amount, txid, status, admin_note, created_at")
+        .select("id, amount, status, admin_note, created_at")
         .order("created_at", { ascending: false })
         .limit(20);
       if (error) throw error;
@@ -99,7 +97,7 @@ function WalletPage() {
   });
 
   const confirmDeposit = useMutation({
-    mutationFn: async (vars: { amount: number; txid: string; receipt: string; file: File | null }) => {
+    mutationFn: async (vars: { amount: number; file: File | null }) => {
       let receiptPath: string | null = null;
       if (vars.file) {
         if (vars.file.size > 10 * 1024 * 1024) throw new Error("حجم الصورة أكبر من 10MB");
@@ -112,8 +110,6 @@ function WalletPage() {
       }
       const { error } = await supabase.rpc("submit_deposit_confirmation", {
         _amount: vars.amount,
-        _txid: vars.txid,
-        ...(vars.receipt ? { _receipt_number: vars.receipt } : {}),
         ...(receiptPath ? { _receipt_path: receiptPath } : {}),
       });
       if (error) throw error;
@@ -121,8 +117,6 @@ function WalletPage() {
     onSuccess: () => {
       toast.success("تم إرسال تأكيد الإيداع للمراجعة");
       setDepAmount("");
-      setDepTxid("");
-      setDepReceipt("");
       setDepFile(null);
       void qc.invalidateQueries({ queryKey: ["my-deposit-requests"] });
     },
@@ -230,7 +224,7 @@ function WalletPage() {
         <div className="mt-6 rounded-2xl border border-border/60 p-4">
           <h3 className="font-display font-bold">تأكيد الإيداع</h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            بعد إرسال التحويل، أدخل القيمة ورقم المعاملة (TxID) وسيراجعها الفريق ثم يُضاف المبلغ لرصيدك.
+            بعد إرسال التحويل، أدخل القيمة وأرفق صورة سكرين التحويل، وسيراجعها الفريق ثم يُضاف المبلغ لرصيدك.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div>
@@ -240,22 +234,6 @@ function WalletPage() {
                 value={depAmount}
                 onChange={(e) => setDepAmount(e.target.value.slice(0, 10))}
                 placeholder="100"
-              />
-            </div>
-            <div>
-              <Label className="mb-2 block">رقم المعاملة (TxID)</Label>
-              <Input
-                value={depTxid}
-                onChange={(e) => setDepTxid(e.target.value.trim())}
-                placeholder={`hash التحويل على شبكة ${network}`}
-              />
-            </div>
-            <div>
-              <Label className="mb-2 block">رقم إيصال التحويل</Label>
-              <Input
-                value={depReceipt}
-                onChange={(e) => setDepReceipt(e.target.value.trim().slice(0, 60))}
-                placeholder="رقم الواصل من تطبيق التحويل"
               />
             </div>
             <div>
@@ -277,15 +255,11 @@ function WalletPage() {
                 toast.error("أقل قيمة إيداع 2 USDT");
                 return;
               }
-              if (depTxid.length < 10) {
-                toast.error("رقم المعاملة غير صحيح");
-                return;
-              }
               if (!depFile) {
                 toast.error("أرفق صورة سكرين للتحويل");
                 return;
               }
-              confirmDeposit.mutate({ amount: n, txid: depTxid, receipt: depReceipt, file: depFile });
+              confirmDeposit.mutate({ amount: n, file: depFile });
             }}
           >
             {confirmDeposit.isPending ? "جارٍ الإرسال…" : "تأكيد الإيداع"}
@@ -301,7 +275,6 @@ function WalletPage() {
                 <div key={d.id} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
                   <Badge variant={s.variant}>{s.label}</Badge>
                   <span className="font-display font-bold">{formatUsd(d.amount)}</span>
-                  <code className="max-w-[14rem] truncate text-xs text-muted-foreground">{d.txid}</code>
                   <span className="text-xs text-muted-foreground">{formatDate(d.created_at)}</span>
                   {d.admin_note && (
                     <span className="w-full text-xs text-destructive">ملاحظة الإدارة: {d.admin_note}</span>
