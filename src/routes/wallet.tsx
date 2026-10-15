@@ -144,7 +144,7 @@ function WalletPage() {
         محفظة <span className="neon-text">USDT</span>
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        رسوم الإيداع 1 دولار لكل عملية، وعمولة البيع 5% تُخصم عند تحرير المبلغ للبائع.
+        رسوم الإيداع 1 دولار لكل عملية، ورسوم البيع 5% تُخصم عند تحرير المبلغ للبائع.
       </p>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-3">

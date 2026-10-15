@@ -43,6 +43,13 @@
       "when": 1792024822809,
       "tag": "0005_chat_attachments",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792029067712,
+      "tag": "0006_raise_sale_fee_to_5_percent",
+      "breakpoints": true
     }
   ]
 }

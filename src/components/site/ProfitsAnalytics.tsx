@@ -92,7 +92,7 @@ export function ProfitsAnalytics() {
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          [Coins, "صافي أرباح العمولات", formatUsd(stats.earned + stats.wdFees), `عمولات ${formatUsd(stats.earned)} + سحب ${formatUsd(stats.wdFees)}`],
+          [Coins, "صافي أرباح الرسوم", formatUsd(stats.earned + stats.wdFees), `رسوم البيع ${formatUsd(stats.earned)} + سحب ${formatUsd(stats.wdFees)}`],
           [TrendingUp, "حجم المبيعات", formatUsd(stats.volume), `${stats.count} صفقة مكتملة`],
           [Clock, "أرباح معلّقة", formatUsd(stats.pending), "طلبات داخل الضمان"],
           [ShoppingCart, "متوسط قيمة الصفقة", formatUsd(stats.avg), `${stats.total} طلب في الفترة`],

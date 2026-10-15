@@ -122,7 +122,7 @@ function FinancePage() {
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
           ["قيمة الأجهزة المعروضة", formatUsd(Number(summary.data?.listed_value ?? 0)), `${summary.data?.listed_count ?? 0} عرض نشط`],
-          ["أرباح متوقعة (2.5%)", formatUsd(Number(summary.data?.expected_fees ?? 0)), "من الأجهزة المعروضة"],
+          ["أرباح متوقعة (5%)", formatUsd(Number(summary.data?.expected_fees ?? 0)), "من الأجهزة المعروضة"],
           ["أرباح محققة", formatUsd(Number(summary.data?.earned_fees ?? 0)), `+ ${formatUsd(Number(summary.data?.held_fees ?? 0))} في الضمان`],
           ["رسوم السحب", formatUsd(Number(summary.data?.withdrawal_fees ?? 0)), "2.5$ لكل سحب مكتمل"],
         ].map(([l, v, h]) => (
