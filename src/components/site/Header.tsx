@@ -9,6 +9,7 @@ import { NotificationsBell } from "@/components/site/NotificationsBell";
 
 const links = [
   { to: "/market", label: "السوق" },
+  { to: "/companies", label: "شراء من الشركات" },
   { to: "/sell", label: "أضف عرض" },
   { to: "/chat", label: "الدردشة" },
   { to: "/forum", label: "المنتدى" },

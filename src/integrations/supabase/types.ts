@@ -395,6 +395,7 @@ export type Database = {
           created_at: string
           display_name: string
           id: string
+          is_company: boolean
           is_verified_seller: boolean
           kyc_status: Database["public"]["Enums"]["kyc_status"]
           rating: number
@@ -407,6 +408,7 @@ export type Database = {
           created_at?: string
           display_name?: string
           id: string
+          is_company?: boolean
           is_verified_seller?: boolean
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
           rating?: number
@@ -419,6 +421,7 @@ export type Database = {
           created_at?: string
           display_name?: string
           id?: string
+          is_company?: boolean
           is_verified_seller?: boolean
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
           rating?: number
@@ -712,6 +715,10 @@ export type Database = {
         Args: { _body: string; _link: string; _title: string; _user_id: string }
         Returns: number
       }
+      admin_set_company: {
+        Args: { _company: boolean; _user_id: string }
+        Returns: undefined
+      }
       admin_set_user_role: {
         Args: { _make_admin: boolean; _user_id: string }
         Returns: undefined
@@ -818,6 +825,7 @@ export type Database = {
         Args: { _amount: number; _txid: string }
         Returns: string
       }
+      verified_company_ids: { Args: never; Returns: string[] }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
