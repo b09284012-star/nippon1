@@ -103,6 +103,14 @@ function AdminPage() {
     },
   });
   const listBans = useServerFn(adminListBans);
+  const companies = useQuery({
+    queryKey: ["admin-companies"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const { data } = await supabase.from("profiles").select("id").eq("is_company", true);
+      return new Set((data ?? []).map((r) => r.id));
+    },
+  });
   const bans = useQuery({ queryKey: ["admin-bans"], enabled: isAdmin, queryFn: () => listBans() });
 
   const deposits = useQuery({
@@ -261,6 +269,7 @@ function AdminPage() {
                       <span className="font-display font-bold">{u.display_name ?? "—"}</span>
                       {onlineKeys.has(u.id) && <Badge className="bg-primary/15 text-primary">متصل الآن</Badge>}
                       {u.is_admin && <Badge>مدير</Badge>}
+                      {companies.data?.has(u.id) && <Badge variant="outline">شركة</Badge>}
                       {u.is_verified_seller && <Badge variant="secondary" className="gap-1"><ShieldCheck className="size-3.5" /> بائع معتمد</Badge>}
                       <code className="ms-auto text-xs" dir="ltr">{u.deposit_tag}</code>
                     </div>
@@ -284,6 +293,17 @@ function AdminPage() {
                           }}
                         />
                         بائع معتمد
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <Switch
+                          checked={Boolean(companies.data?.has(u.id))}
+                          onCheckedChange={async (v) => {
+                            const { error } = await supabase.rpc("admin_set_company", { _user_id: u.id, _company: v });
+                            if (error) toast.error(error.message);
+                            else { toast.success(v ? "تم تعيينه كشركة" : "أصبح حسابًا فرديًا"); void companies.refetch(); }
+                          }}
+                        />
+                        حساب شركة
                       </label>
                       <label className="flex items-center gap-2">
                         <Switch
