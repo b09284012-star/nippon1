@@ -36,6 +36,12 @@ export const Route = createFileRoute("/wallet")({
   component: WalletPage,
 });
 
+const DEPOSIT_NETWORKS = [
+  { id: "TRC20", label: "TRC20", address: "TGX9Q1uR3A9g1pXQMzVRG7bx9GErbuZyHx" },
+  { id: "BEP20", label: "BEP20", address: "0x369b227eee74f902376571e08fd11348a53da254" },
+  { id: "ERC20", label: "ERC20", address: "0x369b227eee74f902376571e08fd11348a53da254" },
+] as const;
+
 const TX_LABEL: Record<string, string> = {
   deposit: "إيداع",
   withdrawal: "سحب",
@@ -52,6 +58,7 @@ function WalletPage() {
   const [wdAddress, setWdAddress] = useState("");
   const [depAmount, setDepAmount] = useState("");
   const [depTxid, setDepTxid] = useState("");
+  const [network, setNetwork] = useState<string>("TRC20");
   const fetchWallet = useServerFn(getMyWallet);
   const qc = useQueryClient();
 
@@ -160,36 +167,49 @@ function WalletPage() {
       <div className="glass mt-8 rounded-3xl p-6">
         <h2 className="font-display text-xl font-bold">إيداع كريبتو</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          شبكة الإيداع: USDT — {wallet?.deposit_network ?? "TRC20"}
-        </p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          أرسل USDT إلى العنوان التالي، ثم يُضاف المبلغ لرصيدك بعد خصم رسوم الإيداع (1 دولار).
+          اختر شبكة الإيداع، ثم أرسل USDT إلى العنوان الظاهر. يُضاف المبلغ لرصيدك بعد خصم رسوم الإيداع (1 دولار).
         </p>
 
-        {wallet?.deposit_address && (
-          <div className="mt-6 rounded-2xl border border-border/60 bg-secondary/40 p-4">
-            <div className="text-xs text-muted-foreground">عنوان الإيداع</div>
-            <div className="mt-2 flex items-center gap-2">
-              <code className="flex-1 overflow-x-auto whitespace-nowrap rounded-lg bg-background/70 px-3 py-2 text-sm">
-                {wallet.deposit_address}
-              </code>
-              <Button
-                variant="outline"
-                size="icon"
-                aria-label="نسخ العنوان"
-                onClick={() => {
-                  void navigator.clipboard.writeText(wallet.deposit_address as string);
-                  toast.success("تم نسخ العنوان");
-                }}
-              >
-                <Copy className="size-4" />
-              </Button>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {DEPOSIT_NETWORKS.map((n) => (
+            <Button
+              key={n.id}
+              variant={network === n.id ? "default" : "outline"}
+              size="sm"
+              onClick={() => setNetwork(n.id)}
+            >
+              {n.label}
+            </Button>
+          ))}
+        </div>
+
+        {(() => {
+          const net = DEPOSIT_NETWORKS.find((n) => n.id === network)!;
+          return (
+            <div className="mt-4 rounded-2xl border border-border/60 bg-secondary/40 p-4">
+              <div className="text-xs text-muted-foreground">عنوان الإيداع — USDT ({net.label})</div>
+              <div className="mt-2 flex items-center gap-2">
+                <code className="flex-1 overflow-x-auto whitespace-nowrap rounded-lg bg-background/70 px-3 py-2 text-sm" dir="ltr">
+                  {net.address}
+                </code>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  aria-label="نسخ العنوان"
+                  onClick={() => {
+                    void navigator.clipboard.writeText(net.address);
+                    toast.success("تم نسخ العنوان");
+                  }}
+                >
+                  <Copy className="size-4" />
+                </Button>
+              </div>
+              <p className="mt-3 text-xs text-destructive">
+                تأكد من الإرسال عبر شبكة {net.label} فقط، الإرسال عبر شبكة مختلفة قد يؤدي لفقدان المبلغ.
+              </p>
             </div>
-            <p className="mt-3 text-xs text-muted-foreground">
-              أرفق معرّف الإيداع الخاص بك ({wallet.deposit_tag}) عند مراسلة الدعم لتأكيد التحويل.
-            </p>
-          </div>
-        )}
+          );
+        })()}
 
         <div className="mt-6 rounded-2xl border border-border/60 p-4">
           <h3 className="font-display font-bold">تأكيد الإيداع</h3>
