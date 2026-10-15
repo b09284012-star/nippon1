@@ -153,7 +153,12 @@ function OrdersPage() {
                 )}
 
                 {isBuyer && o.status === "completed" && (
-                  <ReviewForm orderId={o.id} sellerId={o.seller_id} onDone={() => void refetch()} />
+                  <ReviewForm
+                    orderId={o.id}
+                    sellerId={o.seller_id}
+                    reviewerId={user!.id}
+                    onDone={() => void refetch()}
+                  />
                 )}
 
                 {o.status !== "completed" && o.status !== "refunded" && o.status !== "disputed" && (
@@ -184,10 +189,12 @@ function OrdersPage() {
 function ReviewForm({
   orderId,
   sellerId,
+  reviewerId,
   onDone,
 }: {
   orderId: string;
   sellerId: string;
+  reviewerId: string;
   onDone: () => void;
 }) {
   const [rating, setRating] = useState(0);
@@ -225,6 +232,7 @@ function ReviewForm({
     const { error } = await supabase.from("reviews").insert({
       order_id: orderId,
       seller_id: sellerId,
+      reviewer_id: reviewerId,
       rating,
       comment: comment.trim() || null,
     });
