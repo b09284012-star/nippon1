@@ -1,3 +1,4 @@
+import { useMyCountry } from "@/lib/my-country";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ShieldCheck, MessagesSquare, Wallet2, BadgeCheck, ArrowLeft } from "lucide-react";
@@ -51,13 +52,16 @@ const steps = [
 ];
 
 function Home() {
+  const { country } = useMyCountry();
   const { data: listings } = useQuery({
-    queryKey: ["latest-listings"],
+    queryKey: ["latest-listings", country],
+    enabled: !!country,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("listings")
         .select("*")
         .eq("status", "active")
+        .eq("location", country)
         .order("created_at", { ascending: false })
         .limit(6);
       if (error) throw error;
