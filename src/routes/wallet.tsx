@@ -231,7 +231,7 @@ function WalletPage() {
               <Input
                 value={depTxid}
                 onChange={(e) => setDepTxid(e.target.value.trim())}
-                placeholder="hash التحويل على شبكة TRC20"
+                placeholder={`hash التحويل على شبكة ${network}`}
               />
             </div>
             <Button
