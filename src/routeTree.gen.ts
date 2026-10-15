@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CompaniesRouteImport } from './routes/companies'
 import { Route as FinanceRouteImport } from './routes/finance'
 import { Route as ForumRouteImport } from './routes/forum'
 import { Route as MarketRouteImport } from './routes/market'
@@ -40,6 +41,11 @@ const AdminRoute = AdminRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompaniesRoute = CompaniesRouteImport.update({
+  id: '/companies',
+  path: '/companies',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FinanceRoute = FinanceRouteImport.update({
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/companies': typeof CompaniesRoute
   '/finance': typeof FinanceRoute
   '/forum': typeof ForumRoute
   '/market': typeof MarketRoute
@@ -136,6 +143,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/companies': typeof CompaniesRoute
   '/finance': typeof FinanceRoute
   '/forum': typeof ForumRoute
   '/market': typeof MarketRoute
@@ -156,6 +164,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/companies': typeof CompaniesRoute
   '/finance': typeof FinanceRoute
   '/forum': typeof ForumRoute
   '/market': typeof MarketRoute
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/companies'
     | '/finance'
     | '/forum'
     | '/market'
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/companies'
     | '/finance'
     | '/forum'
     | '/market'
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/companies'
     | '/finance'
     | '/forum'
     | '/market'
@@ -235,6 +247,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
+  CompaniesRoute: typeof CompaniesRoute
   FinanceRoute: typeof FinanceRoute
   ForumRoute: typeof ForumRoute
   MarketRoute: typeof MarketRoute
@@ -272,6 +285,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/companies': {
+      id: '/companies'
+      path: '/companies'
+      fullPath: '/companies'
+      preLoaderRoute: typeof CompaniesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/finance': {
@@ -379,6 +399,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
+  CompaniesRoute: CompaniesRoute,
   FinanceRoute: FinanceRoute,
   ForumRoute: ForumRoute,
   MarketRoute: MarketRoute,
