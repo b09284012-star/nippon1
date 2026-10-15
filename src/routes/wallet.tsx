@@ -58,6 +58,8 @@ function WalletPage() {
   const [wdAddress, setWdAddress] = useState("");
   const [depAmount, setDepAmount] = useState("");
   const [depTxid, setDepTxid] = useState("");
+  const [depReceipt, setDepReceipt] = useState("");
+  const [depFile, setDepFile] = useState<File | null>(null);
   const [network, setNetwork] = useState<string>("TRC20");
   const fetchWallet = useServerFn(getMyWallet);
   const qc = useQueryClient();
