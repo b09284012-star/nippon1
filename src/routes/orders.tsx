@@ -180,3 +180,107 @@ function OrdersPage() {
     </div>
   );
 }
+
+function ReviewForm({
+  orderId,
+  sellerId,
+  onDone,
+}: {
+  orderId: string;
+  sellerId: string;
+  onDone: () => void;
+}) {
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const { data: existing } = useQuery({
+    queryKey: ["my-review", orderId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("reviews")
+        .select("id, rating, comment")
+        .eq("order_id", orderId)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  if (existing) {
+    return (
+      <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+        <span>تقييمك:</span>
+        <Stars value={existing.rating} />
+        {existing.comment ? <span>— {existing.comment}</span> : null}
+      </div>
+    );
+  }
+
+  const submit = async () => {
+    if (rating < 1) {
+      toast.error("اختر عدد النجوم أولًا");
+      return;
+    }
+    setBusy(true);
+    const { error } = await supabase.from("reviews").insert({
+      order_id: orderId,
+      seller_id: sellerId,
+      rating,
+      comment: comment.trim() || null,
+    });
+    setBusy(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("شكرًا! تم إرسال تقييمك للبائع");
+    onDone();
+  };
+
+  return (
+    <div className="glass mt-3 rounded-xl p-3">
+      <div className="text-sm font-bold">قيّم البائع بعد اكتمال الصفقة</div>
+      <div className="mt-2 flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button
+            key={n}
+            type="button"
+            aria-label={`${n} نجوم`}
+            onClick={() => setRating(n)}
+            className="p-0.5"
+          >
+            <Star
+              className={
+                n <= rating ? "size-6 fill-primary text-primary" : "size-6 text-muted-foreground/40"
+              }
+            />
+          </button>
+        ))}
+      </div>
+      <Textarea
+        className="mt-2"
+        placeholder="اكتب تجربتك مع البائع (اختياري)"
+        value={comment}
+        onChange={(e) => setComment(e.target.value.slice(0, 500))}
+      />
+      <Button size="sm" className="mt-2" onClick={() => void submit()} disabled={busy}>
+        {busy ? "جارٍ الإرسال…" : "إرسال التقييم"}
+      </Button>
+    </div>
+  );
+}
+
+function Stars({ value }: { value: number }) {
+  return (
+    <span className="inline-flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <Star
+          key={n}
+          className={
+            n <= value ? "size-4 fill-primary text-primary" : "size-4 text-muted-foreground/40"
+          }
+        />
+      ))}
+    </span>
+  );
+}
