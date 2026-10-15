@@ -5,6 +5,7 @@ import { FALLBACK_IMAGE, formatUsd, useStorageUrl } from "@/lib/media";
 
 export type ListingRow = {
   id: string;
+  seller_id: string;
   title: string;
   brand: string;
   model: string;
