@@ -13,6 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useMyCountry } from "@/lib/my-country";
+import { COUNTRIES } from "@/lib/countries";
 import { ListingCard, type ListingRow } from "@/components/site/ListingCard";
 
 export const Route = createFileRoute("/market")({
@@ -39,13 +41,16 @@ function Market() {
   const [maxPrice, setMaxPrice] = useState(8000);
   const [warranty, setWarranty] = useState("all");
 
+  const { country, isAccount, setGuest } = useMyCountry();
   const { data, isLoading } = useQuery({
-    queryKey: ["listings"],
+    queryKey: ["listings", country],
+    enabled: !!country,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("listings")
         .select("*")
         .eq("status", "active")
+        .eq("location", country)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data as unknown as ListingRow[];
@@ -69,9 +74,22 @@ function Market() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
-      <h1 className="font-display text-4xl font-black">السوق</h1>
+      <h1 className="font-display text-4xl font-black">
+        السوق{country ? ` — ${country}` : ""}
+      </h1>
+      {!isAccount && (
+        <div className="mt-4 max-w-xs">
+          <Label className="mb-2 block">اختر دولتك لعرض سوقها</Label>
+          <Select value={country} onValueChange={setGuest}>
+            <SelectTrigger><SelectValue placeholder="اختر الدولة" /></SelectTrigger>
+            <SelectContent>
+              {COUNTRIES.map((c) => (<SelectItem key={c} value={c}>{c}</SelectItem>))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
       <p className="mt-2 text-muted-foreground">
-        {isLoading ? "جاري التحميل…" : `${filtered.length} جهاز متاح`}
+        {!country ? "اختر دولتك لعرض الأجهزة المتاحة فيها." : isLoading ? "جاري التحميل…" : `${filtered.length} جهاز متاح في ${country}`}
       </p>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[280px_1fr]">
@@ -150,7 +168,7 @@ function Market() {
           {filtered.map((l) => (
             <ListingCard key={l.id} listing={l} />
           ))}
-          {!isLoading && filtered.length === 0 && (
+          {country && !isLoading && filtered.length === 0 && (
             <p className="text-muted-foreground">لا توجد نتائج مطابقة.</p>
           )}
         </div>
