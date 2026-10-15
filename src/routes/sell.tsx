@@ -151,7 +151,24 @@ function SellPage() {
           defaultValue={1}
         />
         <Field name="hours_used" label="ساعات التشغيل (اختياري)" type="number" />
-        <Field name="location" label="الموقع (اختياري)" placeholder="طرابلس" />
+        <div>
+          <Label className="mb-2 block">الدولة *</Label>
+          <select
+            name="location"
+            required
+            defaultValue=""
+            className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+          >
+            <option value="" disabled>
+              اختر الدولة
+            </option>
+            {COUNTRIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </div>
 
         <div className="sm:col-span-2">
           <Label className="mb-2 block">الوصف</Label>
@@ -175,6 +192,34 @@ function SellPage() {
     </div>
   );
 }
+
+const COUNTRIES = [
+  "ليبيا",
+  "السعودية",
+  "الإمارات",
+  "مصر",
+  "تونس",
+  "الجزائر",
+  "المغرب",
+  "الأردن",
+  "العراق",
+  "الكويت",
+  "قطر",
+  "البحرين",
+  "عُمان",
+  "اليمن",
+  "سوريا",
+  "لبنان",
+  "فلسطين",
+  "السودان",
+  "موريتانيا",
+  "تركيا",
+  "ألمانيا",
+  "فرنسا",
+  "بريطانيا",
+  "الولايات المتحدة",
+  "أخرى",
+];
 
 function Field({
   name,
