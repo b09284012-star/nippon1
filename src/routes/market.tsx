@@ -46,12 +46,7 @@ function Market() {
     queryKey: ["listings", country],
     enabled: !!country,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("listings")
-        .select("*")
-        .eq("status", "active")
-        .eq("location", country)
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.rpc("regular_market_listings", { _country: country });
       if (error) throw error;
       return data as unknown as ListingRow[];
     },

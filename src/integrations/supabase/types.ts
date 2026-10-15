@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      company_profiles: {
+        Row: {
+          company_name: string
+          contact_email: string
+          contact_phone: string
+          description: string
+          logo_path: string | null
+          user_id: string
+          website: string
+        }
+        Insert: {
+          company_name?: string
+          contact_email?: string
+          contact_phone?: string
+          description?: string
+          logo_path?: string | null
+          user_id: string
+          website?: string
+        }
+        Update: {
+          company_name?: string
+          contact_email?: string
+          contact_phone?: string
+          description?: string
+          logo_path?: string | null
+          user_id?: string
+          website?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversations: {
         Row: {
           buyer_id: string
@@ -751,6 +789,18 @@ export type Database = {
         Args: { _id: string; _tx_hash?: string }
         Returns: undefined
       }
+      company_directory: {
+        Args: never
+        Returns: {
+          company_name: string
+          contact_email: string
+          contact_phone: string
+          description: string
+          logo_path: string
+          user_id: string
+          website: string
+        }[]
+      }
       create_escrow_order: {
         Args: {
           _listing_id: string
@@ -786,6 +836,36 @@ export type Database = {
         }[]
       }
       refund_escrow: { Args: { _order_id: string }; Returns: undefined }
+      regular_market_listings: {
+        Args: { _country: string; _limit?: number }
+        Returns: {
+          algorithm: string | null
+          availability: string
+          brand: string
+          condition: string
+          created_at: string
+          description: string
+          hashrate: string
+          hours_used: number | null
+          id: string
+          images: string[]
+          location: string | null
+          model: string
+          power_watts: number
+          price_usd: number
+          quantity: number
+          seller_id: string
+          status: Database["public"]["Enums"]["listing_status"]
+          title: string
+          warranty_months: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "listings"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       reject_deposit: {
         Args: { _id: string; _reason: string }
         Returns: undefined

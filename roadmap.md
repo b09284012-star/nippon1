@@ -2,3 +2,6 @@
 - [x] Verify the inbox with an authenticated account.
 - [x] Resolve the flagged profile-read exposure after the owner's access decision.
 - [x] Slightly increase spacing between the homepage's two headline lines.
+- [x] Add company branding, logo upload, and explicitly public business contact details.
+- [x] Give company offers a distinct presentation and exclude them from regular market/home feeds.
+- [x] Verify company profile saving and inventory separation with a temporary offer and logo, then remove test data.

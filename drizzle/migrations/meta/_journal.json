@@ -57,6 +57,13 @@
       "when": 1792029818838,
       "tag": "0007_company_accounts",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792091543866,
+      "tag": "0008_company_branding_separate_market",
+      "breakpoints": true
     }
   ]
 }

@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/dialog";
 import { FALLBACK_IMAGE, formatUsd, useStorageUrl } from "@/lib/media";
 import { useAuth } from "@/lib/auth";
+import { useCompanies } from "@/lib/companies";
+import { CompanyIdentity } from "@/components/site/CompanyIdentity";
 
 export const Route = createFileRoute("/listings/$id")({
   head: () => ({
@@ -44,6 +46,7 @@ function ListingDetail() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user, isAdmin } = useAuth();
+  const companies = useCompanies();
   const [editOpen, setEditOpen] = useState(false);
   const [address, setAddress] = useState("");
   const [buying, setBuying] = useState(false);
@@ -141,6 +144,7 @@ function ListingDetail() {
   if (!listing) return <div className="mx-auto max-w-7xl px-4 py-20">جاري التحميل…</div>;
 
   const isOwner = user?.id === listing.seller_id || isAdmin;
+  const company = companies.data?.find((entry) => entry.user_id === listing.seller_id);
 
   const removeListing = async () => {
     if (!confirm("حذف هذا المنشور نهائيًا؟")) return;
@@ -152,7 +156,8 @@ function ListingDetail() {
     } else toast.success("تم حذف المنشور");
     await queryClient.invalidateQueries({ queryKey: ["listings"] });
     await queryClient.invalidateQueries({ queryKey: ["latest-listings"] });
-    navigate({ to: "/market" });
+    await queryClient.invalidateQueries({ queryKey: ["company-listings"] });
+    navigate({ to: company ? "/companies" : "/market" });
   };
 
   const onOrder = listing.availability === "on_order";
@@ -160,6 +165,7 @@ function ListingDetail() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
+      {company && <section className="mb-8 border-b border-border pb-6"><CompanyIdentity company={company} /></section>}
       <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
         <div className="glass card-3d overflow-hidden rounded-3xl p-3">
           <img
