@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth";
-import { formatDate, formatUsd } from "@/lib/media";
+import { formatDate, formatUsd, useStorageUrl } from "@/lib/media";
 import { useOnlineKeys } from "@/lib/presence";
 import { cn } from "@/lib/utils";
 import { useServerFn } from "@tanstack/react-start";
@@ -550,6 +550,8 @@ type DepositRowData = {
   email: string | null;
   amount: number;
   txid: string;
+  receipt_number: string | null;
+  receipt_image_path: string | null;
   status: string;
   admin_note: string | null;
   created_at: string;
@@ -558,6 +560,7 @@ type DepositRowData = {
 function DepositRow({ d, onDone }: { d: DepositRowData; onDone: () => void }) {
   const [reason, setReason] = useState("");
   const [showReason, setShowReason] = useState(false);
+  const receiptUrl = useStorageUrl("deposit-receipts", d.receipt_image_path);
   const [busy, setBusy] = useState(false);
 
   return (
@@ -573,6 +576,24 @@ function DepositRow({ d, onDone }: { d: DepositRowData; onDone: () => void }) {
       <code className="mt-2 block overflow-x-auto whitespace-nowrap rounded-lg bg-background/70 px-3 py-2 text-xs">
         TxID: {d.txid}
       </code>
+      {d.receipt_number && (
+        <p className="mt-2 text-xs">
+          رقم إيصال التحويل: <span className="font-semibold" dir="ltr">{d.receipt_number}</span>
+        </p>
+      )}
+      {d.receipt_image_path && (
+        <a href={receiptUrl.data ?? undefined} target="_blank" rel="noreferrer" className="mt-2 block">
+          {receiptUrl.data ? (
+            <img
+              src={receiptUrl.data}
+              alt="سكرين التحويل"
+              className="max-h-48 rounded-xl border border-border/60 object-contain"
+            />
+          ) : (
+            <span className="text-xs text-muted-foreground">جارٍ تحميل صورة السكرين…</span>
+          )}
+        </a>
+      )}
       <p className="mt-2 text-xs text-muted-foreground">{formatDate(d.created_at)}</p>
       {d.admin_note && <p className="mt-2 text-xs text-destructive">ملاحظة: {d.admin_note}</p>}
 

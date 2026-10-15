@@ -58,6 +58,8 @@ function WalletPage() {
   const [wdAddress, setWdAddress] = useState("");
   const [depAmount, setDepAmount] = useState("");
   const [depTxid, setDepTxid] = useState("");
+  const [depReceipt, setDepReceipt] = useState("");
+  const [depFile, setDepFile] = useState<File | null>(null);
   const [network, setNetwork] = useState<string>("TRC20");
   const fetchWallet = useServerFn(getMyWallet);
   const qc = useQueryClient();
@@ -97,10 +99,22 @@ function WalletPage() {
   });
 
   const confirmDeposit = useMutation({
-    mutationFn: async (vars: { amount: number; txid: string }) => {
+    mutationFn: async (vars: { amount: number; txid: string; receipt: string; file: File | null }) => {
+      let receiptPath: string | null = null;
+      if (vars.file) {
+        if (vars.file.size > 10 * 1024 * 1024) throw new Error("حجم الصورة أكبر من 10MB");
+        const ext = vars.file.name.split(".").pop() ?? "jpg";
+        receiptPath = `${user!.id}/${crypto.randomUUID()}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("deposit-receipts")
+          .upload(receiptPath, vars.file, vars.file.type ? { contentType: vars.file.type } : {});
+        if (upErr) throw upErr;
+      }
       const { error } = await supabase.rpc("submit_deposit_confirmation", {
         _amount: vars.amount,
         _txid: vars.txid,
+        ...(vars.receipt ? { _receipt_number: vars.receipt } : {}),
+        ...(receiptPath ? { _receipt_path: receiptPath } : {}),
       });
       if (error) throw error;
     },
@@ -108,6 +122,8 @@ function WalletPage() {
       toast.success("تم إرسال تأكيد الإيداع للمراجعة");
       setDepAmount("");
       setDepTxid("");
+      setDepReceipt("");
+      setDepFile(null);
       void qc.invalidateQueries({ queryKey: ["my-deposit-requests"] });
     },
     onError: (e: Error) => toast.error(e.message || "تعذر إرسال تأكيد الإيداع"),
@@ -216,7 +232,7 @@ function WalletPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             بعد إرسال التحويل، أدخل القيمة ورقم المعاملة (TxID) وسيراجعها الفريق ثم يُضاف المبلغ لرصيدك.
           </p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-[10rem_1fr_auto] sm:items-end">
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div>
               <Label className="mb-2 block">القيمة (USDT)</Label>
               <Input
@@ -234,24 +250,46 @@ function WalletPage() {
                 placeholder={`hash التحويل على شبكة ${network}`}
               />
             </div>
-            <Button
-              disabled={confirmDeposit.isPending}
-              onClick={() => {
-                const n = Number(depAmount);
-                if (!Number.isFinite(n) || n < 2) {
-                  toast.error("أقل قيمة إيداع 2 USDT");
-                  return;
-                }
-                if (depTxid.length < 10) {
-                  toast.error("رقم المعاملة غير صحيح");
-                  return;
-                }
-                confirmDeposit.mutate({ amount: n, txid: depTxid });
-              }}
-            >
-              {confirmDeposit.isPending ? "جارٍ الإرسال…" : "تأكيد الإيداع"}
-            </Button>
+            <div>
+              <Label className="mb-2 block">رقم إيصال التحويل</Label>
+              <Input
+                value={depReceipt}
+                onChange={(e) => setDepReceipt(e.target.value.trim().slice(0, 60))}
+                placeholder="رقم الواصل من تطبيق التحويل"
+              />
+            </div>
+            <div>
+              <Label className="mb-2 block">صورة سكرين للتحويل</Label>
+              <Input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(e) => setDepFile(e.target.files?.[0] ?? null)}
+              />
+              <p className="mt-1 text-xs text-muted-foreground">لقطة شاشة لإثبات التحويل (حتى 10MB).</p>
+            </div>
           </div>
+          <Button
+            className="mt-4"
+            disabled={confirmDeposit.isPending}
+            onClick={() => {
+              const n = Number(depAmount);
+              if (!Number.isFinite(n) || n < 2) {
+                toast.error("أقل قيمة إيداع 2 USDT");
+                return;
+              }
+              if (depTxid.length < 10) {
+                toast.error("رقم المعاملة غير صحيح");
+                return;
+              }
+              if (!depFile) {
+                toast.error("أرفق صورة سكرين للتحويل");
+                return;
+              }
+              confirmDeposit.mutate({ amount: n, txid: depTxid, receipt: depReceipt, file: depFile });
+            }}
+          >
+            {confirmDeposit.isPending ? "جارٍ الإرسال…" : "تأكيد الإيداع"}
+          </Button>
 
           <div className="mt-6 divide-y divide-border/60 rounded-2xl border border-border/60">
             {(deposits.data ?? []).length === 0 && (
