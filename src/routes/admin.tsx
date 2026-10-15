@@ -550,6 +550,8 @@ type DepositRowData = {
   email: string | null;
   amount: number;
   txid: string;
+  receipt_number: string | null;
+  receipt_image_path: string | null;
   status: string;
   admin_note: string | null;
   created_at: string;
@@ -558,6 +560,7 @@ type DepositRowData = {
 function DepositRow({ d, onDone }: { d: DepositRowData; onDone: () => void }) {
   const [reason, setReason] = useState("");
   const [showReason, setShowReason] = useState(false);
+  const receiptUrl = useStorageUrl("deposit-receipts", d.receipt_image_path);
   const [busy, setBusy] = useState(false);
 
   return (
