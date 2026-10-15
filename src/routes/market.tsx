@@ -38,6 +38,7 @@ function Market() {
   const [condition, setCondition] = useState("all");
   const [maxPrice, setMaxPrice] = useState(8000);
   const [warranty, setWarranty] = useState("all");
+  const [country, setCountry] = useState("all");
 
   const { data, isLoading } = useQuery({
     queryKey: ["listings"],
@@ -57,10 +58,23 @@ function Market() {
     [data],
   );
 
+  const countries = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          (data ?? [])
+            .map((l) => (l.location ?? "").trim())
+            .filter((loc) => loc.length > 0),
+        ),
+      ),
+    [data],
+  );
+
   const filtered = (data ?? []).filter((l) => {
     if (q && !`${l.title} ${l.brand} ${l.model}`.toLowerCase().includes(q.toLowerCase()))
       return false;
     if (brand !== "all" && l.brand !== brand) return false;
+    if (country !== "all" && (l.location ?? "").trim() !== country) return false;
     if (condition !== "all" && l.condition !== condition) return false;
     if (Number(l.price_usd) > maxPrice) return false;
     if (warranty !== "all" && l.warranty_months < Number(warranty)) return false;
@@ -87,6 +101,22 @@ function Market() {
                 className="ps-9"
               />
             </div>
+          </div>
+          <div>
+            <Label className="mb-2 block">الدولة</Label>
+            <Select value={country} onValueChange={setCountry}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">كل الدول</SelectItem>
+                {countries.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <Label className="mb-2 block">الماركة</Label>
