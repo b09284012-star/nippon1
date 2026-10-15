@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/lib/auth";
+import { COUNTRIES } from "@/lib/countries";
 
 export const Route = createFileRoute("/sell")({
   head: () => ({
@@ -192,34 +193,6 @@ function SellPage() {
     </div>
   );
 }
-
-const COUNTRIES = [
-  "ليبيا",
-  "السعودية",
-  "الإمارات",
-  "مصر",
-  "تونس",
-  "الجزائر",
-  "المغرب",
-  "الأردن",
-  "العراق",
-  "الكويت",
-  "قطر",
-  "البحرين",
-  "عُمان",
-  "اليمن",
-  "سوريا",
-  "لبنان",
-  "فلسطين",
-  "السودان",
-  "موريتانيا",
-  "تركيا",
-  "ألمانيا",
-  "فرنسا",
-  "بريطانيا",
-  "الولايات المتحدة",
-  "أخرى",
-];
 
 function Field({
   name,
