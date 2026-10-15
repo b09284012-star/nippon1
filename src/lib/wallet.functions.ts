@@ -5,7 +5,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 const NOWPAYMENTS_API = "https://api.nowpayments.io/v1";
 
 export const DEPOSIT_FEE_USD = 1;
-export const SALE_COMMISSION_RATE = 0.05;
+export const SALE_FEE_RATE = 0.05;
 
 /** Wallet + transactions for the signed-in user. */
 export const getMyWallet = createServerFn({ method: "GET" })

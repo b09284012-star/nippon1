@@ -99,7 +99,7 @@ function OrdersPage() {
               </div>
 
               <div className="mt-2 text-xs text-muted-foreground">
-                {isBuyer ? "أنت المشتري" : "أنت البائع"} • العمولة {formatUsd(o.fee)}
+                {isBuyer ? "أنت المشتري" : "أنت البائع"} • الرسوم {formatUsd(o.fee)}
                 {o.tracking_number ? ` • تتبع: ${o.shipping_carrier} ${o.tracking_number}` : ""}
               </div>
 
