@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/media";
 import { useIsOnline } from "@/lib/presence";
+import { ChatAttachment } from "@/components/site/ChatAttachment";
 
 export const Route = createFileRoute("/chat/$id")({
   head: () => ({
@@ -33,6 +34,8 @@ function ChatRoomPage() {
   const navigate = useNavigate();
   const [text, setText] = useState("");
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const { data: other } = useQuery({
     queryKey: ["conv-other", id, user?.id],
@@ -109,6 +112,34 @@ function ChatRoomPage() {
     void refetch();
   };
 
+  const sendFile = async (file: File) => {
+    if (!user) return;
+    if (file.size > 20 * 1024 * 1024) {
+      toast.error("الحد الأقصى لحجم الملف 20 ميغابايت");
+      return;
+    }
+    setUploading(true);
+    const ext = file.name.includes(".") ? file.name.split(".").pop() : "bin";
+    const path = `${id}/${crypto.randomUUID()}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("chat-files").upload(path, file, { contentType: file.type });
+    if (upErr) {
+      setUploading(false);
+      toast.error("تعذر رفع الملف");
+      return;
+    }
+    const { error } = await supabase.from("messages").insert({
+      conversation_id: id,
+      sender_id: user.id,
+      body: "",
+      attachment_path: path,
+      attachment_name: file.name.slice(0, 200),
+      attachment_type: file.type || null,
+    });
+    setUploading(false);
+    if (error) toast.error(error.message);
+    else void refetch();
+  };
+
   return (
     <div className="mx-auto flex max-w-3xl flex-col px-4 py-10">
       <div className="flex items-center gap-3">
@@ -141,7 +172,8 @@ function ChatRoomPage() {
               {other && !other.isParty && !mine && (
                 <span className="mb-1 block text-[10px] font-bold">{m.sender_id === other.buyer_id ? "المشتري" : "البائع"}</span>
               )}
-              <p className="whitespace-pre-wrap">{m.body}</p>
+              {m.attachment_path && <ChatAttachment path={m.attachment_path} name={m.attachment_name} type={m.attachment_type} />}
+              {m.body && <p className="whitespace-pre-wrap">{m.body}</p>}
               <span className="mt-1 block text-[10px] opacity-70">{formatDate(m.created_at)}</span>
             </div>
           );
@@ -150,6 +182,10 @@ function ChatRoomPage() {
       </div>
 
       <div className="mt-4 flex items-center gap-2">
+        <input ref={fileRef} type="file" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) void sendFile(f); }} />
+        <Button variant="secondary" disabled={uploading} onClick={() => fileRef.current?.click()} aria-label="إرفاق صورة أو ملف">
+          {uploading ? "…" : "📎"}
+        </Button>
         <Input
           value={text}
           onChange={(e) => setText(e.target.value)}
