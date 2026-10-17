@@ -44,7 +44,6 @@ function Market() {
   const { country, isAccount, setGuest } = useMyCountry();
   const { data, isLoading } = useQuery({
     queryKey: ["listings", country],
-    enabled: !!country,
     queryFn: async () => {
       const { data, error } = await supabase.rpc("regular_market_listings", { _country: country });
       if (error) throw error;
@@ -74,17 +73,18 @@ function Market() {
       </h1>
       {!isAccount && (
         <div className="mt-4 max-w-xs">
-          <Label className="mb-2 block">اختر دولتك لعرض سوقها</Label>
-          <Select value={country} onValueChange={setGuest}>
-            <SelectTrigger><SelectValue placeholder="اختر الدولة" /></SelectTrigger>
+          <Label className="mb-2 block">الدولة</Label>
+          <Select value={country || "all"} onValueChange={(value) => setGuest(value === "all" ? "" : value)}>
+            <SelectTrigger><SelectValue placeholder="جميع الدول" /></SelectTrigger>
             <SelectContent>
+              <SelectItem value="all">جميع الدول</SelectItem>
               {COUNTRIES.map((c) => (<SelectItem key={c} value={c}>{c}</SelectItem>))}
             </SelectContent>
           </Select>
         </div>
       )}
       <p className="mt-2 text-muted-foreground">
-        {!country ? "اختر دولتك لعرض الأجهزة المتاحة فيها." : isLoading ? "جاري التحميل…" : `${filtered.length} جهاز متاح في ${country}`}
+        {isLoading ? "جاري التحميل…" : `${filtered.length} جهاز متاح${country ? ` في ${country}` : ""}`}
       </p>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[280px_1fr]">
@@ -163,7 +163,7 @@ function Market() {
           {filtered.map((l) => (
             <ListingCard key={l.id} listing={l} />
           ))}
-          {country && !isLoading && filtered.length === 0 && (
+          {!isLoading && filtered.length === 0 && (
             <p className="text-muted-foreground">لا توجد نتائج مطابقة.</p>
           )}
         </div>

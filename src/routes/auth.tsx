@@ -11,8 +11,10 @@ import { useAuth } from "@/lib/auth";
 import { ForgotPassword } from "@/components/site/ForgotPassword";
 import { COUNTRIES } from "@/lib/countries";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { listingReturnPath } from "@/lib/listing-access";
 
 export const Route = createFileRoute("/auth")({
+  validateSearch: (search: Record<string, unknown>): { redirect?: string } => ({ redirect: listingReturnPath(search.redirect) }),
   head: () => ({
     meta: [
       { title: "الدخول والتسجيل | Nippon" },
@@ -34,6 +36,7 @@ const schema = z.object({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { redirect } = Route.useSearch();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -47,8 +50,13 @@ function AuthPage() {
   const [forgot, setForgot] = useState(false);
 
   useEffect(() => {
-    if (user) void navigate({ to: "/market" });
-  }, [user, navigate]);
+    if (!user) return;
+    if (redirect) {
+      void navigate({ to: "/listings/$id", params: { id: redirect.slice("/listings/".length) }, replace: true });
+    } else {
+      void navigate({ to: "/market", replace: true });
+    }
+  }, [user, navigate, redirect]);
 
   const signIn = async () => {
     const parsed = schema.safeParse({ email, password });
@@ -72,7 +80,7 @@ function AuthPage() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/market`,
+        emailRedirectTo: `${window.location.origin}/auth${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""}`,
         data: { display_name: name, full_name: fullName.trim(), phone: phone.trim(), country: country.trim(), city: city.trim(), address: addr.trim() },
       },
     });

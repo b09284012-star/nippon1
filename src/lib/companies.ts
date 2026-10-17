@@ -16,7 +16,6 @@ export function useCompanies() {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["company-directory", user?.id],
-    enabled: Boolean(user),
     queryFn: async () => {
       const { data, error } = await supabase.rpc("company_directory");
       if (error) throw error;

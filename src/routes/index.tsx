@@ -55,7 +55,6 @@ function Home() {
   const { country } = useMyCountry();
   const { data: listings } = useQuery({
     queryKey: ["latest-listings", country],
-    enabled: !!country,
     queryFn: async () => {
       const { data, error } = await supabase.rpc("regular_market_listings", { _country: country, _limit: 6 });
       if (error) throw error;
