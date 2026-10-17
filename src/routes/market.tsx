@@ -16,6 +16,7 @@ import {
 import { useMyCountry } from "@/lib/my-country";
 import { COUNTRIES } from "@/lib/countries";
 import { ListingCard, type ListingRow } from "@/components/site/ListingCard";
+import { inventoryCountry } from "@/lib/listing-access";
 
 export const Route = createFileRoute("/market")({
   head: () => ({
@@ -45,7 +46,7 @@ function Market() {
   const { data, isLoading } = useQuery({
     queryKey: ["listings", country],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("regular_market_listings", { _country: country });
+      const { data, error } = await supabase.rpc("regular_market_listing_cards", { _country: inventoryCountry(country) });
       if (error) throw error;
       return data as unknown as ListingRow[];
     },

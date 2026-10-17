@@ -13,6 +13,6 @@
 - Notifications use one user-scoped shared query for the header badge and full-page inbox so read state and incoming alerts stay synchronized.
 - Other-user identity reads use the authenticated pseudonym-only public_profile_names RPC; full profiles and private information remain owner/admin-scoped to prevent direct disclosure.
 - Company branding and deliberately public business contacts live in company_profiles and are read through company_directory; never reuse private profile/contact fields for business display.
-- Regular inventory feeds use regular_market_listings to exclude company sellers centrally; company inventory uses its own directory and dedicated offer presentation so seller type changes apply to existing offers too.
+- Regular inventory feeds use regular_market_listing_cards to exclude company sellers centrally; company inventory uses company_market_listings and its own directory so seller type changes apply to existing offers too.
 - Public inventory RPCs expose only offer-card fields and deliberately public company branding; listing detail URLs live under the authenticated layout to require sign-in without changing existing links.
 - Auth return destinations are validated listing paths, preserving the selected offer while rejecting external redirects.

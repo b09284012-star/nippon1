@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ListingCard, type ListingRow } from "@/components/site/ListingCard";
 import heroMiners from "@/assets/hero-miners.jpeg.asset.json";
+import { inventoryCountry } from "@/lib/listing-access";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -56,7 +57,7 @@ function Home() {
   const { data: listings } = useQuery({
     queryKey: ["latest-listings", country],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("regular_market_listings", { _country: country, _limit: 6 });
+      const { data, error } = await supabase.rpc("regular_market_listing_cards", { _country: inventoryCountry(country), _limit: 6 });
       if (error) throw error;
       return data as unknown as ListingRow[];
     },

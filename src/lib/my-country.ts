@@ -20,10 +20,11 @@ export function useMyCountry() {
     queryKey: ["my-country", user?.id],
     enabled: !!user,
     queryFn: async () => {
+      if (!user) return "";
       const { data } = await supabase
         .from("user_private_info")
         .select("country")
-        .eq("user_id", user!.id)
+        .eq("user_id", user.id)
         .maybeSingle();
       return ((data as { country?: string } | null)?.country ?? "").trim();
     },
