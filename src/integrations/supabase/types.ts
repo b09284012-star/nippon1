@@ -808,6 +808,24 @@ export type Database = {
           website: string
         }[]
       }
+      company_market_listings: {
+        Args: never
+        Returns: {
+          brand: string
+          condition: string
+          hashrate: string
+          id: string
+          images: string[]
+          location: string
+          model: string
+          power_watts: number
+          price_usd: number
+          seller_id: string
+          status: string
+          title: string
+          warranty_months: number
+        }[]
+      }
       create_escrow_order: {
         Args: {
           _listing_id: string
@@ -827,6 +845,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_public_inventory_image: { Args: { _name: string }; Returns: boolean }
       mark_order_shipped: {
         Args: { _carrier: string; _order_id: string; _tracking: string }
         Returns: undefined
@@ -843,6 +862,24 @@ export type Database = {
         }[]
       }
       refund_escrow: { Args: { _order_id: string }; Returns: undefined }
+      regular_market_listing_cards: {
+        Args: { _country?: string; _limit?: number }
+        Returns: {
+          brand: string
+          condition: string
+          hashrate: string
+          id: string
+          images: string[]
+          location: string
+          model: string
+          power_watts: number
+          price_usd: number
+          seller_id: string
+          status: string
+          title: string
+          warranty_months: number
+        }[]
+      }
       regular_market_listings: {
         Args: { _country: string; _limit?: number }
         Returns: {

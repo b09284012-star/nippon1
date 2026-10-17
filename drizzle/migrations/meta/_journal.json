@@ -78,6 +78,13 @@
       "when": 1792104046391,
       "tag": "0010_drop_deposit_txid_and_receipt_inputs",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1792229817252,
+      "tag": "0011_public_inventory_cards",
+      "breakpoints": true
     }
   ]
 }
