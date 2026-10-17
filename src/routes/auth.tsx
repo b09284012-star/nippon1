@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { listingReturnPath } from "@/lib/listing-access";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>): { redirect?: string } => ({ redirect: listingReturnPath(search.redirect) }),
+  validateSearch: (search: Record<string, unknown>): { redirect?: string | undefined } => ({ redirect: listingReturnPath(search["redirect"]) }),
   head: () => ({
     meta: [
       { title: "الدخول والتسجيل | Nippon" },
