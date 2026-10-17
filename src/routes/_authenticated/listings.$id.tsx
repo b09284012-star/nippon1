@@ -24,7 +24,7 @@ import { useAuth } from "@/lib/auth";
 import { useCompanies } from "@/lib/companies";
 import { CompanyIdentity } from "@/components/site/CompanyIdentity";
 
-export const Route = createFileRoute("/listings/$id")({
+export const Route = createFileRoute("/_authenticated/listings/$id")({
   head: () => ({
     meta: [
       { title: "تفاصيل الجهاز | Nippon" },
