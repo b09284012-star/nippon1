@@ -1,0 +1,672 @@
+{
+  "meta": {
+    "name": "Nippon ",
+    "package": "@ws-52adc5b3e74ffb37dbcf/a5221ce4-14fe-4335-b8b1-3f32b1047cfe",
+    "version": "1.0.0",
+    "framework": "react",
+    "css_framework": "tailwind",
+    "starter_template": "custom_design_system_tailwind",
+    "theme_files": [
+      "src/styles.css"
+    ],
+    "source_type": "local",
+    "source_manifest": {
+      "#enrichment": "6d491a7e20a3d0590050712dacd1ec0236f407e8897b90a5ff204d937a61a4d8",
+      ".gitignore": "6d9e901a692b46a83707c245fb03bc91",
+      ".lovable/plan/nippon-سوق-أجهزة-التعدين-المستعملة-2026-09-01.md": "ac374c6f5df6516395749eda9af7c9d9",
+      ".lovable/project.json": "970b40e5bde7e7161994617aee05b64d",
+      ".prettierignore": "7279a476f196a2da5f7edd18db568dc6",
+      ".prettierrc": "185ef0234746ab738ac1ab6cec5e2bd9",
+      "AGENTS.md": "a91631386c52ffd4556e392262ef6bd3",
+      "README.md": "52200e16c16026152b95d79cc6eb78b7",
+      "bunfig.toml": "89115995d9de72fdfc894e16b1e75297",
+      "components.json": "30d3d035361ce807021f5c54620962e9",
+      "drizzle.config.ts": "c2b6029fa56b49433380b7263b06e3f7",
+      "drizzle/migrations/0000_remove_kyc_verified_sellers_fees.sql": "1e430219fb0d2c48ba24684161a86883",
+      "drizzle/migrations/0001_restrict_public_reads_to_authenticated.sql": "276f2d95ec57a8974d73edc6a00548ac",
+      "drizzle/migrations/0002_admin_manual_credit.sql": "b4e73e48442b88e66059b45d09bc174e",
+      "drizzle/migrations/0003_notifications_and_dispute_chat.sql": "1668d694ce5747c0b39b63e366a02be6",
+      "drizzle/migrations/0004_private_profiles_public_pseudonyms.sql": "36c37ce32d8e4d1eeb44a68e0de0d1fb",
+      "drizzle/migrations/0005_chat_attachments.sql": "3783b033f3f7257162f4801fcd2adfd6",
+      "drizzle/migrations/0006_raise_sale_fee_to_5_percent.sql": "7bf1d140d4fc2873e8d2a59b3853498c",
+      "drizzle/migrations/0007_company_accounts.sql": "61d303f1c4774e8c2ab8c9524fd80d8a",
+      "drizzle/migrations/0008_company_branding_separate_market.sql": "a1d8b0656a3bb0fdfedd232042a3caa6",
+      "drizzle/migrations/0009_deposit_receipt_number_and_screenshot.sql": "b66ea51e1fc829820791bbdcd127aba1",
+      "drizzle/migrations/0010_drop_deposit_txid_and_receipt_inputs.sql": "5c3dcaf6a627221092d8dd47a57dcade",
+      "drizzle/migrations/meta/0000_snapshot.json": "e738610b92405c8e2ffa7016b3499a4f",
+      "drizzle/migrations/meta/0001_snapshot.json": "8427b1f7076df1000063423540a49aa9",
+      "drizzle/migrations/meta/0002_snapshot.json": "d957a6a6dd50ac7c13ac161cd2184d0f",
+      "drizzle/migrations/meta/0003_snapshot.json": "20d8fb7c5c4bc87288a39a5d3891ecb9",
+      "drizzle/migrations/meta/0004_snapshot.json": "f6fed62efa2668befab6255de57ccda7",
+      "drizzle/migrations/meta/0005_snapshot.json": "ebc4f289a0bcaf8013c0bf1d4e6ef5ee",
+      "drizzle/migrations/meta/0006_snapshot.json": "6846a6349cdb8cc493b4657c01085a61",
+      "drizzle/migrations/meta/0007_snapshot.json": "d19f3189b82885960261d5b04d59ac60",
+      "drizzle/migrations/meta/0008_snapshot.json": "60cf27f1cb9f253a2c2df2dea3a8885c",
+      "drizzle/migrations/meta/0009_snapshot.json": "3141ad97ea406c23cbf38ea46d2aa816",
+      "drizzle/migrations/meta/0010_snapshot.json": "a0f22200d61f86d00495be2179bf4a03",
+      "drizzle/migrations/meta/_journal.json": "e72c196fae5c494cdf67b5fcaa77cbd6",
+      "drizzle/schema.ts": "a60267d05d7dd11572f02686241f37c6",
+      "eslint.config.js": "345bdd57e188e0e4525edcd00e5003f5",
+      "package.json": "39a25cb8d431d638857960584c86b83b",
+      "public/favicon.png": "b8387d7f163c42a48cdfb2d71e427c30",
+      "public/robots.txt": "f9dff89adf98833e676de2205921996a",
+      "roadmap.md": "0f5bd316879571f732afbd88ad0b579f",
+      "src/assets/hero-miners.jpeg.asset.json": "b95cb4585f20afba75c440d7b8564a20",
+      "src/assets/nippon-logo.png.asset.json": "4082ecfe03d98681fa164afe4df3646d",
+      "src/components/site/AnalyticsCharts.tsx": "e047d69f6fc36ab70ad7da8261b51ff1",
+      "src/components/site/ChatAttachment.tsx": "7935a69b6b27dac61bbae768cc1075b7",
+      "src/components/site/CompanyIdentity.tsx": "5fd89ee10bd308e1016e3cccf4de71cc",
+      "src/components/site/CompanyListingCard.tsx": "4b2abce296a5230eb32c32ef7f8330cf",
+      "src/components/site/CompanyProfileEditor.tsx": "bbe51368c406f202c9f02b6adca5b782",
+      "src/components/site/Footer.tsx": "d4ee6db3e18cef764f48ac40dfda8543",
+      "src/components/site/ForgotPassword.tsx": "0cc4f63614707a8f3a1f8b5b5a0d34c1",
+      "src/components/site/Header.tsx": "1c172df9c0c94287f9d925c2d8fdf3f1",
+      "src/components/site/ListingCard.tsx": "f9b5d1ea8494af6a109865683db8c618",
+      "src/components/site/NotificationsBell.tsx": "5d43739e597822b62a9aac868ae217cb",
+      "src/components/site/PresenceTracker.tsx": "f17ce00eab870e94fc51af83d590585f",
+      "src/components/site/ProfitsAnalytics.tsx": "2073562c4cb534d0bcc4608f9bd88d7b",
+      "src/components/site/SupportWhatsApp.tsx": "0644d6a1e23a13fb97012467b470cb39",
+      "src/components/ui/accordion.tsx": "55f9dda62b4e3913c9b23e5015a86aef",
+      "src/components/ui/alert-dialog.tsx": "96350e949e9b7b674545430a410ab89c",
+      "src/components/ui/alert.tsx": "f993d7e96b1e25ce50e68ed97e11d2a8",
+      "src/components/ui/aspect-ratio.tsx": "c5c364545e1b25a94e9e752cd67ad048",
+      "src/components/ui/avatar.tsx": "72989cd32f72c4122802540ef32525a5",
+      "src/components/ui/badge.tsx": "81cade001fc4260f9943e18dcd79449b",
+      "src/components/ui/breadcrumb.tsx": "bb9ac254f12662b20d5d50b84308bf3a",
+      "src/components/ui/button.tsx": "7d07d520f486b12bd47373d694ecd2ee",
+      "src/components/ui/calendar.tsx": "d849cc610e2683271f3f1c47d093cf30",
+      "src/components/ui/card.tsx": "d6c48ea36221b9cdc3576d305d12d5d5",
+      "src/components/ui/carousel.tsx": "e324c68ae00cd5aed49317638abd429a",
+      "src/components/ui/chart.tsx": "6a3baf94f2e89f1f97d4d7a28f3622d2",
+      "src/components/ui/checkbox.tsx": "f78aac270ca482c8c2cb907ef6260462",
+      "src/components/ui/collapsible.tsx": "767631bbc344945c236f185f4078d71d",
+      "src/components/ui/command.tsx": "014782599cc838b021ec68b07ad4ea02",
+      "src/components/ui/context-menu.tsx": "3ba8244ea23df34a1dba92f3a1230dad",
+      "src/components/ui/dialog.tsx": "ef4fe8e7de8675730afe3d633b260e09",
+      "src/components/ui/drawer.tsx": "8be333e8fd8e42576b1b5f72f07f4337",
+      "src/components/ui/dropdown-menu.tsx": "28d6e98d3c7811fc0514bfa69416f087",
+      "src/components/ui/form.tsx": "1b0aa6302b9017ea2a1307c22a1d2983",
+      "src/components/ui/hover-card.tsx": "1442794c5ca2a78d69e4e613b315ed3d",
+      "src/components/ui/input-otp.tsx": "65625f2f1c4d731a760aeed7b54459d1",
+      "src/components/ui/input.tsx": "1d4cc52a4cd8afb3e18e45bda942bb8a",
+      "src/components/ui/label.tsx": "7e35df4ca8edd0835efd97ca7937ef92",
+      "src/components/ui/menubar.tsx": "3c4121a1e78d3f424a7295381a8997d3",
+      "src/components/ui/navigation-menu.tsx": "e85351147a02b29577ff83d188b63c24",
+      "src/components/ui/pagination.tsx": "fac6cdbb4bbf78b273d85cd36d6cbb49",
+      "src/components/ui/popover.tsx": "f18aa1da2144f25ee60795c539c51bcd",
+      "src/components/ui/progress.tsx": "55c462e5c9dd678dcf2c0c510b014ac4",
+      "src/components/ui/radio-group.tsx": "0e1ace237a5da3197e3eb1e6683faba9",
+      "src/components/ui/resizable.tsx": "d9fcb9203c749fcab4e125a99bb12a86",
+      "src/components/ui/scroll-area.tsx": "87b65d3eb26f2b02ff35a7acea585ba5",
+      "src/components/ui/select.tsx": "31ea1bbd6671833b010b2e852c8a55d0",
+      "src/components/ui/separator.tsx": "433d163c4ffa00b59398a0c293198b5e",
+      "src/components/ui/sheet.tsx": "0221fbf97b69611b47fcbc10bb27669a",
+      "src/components/ui/sidebar.tsx": "83c1623eb50ebc370d7b1b84a542e369",
+      "src/components/ui/skeleton.tsx": "41b182e6e2fc3805960d41e767d4a972",
+      "src/components/ui/slider.tsx": "4752f1bfa26426988d325599e01c335b",
+      "src/components/ui/sonner.tsx": "97f59f60be3413196d095fcbf7383216",
+      "src/components/ui/switch.tsx": "82f5d8b0c59bb7ff305caa9f502e79ff",
+      "src/components/ui/table.tsx": "7cc889989d53894b659903c73aded96e",
+      "src/components/ui/tabs.tsx": "64a7904723fae1344f5aa5714f28b93d",
+      "src/components/ui/textarea.tsx": "c7aad96fb9545210d53135a96c76ed6b",
+      "src/components/ui/toggle-group.tsx": "ac26383acf721d116ca8e3ab5c5355d5",
+      "src/components/ui/toggle.tsx": "ee8c5adac74e7242b85b544db1a8fbad",
+      "src/components/ui/tooltip.tsx": "67d71db5a1ab935695d1def497f5b8a6",
+      "src/hooks/use-mobile.tsx": "c0a0bdd4638c391a1dd06ac82074e60b",
+      "src/integrations/supabase/auth-attacher.ts": "dad043cda134d909e52de0346c16625e",
+      "src/integrations/supabase/auth-middleware.ts": "5d9d831f79177b7c6327cbd794a97367",
+      "src/integrations/supabase/client.server.ts": "23f838ab7633e0a97e695f3c500d91aa",
+      "src/integrations/supabase/client.ts": "b40d27b03f346573ed0f76551e478ffb",
+      "src/integrations/supabase/cron-auth.ts": "6c04781ff98ada5977945fae55d39385",
+      "src/integrations/supabase/previewAuthStorage.ts": "bb74f08a89d367e3a4a18880dad1050f",
+      "src/integrations/supabase/types.ts": "a376309f0001053b3b97e93404960cf6",
+      "src/lib/account.functions.ts": "c440f2b09a1acec3dadccbdfbd5f882b",
+      "src/lib/auth.tsx": "85443a1e8d0fe32940fa34794d4b99d2",
+      "src/lib/companies.ts": "7eed7a29ba7fbaebd994460806014c8d",
+      "src/lib/countries.ts": "990e2cf51605d1f75ae08e50b908549e",
+      "src/lib/error-capture.ts": "f630d9686a9a989170f22eff4de7b30d",
+      "src/lib/error-page.ts": "8da0ddd7569bac2676b9a5c8edff8a36",
+      "src/lib/finance.functions.ts": "87efd3e3bbddd8031ea47f3086257cc4",
+      "src/lib/lovable-error-reporting.ts": "77368331b8ef6e6edcf1a29b24a52d39",
+      "src/lib/media.tsx": "b9bf23a429444c342cfb965e5431d466",
+      "src/lib/my-country.ts": "f66b42718070d31df686b5ce154f41f3",
+      "src/lib/notifications.ts": "264cf06f7157428a07084a9f37523390",
+      "src/lib/presence.ts": "219ce972faba165a4ae93f5f50c1b567",
+      "src/lib/utils.ts": "d9837f38cc05303254571985e3164050",
+      "src/lib/wallet.functions.ts": "35b2a71620a7e178cac2d6177d3f0a1c",
+      "src/routeTree.gen.ts": "b913bd1245ae509072efd785391af63f",
+      "src/router.tsx": "8f905e713b0eba7fa8148b7995a708c9",
+      "src/routes/README.md": "b3a2f259b66fd1a11f54b6d5ac83bf57",
+      "src/routes/__root.tsx": "ffafd6efc9ed8b9990fd0b2b15dcdea3",
+      "src/routes/admin.tsx": "6b365519f9888367caabd9bee76a87dc",
+      "src/routes/api/public/nowpayments.ts": "6a6f2db54a359ea4962aff80878f447c",
+      "src/routes/auth.tsx": "ad392831f29e3a8f0833a59dd287728b",
+      "src/routes/chat.$id.tsx": "ed0b218ec06698f07dd72b5b082a610c",
+      "src/routes/chat.index.tsx": "cc8b8d963cc0a6c64cef05b579b8defc",
+      "src/routes/companies.tsx": "01d5cb5f4e3b5a7be2463eede4e84e77",
+      "src/routes/finance.tsx": "93ca612c76208698c9cd12beb093e34f",
+      "src/routes/forum.tsx": "eafa55a3b78c43ee1e2cacac02ee140f",
+      "src/routes/index.tsx": "b187fd4bfff839eb3523afb7251c27fb",
+      "src/routes/listings.$id.tsx": "cc1aef2f414124978defe6b2d1d239b1",
+      "src/routes/market.tsx": "b1545a1b352f4f3ddce10c4f9e711d87",
+      "src/routes/notifications.tsx": "e540ae3fdbe8bf9b77900e6e55178f7f",
+      "src/routes/orders.tsx": "bc9bd72a78514ad41ec2d3e89e806bc3",
+      "src/routes/profile.tsx": "43270603045e8312f8966e09c670c823",
+      "src/routes/profits.tsx": "d73a279803a59c1ae3c8af221083190a",
+      "src/routes/reset-password.tsx": "3cb7e799dab77ae89eca8d63c2bbd8e2",
+      "src/routes/sell.tsx": "5d2d8efcf622c374b6dd1003141bc632",
+      "src/routes/wallet.tsx": "43fdbf9d5c073ea0e3f6bacb6da0110c",
+      "src/server.ts": "c7bbc49bb70e318af618d92775ee0f27",
+      "src/start.ts": "d77c1c12904be5077c6955d9b30071af",
+      "src/styles.css": "b677d84e41d15b673592895b63f6d2ea",
+      "supabase/config.toml": "a3935fc3355fc41c041f25cfdbb52234",
+      "supabase/migrations/20260901215050_7a7e09a0-acff-4979-b218-abb1a1872654.sql": "cc735659ccefddb121544f9160aeb3ca",
+      "supabase/migrations/20260901215108_c01d786a-1a22-43d3-a15c-50b871bb51bf.sql": "8f1978d54d1967ece0d9ddd0c00277ce",
+      "supabase/migrations/20260901215137_5fd4411e-9546-44ea-b690-19b26597b0a1.sql": "366925c35a610b455f6009600a1047e9",
+      "supabase/migrations/20260902000753_3b15ce28-aaea-4720-bcd6-2d266bf21741.sql": "64bba1ea2402058b49991ac18f692bd1",
+      "supabase/migrations/20260903001426_cca93508-3c23-465d-8c2a-8be2c1f8dedd.sql": "b213423bd79e0c9e9d677924b867ef91",
+      "supabase/migrations/20260903001447_6be37ea2-21a8-4483-978b-a2868826cbc3.sql": "b5f806c565322de27d46644b92dfd90b",
+      "supabase/migrations/20260904015405_5c1c315a-448b-4518-9a93-c8aba7d7b2f2.sql": "884a6635f8618a4731ff6e2940121271",
+      "supabase/migrations/20260905193958_f4d422ea-6944-43c3-9be5-5e7c0dd8005e.sql": "948ba0d7d295e4860df0e461c85f2f19",
+      "supabase/migrations/20260905200305_01ca6a51-d70b-4ae4-b987-d634412f1bc3.sql": "94243a597a0d85ea4cf25d0ab02847a1",
+      "supabase/migrations/20260905201209_d223d5ae-17bb-40fc-8b7c-edf57cd70fd6.sql": "020b2feb710a885a9cc428cc8653ea6d",
+      "supabase/migrations/20260906000939_ee2eb7fc-e86e-4803-923d-653ce06845c5.sql": "06cb69bd97d70c7c56f48365dfcf6e34",
+      "tsconfig.json": "e84e5c7fe88e3c5a4d54f55a816d42c1",
+      "vite.config.ts": "d67e8217e5f31b87c276b6357c9aedcf"
+    },
+    "pipeline_version": 8
+  },
+  "tokens": {
+    "color": [
+      {
+        "name": "--background",
+        "raw": "oklch(0.16 0.03 265)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--foreground",
+        "raw": "oklch(0.96 0.01 250)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--card",
+        "raw": "oklch(0.21 0.035 266)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--card-foreground",
+        "raw": "oklch(0.96 0.01 250)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--popover",
+        "raw": "oklch(0.2 0.035 266)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--popover-foreground",
+        "raw": "oklch(0.96 0.01 250)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--primary",
+        "raw": "oklch(0.79 0.16 194)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--primary-foreground",
+        "raw": "oklch(0.16 0.03 265)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--secondary",
+        "raw": "oklch(0.28 0.05 275)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--secondary-foreground",
+        "raw": "oklch(0.96 0.01 250)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--muted",
+        "raw": "oklch(0.26 0.035 268)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--muted-foreground",
+        "raw": "oklch(0.72 0.03 260)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--accent",
+        "raw": "oklch(0.68 0.19 305)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--accent-foreground",
+        "raw": "oklch(0.97 0.01 250)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--destructive",
+        "raw": "oklch(0.63 0.22 25)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--destructive-foreground",
+        "raw": "oklch(0.98 0.01 250)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--success",
+        "raw": "oklch(0.72 0.17 155)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--success-foreground",
+        "raw": "oklch(0.16 0.03 265)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--warning",
+        "raw": "oklch(0.8 0.16 80)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--warning-foreground",
+        "raw": "oklch(0.16 0.03 265)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--border",
+        "raw": "oklch(0.32 0.04 270)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--input",
+        "raw": "oklch(0.3 0.04 270)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--ring",
+        "raw": "oklch(0.79 0.16 194)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--chart-1",
+        "raw": "oklch(0.79 0.16 194)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--chart-2",
+        "raw": "oklch(0.68 0.19 305)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--chart-3",
+        "raw": "oklch(0.72 0.17 155)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--chart-4",
+        "raw": "oklch(0.8 0.16 80)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--chart-5",
+        "raw": "oklch(0.63 0.22 25)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--sidebar",
+        "raw": "oklch(0.19 0.033 266)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--sidebar-foreground",
+        "raw": "oklch(0.96 0.01 250)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--sidebar-primary",
+        "raw": "oklch(0.79 0.16 194)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--sidebar-primary-foreground",
+        "raw": "oklch(0.16 0.03 265)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--sidebar-accent",
+        "raw": "oklch(0.28 0.05 275)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--sidebar-accent-foreground",
+        "raw": "oklch(0.96 0.01 250)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--sidebar-border",
+        "raw": "oklch(0.32 0.04 270)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--sidebar-ring",
+        "raw": "oklch(0.79 0.16 194)",
+        "source": "src/styles.css"
+      }
+    ],
+    "typography": [
+      {
+        "name": "--font-sans",
+        "raw": "\"Tajawal\", ui-sans-serif, system-ui, sans-serif",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--font-display",
+        "raw": "\"Cairo\", ui-sans-serif, system-ui, sans-serif",
+        "source": "src/styles.css"
+      }
+    ],
+    "radius": [
+      {
+        "name": "--radius-sm",
+        "raw": "calc(var(--radius) - 4px)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--radius-md",
+        "raw": "calc(var(--radius) - 2px)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--radius-xl",
+        "raw": "calc(var(--radius) + 4px)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--radius-2xl",
+        "raw": "calc(var(--radius) + 8px)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--radius-3xl",
+        "raw": "calc(var(--radius) + 12px)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--radius",
+        "raw": "1rem",
+        "source": "src/styles.css"
+      }
+    ],
+    "shadow": [
+      {
+        "name": "--shadow-neon",
+        "raw": "0 24px 60px -24px color-mix(in oklab, var(--primary) 55%, transparent)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--shadow-violet",
+        "raw": "0 24px 60px -28px color-mix(in oklab, var(--accent) 60%, transparent)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--shadow-depth",
+        "raw": "0 28px 60px -30px oklch(0 0 0 / 0.85)",
+        "source": "src/styles.css"
+      }
+    ],
+    "other": [
+      {
+        "name": "--gradient-neon",
+        "raw": "linear-gradient(135deg, var(--primary), var(--accent))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--gradient-surface",
+        "raw": "linear-gradient(\n    160deg,\n    color-mix(in oklab, var(--card) 92%, white 8%),\n    color-mix(in oklab, var(--background) 88%, black 12%)\n  )",
+        "source": "src/styles.css"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "AnalyticsCharts",
+      "file": "src/components/site/AnalyticsCharts",
+      "import_path": "",
+      "props": [
+        {
+          "name": "series",
+          "type": "any",
+          "required": true
+        },
+        {
+          "name": "top",
+          "type": "any",
+          "required": true
+        },
+        {
+          "name": "statusCount",
+          "type": "object",
+          "required": true
+        },
+        {
+          "name": "metric",
+          "type": "enum",
+          "values": [
+            "volume",
+            "fee"
+          ],
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "ChatAttachment",
+      "file": "src/components/site/ChatAttachment",
+      "import_path": ""
+    },
+    {
+      "name": "CompanyIdentity",
+      "file": "src/components/site/CompanyIdentity",
+      "import_path": ""
+    },
+    {
+      "name": "CompanyListingCard",
+      "file": "src/components/site/CompanyListingCard",
+      "import_path": ""
+    },
+    {
+      "name": "CompanyProfileEditor",
+      "file": "src/components/site/CompanyProfileEditor",
+      "import_path": ""
+    },
+    {
+      "name": "Footer",
+      "file": "src/components/site/Footer",
+      "import_path": ""
+    },
+    {
+      "name": "ForgotPassword",
+      "file": "src/components/site/ForgotPassword",
+      "import_path": ""
+    },
+    {
+      "name": "Header",
+      "file": "src/components/site/Header",
+      "import_path": ""
+    },
+    {
+      "name": "ListingCard",
+      "file": "src/components/site/ListingCard",
+      "import_path": ""
+    },
+    {
+      "name": "NotificationsBell",
+      "file": "src/components/site/NotificationsBell",
+      "import_path": ""
+    },
+    {
+      "name": "PresenceTracker",
+      "file": "src/components/site/PresenceTracker",
+      "import_path": ""
+    },
+    {
+      "name": "ProfitsAnalytics",
+      "file": "src/components/site/ProfitsAnalytics",
+      "import_path": ""
+    },
+    {
+      "name": "SupportWhatsAppButton",
+      "file": "src/components/site/SupportWhatsApp",
+      "import_path": ""
+    },
+    {
+      "name": "Badge",
+      "file": "src/components/ui/badge",
+      "import_path": "",
+      "props": [
+        {
+          "name": "variant",
+          "type": "enum",
+          "values": [
+            "default",
+            "secondary",
+            "destructive",
+            "outline"
+          ],
+          "default": "default"
+        }
+      ]
+    },
+    {
+      "name": "Button",
+      "file": "src/components/ui/button",
+      "import_path": "",
+      "props": [
+        {
+          "name": "variant",
+          "type": "enum",
+          "values": [
+            "default",
+            "destructive",
+            "outline",
+            "secondary",
+            "ghost",
+            "link"
+          ],
+          "default": "default"
+        },
+        {
+          "name": "size",
+          "type": "enum",
+          "values": [
+            "default",
+            "sm",
+            "lg",
+            "icon"
+          ],
+          "default": "default"
+        },
+        {
+          "name": "asChild",
+          "type": "boolean",
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "ChartContainer",
+      "file": "src/components/ui/chart",
+      "import_path": ""
+    },
+    {
+      "name": "ChartTooltip",
+      "file": "src/components/ui/chart",
+      "import_path": ""
+    },
+    {
+      "name": "ChartTooltipContent",
+      "file": "src/components/ui/chart",
+      "import_path": ""
+    },
+    {
+      "name": "ChartLegend",
+      "file": "src/components/ui/chart",
+      "import_path": ""
+    },
+    {
+      "name": "ChartLegendContent",
+      "file": "src/components/ui/chart",
+      "import_path": ""
+    },
+    {
+      "name": "ChartStyle",
+      "file": "src/components/ui/chart",
+      "import_path": ""
+    },
+    {
+      "name": "Input",
+      "file": "src/components/ui/input",
+      "import_path": ""
+    },
+    {
+      "name": "Label",
+      "file": "src/components/ui/label",
+      "import_path": ""
+    },
+    {
+      "name": "Tabs",
+      "file": "src/components/ui/tabs",
+      "import_path": ""
+    },
+    {
+      "name": "TabsList",
+      "file": "src/components/ui/tabs",
+      "import_path": ""
+    },
+    {
+      "name": "TabsTrigger",
+      "file": "src/components/ui/tabs",
+      "import_path": ""
+    },
+    {
+      "name": "TabsContent",
+      "file": "src/components/ui/tabs",
+      "import_path": ""
+    },
+    {
+      "name": "Textarea",
+      "file": "src/components/ui/textarea",
+      "import_path": ""
+    },
+    {
+      "name": "Constants",
+      "file": "src/integrations/supabase/types",
+      "import_path": ""
+    },
+    {
+      "name": "AuthProvider",
+      "file": "src/lib/auth",
+      "import_path": ""
+    }
+  ],
+  "assets": [
+    {
+      "file": "src/assets/hero-miners.jpeg.asset.json",
+      "kind": "image",
+      "format": "jpeg",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/nippon-logo.png.asset.json",
+      "kind": "logo",
+      "format": "png",
+      "pointer": true
+    }
+  ]
+}
