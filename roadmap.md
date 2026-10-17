@@ -1,3 +1,6 @@
+- [x] Show public regular/company offers without requiring a country, preserving private data.
+- [x] Require sign-in for listing details and return to the same listing.
+- [x] Test public browsing and sign-in return flow (company feeds are reachable publicly; no live company offers currently exist).
 - [x] Replace the notification popup with a full-page inbox showing each notification's timestamp.
 - [x] Verify the inbox with an authenticated account.
 - [x] Resolve the flagged profile-read exposure after the owner's access decision.

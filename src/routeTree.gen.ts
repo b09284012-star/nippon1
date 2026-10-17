@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CompaniesRouteImport } from './routes/companies'
@@ -25,12 +26,16 @@ import { Route as SellRouteImport } from './routes/sell'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as ChatIndexRouteImport } from './routes/chat.index'
 import { Route as ChatIdRouteImport } from './routes/chat.$id'
-import { Route as ListingsIdRouteImport } from './routes/listings.$id'
+import { Route as AuthenticatedListingsIdRouteImport } from './routes/_authenticated/listings.$id'
 import { Route as ApiPublicNowpaymentsRouteImport } from './routes/api/public/nowpayments'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -108,10 +113,10 @@ const ChatIdRoute = ChatIdRouteImport.update({
   path: '/chat/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ListingsIdRoute = ListingsIdRouteImport.update({
+const AuthenticatedListingsIdRoute = AuthenticatedListingsIdRouteImport.update({
   id: '/listings/$id',
   path: '/listings/$id',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ApiPublicNowpaymentsRoute = ApiPublicNowpaymentsRouteImport.update({
   id: '/api/public/nowpayments',
@@ -135,8 +140,8 @@ export interface FileRoutesByFullPath {
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRoute
   '/chat/$id': typeof ChatIdRoute
-  '/listings/$id': typeof ListingsIdRoute
   '/chat/': typeof ChatIndexRoute
+  '/listings/$id': typeof AuthenticatedListingsIdRoute
   '/api/public/nowpayments': typeof ApiPublicNowpaymentsRoute
 }
 export interface FileRoutesByTo {
@@ -155,13 +160,14 @@ export interface FileRoutesByTo {
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRoute
   '/chat/$id': typeof ChatIdRoute
-  '/listings/$id': typeof ListingsIdRoute
   '/chat': typeof ChatIndexRoute
+  '/listings/$id': typeof AuthenticatedListingsIdRoute
   '/api/public/nowpayments': typeof ApiPublicNowpaymentsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/companies': typeof CompaniesRoute
@@ -176,8 +182,8 @@ export interface FileRoutesById {
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRoute
   '/chat/$id': typeof ChatIdRoute
-  '/listings/$id': typeof ListingsIdRoute
   '/chat/': typeof ChatIndexRoute
+  '/_authenticated/listings/$id': typeof AuthenticatedListingsIdRoute
   '/api/public/nowpayments': typeof ApiPublicNowpaymentsRoute
 }
 export interface FileRouteTypes {
@@ -198,8 +204,8 @@ export interface FileRouteTypes {
     | '/sell'
     | '/wallet'
     | '/chat/$id'
-    | '/listings/$id'
     | '/chat/'
+    | '/listings/$id'
     | '/api/public/nowpayments'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -218,12 +224,13 @@ export interface FileRouteTypes {
     | '/sell'
     | '/wallet'
     | '/chat/$id'
-    | '/listings/$id'
     | '/chat'
+    | '/listings/$id'
     | '/api/public/nowpayments'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/admin'
     | '/auth'
     | '/companies'
@@ -238,13 +245,14 @@ export interface FileRouteTypes {
     | '/sell'
     | '/wallet'
     | '/chat/$id'
-    | '/listings/$id'
     | '/chat/'
+    | '/_authenticated/listings/$id'
     | '/api/public/nowpayments'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   CompaniesRoute: typeof CompaniesRoute
@@ -259,7 +267,6 @@ export interface RootRouteChildren {
   SellRoute: typeof SellRoute
   WalletRoute: typeof WalletRoute
   ChatIdRoute: typeof ChatIdRoute
-  ListingsIdRoute: typeof ListingsIdRoute
   ChatIndexRoute: typeof ChatIndexRoute
   ApiPublicNowpaymentsRoute: typeof ApiPublicNowpaymentsRoute
 }
@@ -271,6 +278,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -378,12 +392,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChatIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/listings/$id': {
-      id: '/listings/$id'
+    '/_authenticated/listings/$id': {
+      id: '/_authenticated/listings/$id'
       path: '/listings/$id'
       fullPath: '/listings/$id'
-      preLoaderRoute: typeof ListingsIdRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedListingsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/public/nowpayments': {
       id: '/api/public/nowpayments'
@@ -395,8 +409,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedListingsIdRoute: typeof AuthenticatedListingsIdRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedListingsIdRoute: AuthenticatedListingsIdRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   CompaniesRoute: CompaniesRoute,
@@ -411,7 +437,6 @@ const rootRouteChildren: RootRouteChildren = {
   SellRoute: SellRoute,
   WalletRoute: WalletRoute,
   ChatIdRoute: ChatIdRoute,
-  ListingsIdRoute: ListingsIdRoute,
   ChatIndexRoute: ChatIndexRoute,
   ApiPublicNowpaymentsRoute: ApiPublicNowpaymentsRoute,
 }

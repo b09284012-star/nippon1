@@ -46,15 +46,8 @@ function Companies() {
 
   const listings = useQuery({
     queryKey: ["company-listings"],
-    enabled: !!user,
     queryFn: async () => {
-      const { data: ids, error: e1 } = await supabase.rpc("verified_company_ids");
-      if (e1) throw e1;
-      const list = (ids ?? []) as unknown as string[];
-      if (!list.length) return [] as ListingRow[];
-      const { data, error } = await supabase
-        .from("listings").select("*").eq("status", "active").in("seller_id", list)
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.rpc("company_market_listings");
       if (error) throw error;
       return data as unknown as ListingRow[];
     },
@@ -89,7 +82,7 @@ function Companies() {
         </div>
       )}
 
-      {user && (
+      {(
         <div className="mt-8 space-y-10">
           {(listings.isLoading || companies.isLoading) && <p className="text-muted-foreground">جارٍ تحميل الشركات…</p>}
           {(listings.isError || companies.isError) && <p className="text-destructive">تعذر تحميل عروض الشركات.</p>}
