@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Copy, Wallet2, ShieldCheck, ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
+import { Copy, Wallet2, ShieldCheck, ArrowDownToLine, ArrowUpFromLine, QrCode, Zap, Hexagon, Triangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,7 @@ import { useAuth } from "@/lib/auth";
 import { formatUsd, formatDate } from "@/lib/media";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyWallet } from "@/lib/wallet.functions";
+import { cn } from "@/lib/utils";
 
 const WITHDRAWAL_STATUS: Record<string, { label: string; variant: "secondary" | "default" | "destructive" | "outline" }> = {
   pending: { label: "قيد المراجعة", variant: "secondary" },
@@ -38,10 +39,10 @@ export const Route = createFileRoute("/wallet")({
 });
 
 const DEPOSIT_NETWORKS = [
-  { id: "TRC20", label: "TRC20", address: "TGX9Q1uR3A9g1pXQMzVRG7bx9GErbuZyHx" },
-  { id: "BEP20", label: "BEP20", address: "0x369b227eee74f902376571e08fd11348a53da254" },
-  { id: "ERC20", label: "ERC20", address: "0x369b227eee74f902376571e08fd11348a53da254" },
-] as const;
+  { id: "TRC20", label: "TRC20", sub: "Tron (USDT)", icon: Zap, address: "TGX9Q1uR3A9g1pXQMzVRG7bx9GErbuZyHx" },
+  { id: "BEP20", label: "BEP20", sub: "BNB Smart Chain", icon: Hexagon, address: "0x369b227eee74f902376571e08fd11348a53da254" },
+  { id: "POLYGON", label: "Polygon", sub: "Polygon PoS", icon: Triangle, address: "0x369b227eee74f902376571e08fd11348a53da254" },
+];
 
 const TX_LABEL: Record<string, string> = {
   deposit: "إيداع",
@@ -61,6 +62,7 @@ function WalletPage() {
   const [depAmount, setDepAmount] = useState("");
   const [depFile, setDepFile] = useState<File | null>(null);
   const [network, setNetwork] = useState<string>("TRC20");
+  const [generated, setGenerated] = useState(false);
   const fetchWallet = useServerFn(getMyWallet);
   const qc = useQueryClient();
 
