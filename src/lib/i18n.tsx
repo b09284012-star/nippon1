@@ -8,7 +8,7 @@ export function t<T>(value: T): T {
   if (getLanguage() === "ar") return value;
   const normalized = value.replace(/\s+/g, " ").trim();
   const translated = dictionary[normalized];
-  if (translated) return translated as T;
+  if (translated) return ((value.match(/^\s+/)?.[0] ?? "") + translated + (value.match(/\s+$/)?.[0] ?? "")) as T;
   return value as T;
 }
 export function useLanguage() {
