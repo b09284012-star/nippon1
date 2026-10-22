@@ -576,5 +576,16 @@
   "نجوم": "stars",
   "متصلون الآن (": "Online now (",
   "غير متصلين (": "Offline (",
-  "+ سحب": "+ withdrawals"
+  "+ سحب": "+ withdrawals",
+  "إيداع الرصيد": "Deposit Balance",
+  "أدخل قيمة الإيداع ثم اختر الشبكة لإنشاء طلب الإيداع. يُضاف المبلغ لرصيدك بعد خصم رسوم الإيداع (1 دولار).": "Enter the deposit amount and pick a network to create your request. Your balance is credited after the $1 deposit fee.",
+  "اختر الشبكة": "Select network",
+  "إنشاء طلب إيداع": "Generate Deposit Request",
+  "الرسوم: إيداع 1$ · سحب 2.5$ · بيع 5%": "Fees: $1 deposit · $2.5 withdrawal · 5% sale",
+  "عنوان الإيداع": "Deposit address",
+  "عنوان المحفظة ورمز QR": "Wallet address & QR code",
+  "سيظهر عنوان الإيداع ورمز QR هنا بعد إنشاء الطلب.": "Your deposit address and QR code will appear here once the request is created.",
+  "رمز QR قريبًا": "QR code coming soon",
+  "تم إنشاء طلب الإيداع — أرسل المبلغ إلى العنوان الظاهر": "Deposit request created — send the amount to the address shown.",
+  "بعد إرسال التحويل، أرفق صورة سكرين وسيراجعها الفريق ثم يُضاف المبلغ لرصيدك.": "After sending the transfer, attach a screenshot. The team will review it and credit your balance."
 }
