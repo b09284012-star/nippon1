@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth";
 import { deleteMyAccount } from "@/lib/account.functions";
-import { CompanyProfileEditor } from "@/components/site/CompanyProfileEditor";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -106,9 +105,8 @@ function ProfilePage() {
         </div>
       </div>
 
-      {profile?.is_company && <CompanyProfileEditor userId={user.id} defaultName={profile.display_name} />}
 
-      <section className="glass grid gap-4 rounded-3xl p-6">
+      <section className="grid gap-4 border-t border-border pt-6">
         <h2 className="font-display text-lg font-bold">البيانات الشخصية</h2>
         <F label="الاسم الظاهر" value={f.display_name} onChange={set("display_name")} />
         <F label="نبذة" value={f.bio} onChange={set("bio")} />
@@ -120,14 +118,14 @@ function ProfilePage() {
         <Button disabled={busy} onClick={() => void saveProfile()}>حفظ التغييرات</Button>
       </section>
 
-      <section className="glass grid gap-4 rounded-3xl p-6">
+      <section className="grid gap-4 border-t border-border pt-6">
         <h2 className="flex items-center gap-2 font-display text-lg font-bold"><KeyRound className="size-5" /> تغيير كلمة المرور</h2>
         <F label="كلمة المرور الحالية" type="password" value={cur} onChange={(e) => setCur(e.target.value)} />
         <F label="كلمة المرور الجديدة" type="password" value={pw} onChange={(e) => setPw(e.target.value)} />
         <Button variant="outline" disabled={busy} onClick={() => void changePw()}>تحديث كلمة المرور</Button>
       </section>
 
-      <section className="glass grid gap-3 rounded-3xl p-6">
+      <section className="grid gap-3 border-t border-border pt-6">
         <h2 className="font-display text-lg font-bold">الحساب</h2>
         <Button variant="outline" onClick={() => void signOut().then(() => navigate({ to: "/" }))}><LogOut className="size-4" /> تسجيل الخروج</Button>
         <Button variant="destructive" disabled={busy} onClick={() => void deleteAccount()}><Trash2 className="size-4" /> حذف الحساب نهائيًا</Button>

@@ -1,15 +1,15 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Menu, ShieldCheck, Wallet2, LogOut, UserRound } from "lucide-react";
+import { Menu, ShieldCheck, Wallet2, LogOut, UserRound, Languages } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/nippon-logo.png.asset.json";
 import { NotificationsBell } from "@/components/site/NotificationsBell";
+import { useLanguage } from "@/lib/i18n";
 
 const links = [
   { to: "/market", label: "السوق" },
-  { to: "/companies", label: "شراء من الشركات" },
   { to: "/sell", label: "أضف عرض" },
   { to: "/chat", label: "الدردشة" },
   { to: "/forum", label: "المنتدى" },
@@ -18,6 +18,7 @@ const links = [
 ] as const;
 
 export function Header() {
+  const { language, setLanguage } = useLanguage();
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -32,7 +33,7 @@ export function Header() {
           </span>
         </Link>
 
-        <nav className="mx-auto hidden items-center gap-7 lg:flex">
+        <nav className="mx-auto hidden items-center gap-4 xl:flex">
           {links.map((l) => (
             <Link
               key={l.to}
@@ -55,7 +56,10 @@ export function Header() {
           )}
         </nav>
 
-        <div className="ms-auto flex items-center gap-2 lg:ms-0">
+        <div className="ms-auto flex shrink-0 items-center gap-1 xl:ms-0">
+          <Button variant="ghost" size="sm" onClick={() => setLanguage(language === "ar" ? "en" : "ar")} aria-label={language === "ar" ? "Switch to English" : "التبديل إلى العربية"}>
+            <Languages className="size-4" /><span>{language === "ar" ? "English" : "العربية"}</span>
+          </Button>
           {user ? (
             <>
               <Button
@@ -82,7 +86,7 @@ export function Header() {
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden"
+            className="xl:hidden"
             onClick={() => setOpen((v) => !v)}
             aria-label="القائمة"
           >
@@ -91,7 +95,7 @@ export function Header() {
         </div>
       </div>
 
-      <div className={cn("border-t border-border/60 lg:hidden", open ? "block" : "hidden")}>
+      <div className={cn("border-t border-border/60 xl:hidden", open ? "block" : "hidden")}>
         <nav className="mx-auto grid max-w-7xl gap-1 px-4 py-3">
           {links.map((l) => (
             <Link

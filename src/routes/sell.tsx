@@ -109,7 +109,7 @@ function SellPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
       <h1 className="font-display text-3xl font-black">
-        أضف <span className="neon-text">{profile?.is_company ? "عرض شركة" : "عرض"}</span>
+        أضف <span className="neon-text">عرض</span>
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
         السعر ومدة الضمان حقول إلزامية، والنشر متاح للبائعين المعتمدين من الإدارة فقط.

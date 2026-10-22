@@ -18,6 +18,7 @@ import { SupportWhatsAppButton } from "@/components/site/SupportWhatsApp";
 import { PresenceTracker } from "@/components/site/PresenceTracker";
 import { Footer } from "@/components/site/Footer";
 import { Toaster } from "@/components/ui/sonner";
+import { LanguageInitializer } from "@/lib/i18n";
 
 function NotFoundComponent() {
   return (
@@ -127,6 +128,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <LanguageInitializer />
         <div className="flex min-h-screen flex-col">
           <Header />
           <main className="flex-1">
