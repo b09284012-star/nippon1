@@ -14,44 +14,7 @@ import { formatDate, formatUsd, useStorageUrl } from "@/lib/media";
 import { useOnlineKeys } from "@/lib/presence";
 import { cn } from "@/lib/utils";
 import { useServerFn } from "@tanstack/react-start";
-import { adminAccountAction, adminCreateCompany, adminListBans } from "@/lib/account.functions";
-
-function CreateCompanyForm({ onDone }: { onDone: () => void }) {
-  const create = useServerFn(adminCreateCompany);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [busy, setBusy] = useState(false);
-  const submit = async () => {
-    setBusy(true);
-    try {
-      await create({ data: { email, password, companyName: name } });
-      toast.success("تم إنشاء حساب الشركة");
-      setName(""); setEmail(""); setPassword("");
-      onDone();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "تعذر إنشاء الحساب");
-    } finally {
-      setBusy(false);
-    }
-  };
-  return (
-    <div className="glass rounded-2xl p-4">
-      <div className="mb-3 flex items-center gap-2 font-display font-bold">
-        <UserPlus className="size-4 text-primary" /> إنشاء حساب تجاري (شركة)
-      </div>
-      <div className="grid gap-2 sm:grid-cols-3">
-        <Input value={name} onChange={(e) => setName(e.target.value.slice(0, 60))} placeholder="اسم الشركة" />
-        <Input value={email} onChange={(e) => setEmail(e.target.value.slice(0, 120))} placeholder="البريد الإلكتروني" dir="ltr" type="email" />
-        <Input value={password} onChange={(e) => setPassword(e.target.value.slice(0, 72))} placeholder="كلمة المرور" dir="ltr" type="text" />
-      </div>
-      <Button className="mt-3" size="sm" disabled={busy || !name.trim() || !email.trim() || password.length < 6} onClick={() => void submit()}>
-        إنشاء الحساب
-      </Button>
-      <p className="mt-2 text-xs text-muted-foreground">يُنشأ الحساب مفعّلًا مباشرة وموسومًا كشركة، ويظهر في صفحة «شراء من الشركات» بعد اعتماده كبائع.</p>
-    </div>
-  );
-}
+import { adminAccountAction, adminListBans } from "@/lib/account.functions";
 
 function AccountActions({ userId, bannedUntil, onDone }: { userId: string; bannedUntil?: string | undefined; onDone: () => void }) {
   const act = useServerFn(adminAccountAction);
@@ -140,14 +103,6 @@ function AdminPage() {
     },
   });
   const listBans = useServerFn(adminListBans);
-  const companies = useQuery({
-    queryKey: ["admin-companies"],
-    enabled: isAdmin,
-    queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("id").eq("is_company", true);
-      return new Set((data ?? []).map((r) => r.id));
-    },
-  });
   const bans = useQuery({ queryKey: ["admin-bans"], enabled: isAdmin, queryFn: () => listBans() });
 
   const deposits = useQuery({
@@ -267,7 +222,6 @@ function AdminPage() {
 
 
         <TabsContent value="users" className="mt-6 grid gap-3">
-          <CreateCompanyForm onDone={() => { void users.refetch(); void companies.refetch(); }} />
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value.slice(0, 60))}
@@ -307,7 +261,6 @@ function AdminPage() {
                       <span className="font-display font-bold">{u.display_name ?? "—"}</span>
                       {onlineKeys.has(u.id) && <Badge className="bg-primary/15 text-primary">متصل الآن</Badge>}
                       {u.is_admin && <Badge>مدير</Badge>}
-                      {companies.data?.has(u.id) && <Badge variant="outline">شركة</Badge>}
                       {u.is_verified_seller && <Badge variant="secondary" className="gap-1"><ShieldCheck className="size-3.5" /> بائع معتمد</Badge>}
                       <code className="ms-auto text-xs" dir="ltr">{u.deposit_tag}</code>
                     </div>
@@ -331,17 +284,6 @@ function AdminPage() {
                           }}
                         />
                         بائع معتمد
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <Switch
-                          checked={Boolean(companies.data?.has(u.id))}
-                          onCheckedChange={async (v) => {
-                            const { error } = await supabase.rpc("admin_set_company", { _user_id: u.id, _company: v });
-                            if (error) toast.error(error.message);
-                            else { toast.success(v ? "تم تعيينه كشركة" : "أصبح حسابًا فرديًا"); void companies.refetch(); }
-                          }}
-                        />
-                        حساب شركة
                       </label>
                       <label className="flex items-center gap-2">
                         <Switch
