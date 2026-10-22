@@ -2,7 +2,7 @@ import { t, useLanguage, numberLocale } from "@/lib/i18n";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 
-export const analyticsDollar = (value: number) => new Intl.NumberFormat("ar", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(value);
+export const analyticsDollar = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(value);
 const compactDollar = (value: number) => new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(value);
 const config = {
   volume: { label: "المبيعات", color: "var(--chart-1)" },
@@ -19,9 +19,9 @@ type Props = {
 };
 
 export function AnalyticsCharts({ series, top, statusCount, metric }: Props) {
-  useLanguage();
+  const { direction } = useLanguage();
   const timeline = series.map(([date, values]) => ({ date, ...values }));
-  const statuses = Object.entries(statusCount).map(([status, value]) => ({ name: labels[status] ?? status, value, fill: colors[status] ?? "var(--chart-4)" }));
+  const statuses = Object.entries(statusCount).map(([status, value]) => ({ name: t(labels[status] ?? status), value, fill: colors[status] ?? "var(--chart-4)" }));
   const total = statuses.reduce((sum, item) => sum + item.value, 0);
   const products = top.map(([name, values], index) => ({ name, rank: `#${index + 1}`, ...values }));
   return (
@@ -37,7 +37,7 @@ export function AnalyticsCharts({ series, top, statusCount, metric }: Props) {
               <CartesianGrid vertical={false} stroke="var(--border)" strokeDasharray="3 5" />
               <XAxis dataKey="date" axisLine={false} tickLine={false} minTickGap={36} tickMargin={12} tickFormatter={(value: string) => value.slice(5)} />
               <YAxis axisLine={false} tickLine={false} tickFormatter={compactDollar} width={52} domain={[0, "auto"]} />
-              <ChartTooltip content={<ChartTooltipContent formatter={(value) => <div className="flex w-full items-center justify-between gap-5" dir={useLanguage().direction}><span>{config[metric].label}</span><strong>{analyticsDollar(Number(value))}</strong></div>} labelFormatter={(value) => new Date(`${String(value)}T12:00:00`).toLocaleDateString(numberLocale(), { day: "numeric", month: "long", year: "numeric" })} />} />
+              <ChartTooltip content={<ChartTooltipContent formatter={(value) => <div className="flex w-full items-center justify-between gap-5" dir={direction}><span>{t(config[metric].label)}</span><strong>{analyticsDollar(Number(value))}</strong></div>} labelFormatter={(value) => new Date(`${String(value)}T12:00:00`).toLocaleDateString(numberLocale(), { day: "numeric", month: "long", year: "numeric" })} />} />
               <Area type="monotone" dataKey={metric} stroke={`var(--color-${metric})`} fill={`var(--color-${metric})`} fillOpacity={0.12} strokeWidth={3} dot={timeline.length === 1} activeDot={{ r: 5 }} isAnimationActive={false} />
             </AreaChart>
           </ChartContainer>
@@ -52,7 +52,7 @@ export function AnalyticsCharts({ series, top, statusCount, metric }: Props) {
                 <CartesianGrid horizontal={false} stroke="var(--border)" strokeDasharray="3 5" />
                 <XAxis type="number" axisLine={false} tickLine={false} tickFormatter={compactDollar} />
                 <YAxis type="category" dataKey="rank" axisLine={false} tickLine={false} width={36} />
-                <ChartTooltip content={<ChartTooltipContent labelFormatter={(_, payload) => payload?.[0]?.payload?.name ?? ""} formatter={(value) => <strong dir={useLanguage().direction}>{analyticsDollar(Number(value))}</strong>} />} />
+                <ChartTooltip content={<ChartTooltipContent labelFormatter={(_, payload) => payload?.[0]?.payload?.name ?? ""} formatter={(value) => <strong dir={direction}>{analyticsDollar(Number(value))}</strong>} />} />
                 <Bar dataKey={metric} fill={`var(--color-${metric})`} radius={[0, 4, 4, 0]} maxBarSize={22} isAnimationActive={false} />
               </BarChart>
             </ChartContainer>
@@ -66,7 +66,7 @@ export function AnalyticsCharts({ series, top, statusCount, metric }: Props) {
           {total === 0 ? <EmptyChart text={t("لا توجد طلبات في هذه الفترة")} /> : <>
             <div className="relative mx-auto mt-4 max-w-72">
               <ChartContainer config={config} className="h-64 w-full aspect-auto" dir="ltr">
-                <PieChart><ChartTooltip content={<ChartTooltipContent hideLabel formatter={(value, name) => <div className="flex items-center gap-4" dir={useLanguage().direction}><span>{String(name)}</span><strong>{Number(value)} {t("طلب")}</strong></div>} />} /><Pie data={statuses} dataKey="value" nameKey="name" innerRadius="65%" outerRadius="85%" paddingAngle={3} stroke="var(--background)" isAnimationActive={false}>{statuses.map((status) => <Cell key={status.name} fill={status.fill} />)}</Pie></PieChart>
+                <PieChart><ChartTooltip content={<ChartTooltipContent hideLabel formatter={(value, name) => <div className="flex items-center gap-4" dir={direction}><span>{String(name)}</span><strong>{Number(value)} {t("طلب")}</strong></div>} />} /><Pie data={statuses} dataKey="value" nameKey="name" innerRadius="65%" outerRadius="85%" paddingAngle={3} stroke="var(--background)" isAnimationActive={false}>{statuses.map((status) => <Cell key={status.name} fill={status.fill} />)}</Pie></PieChart>
               </ChartContainer>
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center"><strong className="font-display text-3xl tabular-nums">{total}</strong><span className="text-xs text-muted-foreground">{t("إجمالي الطلبات")}</span></div>
             </div>

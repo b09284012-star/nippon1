@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/nippon-logo.png.asset.json";
 import { NotificationsBell } from "@/components/site/NotificationsBell";
-import { useLanguage } from "@/lib/i18n";
+import { t, useLanguage } from "@/lib/i18n";
 
 const links = [
   { to: "/market", label: "السوق" },
@@ -18,7 +18,6 @@ const links = [
 ] as const;
 
 export function Header() {
-  useLanguage();
   const { language, setLanguage } = useLanguage();
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
@@ -26,10 +25,10 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/70 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
-        <Link to="/" className="flex items-center gap-2">
+      <div className="mx-auto flex h-16 max-w-7xl items-center gap-2 px-3 sm:gap-4 sm:px-4">
+        <Link to="/" className="flex shrink-0 items-center gap-2">
           <img src={logo.url} alt={t("شعار Nippon Mining")} className="h-10 w-auto brightness-125 drop-shadow-[0_0_10px_var(--color-primary)]" />
-          <span className="font-display text-xl font-extrabold tracking-tight">
+          <span className="hidden font-display text-xl font-extrabold sm:inline">
             Nip<span className="text-primary">pon</span>
           </span>
         </Link>
@@ -42,7 +41,7 @@ export function Header() {
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               activeProps={{ className: "text-foreground" }}
             >
-              {l.label}
+              {t(l.label)}
             </Link>
           ))}
           {isAdmin && (
@@ -56,8 +55,8 @@ export function Header() {
         </nav>
 
         <div className="ms-auto flex shrink-0 items-center gap-1 xl:ms-0">
-          <Button variant="ghost" size="sm" onClick={() => setLanguage(language === "ar" ? "en" : "ar")} aria-label={language === "ar" ? "Switch to English" : t("التبديل إلى العربية")}>
-            <Languages className="size-4" /><span>{language === "ar" ? "English" : t("العربية")}</span>
+          <Button variant="ghost" size="sm" onClick={() => setLanguage(language === "ar" ? "en" : "ar")} aria-label={language === "ar" ? "Switch to English" : "Switch to Arabic"}>
+            <Languages className="size-4" /><span>{language === "ar" ? "English" : "العربية"}</span>
           </Button>
           {user ? (
             <>

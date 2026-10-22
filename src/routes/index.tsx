@@ -67,7 +67,7 @@ function Home() {
 
   return (
     <div>
-      <section className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden">
+      <section className="relative flex min-h-[min(720px,calc(100svh-8rem))] items-center justify-center overflow-hidden">
         <img
           src={heroMiners.url}
           alt={t("صف من أجهزة تعدين ANTMINER مستعملة")}
@@ -76,16 +76,16 @@ function Home() {
         <div className="absolute inset-0 bg-background/85" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,var(--background)_95%)]" />
 
-        <div className="relative z-10 mx-auto max-w-4xl px-4 py-24 text-center">
-          <p className="text-sm font-bold tracking-[0.35em] text-primary uppercase">
+        <div className="relative z-10 mx-auto max-w-4xl px-4 py-16 text-center">
+          <p className="text-sm font-bold tracking-normal text-primary uppercase">
             {t("سوق موثوق لأجهزة التعدين")} </p>
-          <h1 className="mt-6 font-display text-5xl leading-[1.1] font-black tracking-tight sm:text-7xl">
+          <h1 className="mt-6 font-display text-4xl leading-tight font-black sm:text-6xl">
             {t("اشترِ بثقة.")} <span className="mt-3 block text-primary sm:mt-4">{t("بِع بأمان.")}</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
             {t("أجهزة ASIC و GPU مستعملة من بائعين معتمدين — المبلغ يبقى محجوزًا في نيبون حتى تستلم جهازك، مع دردشة مباشرة ومحفظة كريبتو داخلية.")} </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-            <Button size="lg" className="px-8 text-base" asChild>
+            <Button size="lg" asChild>
               <Link to="/market">
                 {t("تصفح الأجهزة")} <ArrowLeft className="size-4" />
               </Link>
@@ -100,9 +100,9 @@ function Home() {
               ["100%", "مبالغ محجوزة بالضمان"],
               ["24/7", "دعم النزاعات"],
             ].map(([v, l]) => (
-              <div key={l} className="rounded-xl border border-border/50 bg-background/60 p-4 backdrop-blur-md">
+              <div key={t(l)} className="border-s border-border/50 px-2 py-3 first:border-s-0">
                 <dt className="font-display text-2xl font-black text-primary">{v}</dt>
-                <dd className="mt-1 text-xs text-muted-foreground">{l}</dd>
+                <dd className="mt-1 text-xs text-muted-foreground">{t(l)}</dd>
               </div>
             ))}
           </dl>
@@ -115,13 +115,13 @@ function Home() {
           {t("أربع خطوات فقط: توثيق، تفاوض، دفع محجوز، ثم تسليم. المبلغ لا يصل للبائع إلا بعد تأكيدك.")} </p>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((s, i) => (
-            <div key={s.title} className="glass card-3d card-3d-hover rounded-2xl p-6">
+            <div key={t(s.title)} className="border-t border-border py-6">
               <div className="mb-4 grid size-11 place-items-center rounded-xl bg-[image:var(--gradient-neon)] text-primary-foreground">
                 <s.icon className="size-5" />
               </div>
               <div className="text-xs text-muted-foreground">{t("الخطوة")} {i + 1}</div>
-              <h3 className="mt-1 font-display text-lg font-bold">{s.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{s.text}</p>
+              <h3 className="mt-1 font-display text-lg font-bold">{t(s.title)}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{t(s.text)}</p>
             </div>
           ))}
         </div>
@@ -139,7 +139,7 @@ function Home() {
               {t("عرض الكل")} </Link>
           </div>
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {listings.map((l) => <ListingCard key={l.id} listing={l} />)}
+            {listings.map((l) => <ListingCard key={l.id} listing={t(l)} />)}
           </div>
         </section>
       ) : null}

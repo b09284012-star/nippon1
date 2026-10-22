@@ -72,7 +72,7 @@ function SellPage() {
     const fd = new FormData(e.currentTarget);
     const parsed = schema.safeParse(Object.fromEntries(fd.entries()));
     if (!parsed.success) {
-      toast.error(parsed.error.issues[0]?.message ?? "تحقق من الحقول");
+      toast.error(t(parsed.error.issues[0]?.message) ?? "تحقق من الحقول");
       return;
     }
     setBusy(true);
@@ -164,7 +164,7 @@ function SellPage() {
               {t("اختر الدولة")} </option>
             {COUNTRIES.map((c) => (
               <option key={c} value={c}>
-                {c}
+                {t(c)}
               </option>
             ))}
           </select>

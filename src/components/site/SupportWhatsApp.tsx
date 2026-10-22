@@ -11,7 +11,7 @@ export function SupportWhatsAppButton() {
       href={SUPPORT_WHATSAPP_URL}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`تواصل مع الدعم عبر واتساب ${SUPPORT_WHATSAPP}`}
+      aria-label={(t("تواصل مع الدعم عبر واتساب ") + (SUPPORT_WHATSAPP))}
       className="fixed bottom-5 end-5 z-50 flex items-center gap-2 rounded-full bg-primary px-4 py-3 text-sm font-bold text-primary-foreground shadow-[var(--shadow-neon)] transition-transform hover:scale-105"
     >
       <MessageCircle className="size-5" />

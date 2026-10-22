@@ -122,15 +122,15 @@ function FinancePage() {
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          ["قيمة الأجهزة المعروضة", formatUsd(Number(summary.data?.listed_value ?? 0)), `${summary.data?.listed_count ?? 0} عرض نشط`],
+          ["قيمة الأجهزة المعروضة", formatUsd(Number(summary.data?.listed_value ?? 0)), ((summary.data?.listed_count ?? 0) + t(" عرض نشط"))],
           ["أرباح متوقعة (5%)", formatUsd(Number(summary.data?.expected_fees ?? 0)), "من الأجهزة المعروضة"],
-          ["أرباح محققة", formatUsd(Number(summary.data?.earned_fees ?? 0)), `+ ${formatUsd(Number(summary.data?.held_fees ?? 0))} في الضمان`],
+          ["أرباح محققة", formatUsd(Number(summary.data?.earned_fees ?? 0)), ("+ " + (formatUsd(Number(summary.data?.held_fees ?? 0))) + t(" في الضمان"))],
           ["رسوم السحب", formatUsd(Number(summary.data?.withdrawal_fees ?? 0)), "2.5$ لكل سحب مكتمل"],
         ].map(([l, v, h]) => (
-          <div key={l} className="glass card-3d rounded-2xl p-5">
-            <div className="text-xs text-muted-foreground">{l}</div>
+          <div key={t(l)} className="glass card-3d rounded-2xl p-5">
+            <div className="text-xs text-muted-foreground">{t(l)}</div>
             <div className="mt-1 font-display text-2xl font-black">{v}</div>
-            <div className="mt-1 text-xs text-muted-foreground">{h}</div>
+            <div className="mt-1 text-xs text-muted-foreground">{t(h)}</div>
           </div>
         ))}
       </div>
@@ -285,7 +285,7 @@ function ManualCredit() {
     const { error } = await supabase.rpc("admin_credit_user", { _user_id: target.id, _amount: n, _note: note.trim() || "إضافة يدوية" });
     setBusy(false);
     if (error) { toast.error(error.message === "NEGATIVE_BALANCE" ? t("الرصيد لا يكفي للخصم") : error.message); return; }
-    toast.success(n > 0 ? `تمت إضافة ${formatUsd(n)}` : `تم خصم ${formatUsd(-n)}`);
+    toast.success(n > 0 ? (t("تمت إضافة ") + (formatUsd(n))) : (t("تم خصم ") + (formatUsd(-n))));
     setAmount(""); setNote(""); void users.refetch();
   };
 

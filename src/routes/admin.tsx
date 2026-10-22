@@ -41,7 +41,7 @@ function AccountActions({ userId, bannedUntil, onDone }: { userId: string; banne
       {bannedUntil ? (
         <>
           <Badge variant="destructive">
-            {new Date(bannedUntil).getFullYear() > 2100 ? t("محظور") : `معلّق حتى ${formatDate(bannedUntil)}`}
+            {new Date(bannedUntil).getFullYear() > 2100 ? t("محظور") : (t("معلّق حتى ") + (formatDate(bannedUntil)))}
           </Badge>
           <Button size="sm" variant="outline" disabled={busy} onClick={() => void run("unban", t("تم رفع الحظر"))}>{t("رفع الحظر")}</Button>
         </>
@@ -243,7 +243,7 @@ function AdminPage() {
                       group === "online" ? "animate-pulse bg-primary" : "bg-muted-foreground/50",
                     )}
                   />
-                  {group === "online" ? `متصلون الآن (${list.length})` : `غير متصلين (${list.length})`}
+                  {group === "online" ? (t("متصلون الآن (") + (list.length) + ")") : (t("غير متصلين (") + (list.length) + ")")}
                 </div>
                 {list.map((u) => (
                   <div key={u.id} className="glass rounded-2xl p-4">
@@ -386,7 +386,7 @@ function WithdrawalRow({ w, onDone }: { w: WithdrawalRowData; onDone: () => void
       <div className="flex flex-wrap items-center gap-3">
         <span className="font-display font-bold">{w.display_name ?? w.email}</span>
         <Badge variant={w.status === "pending" ? "default" : "secondary"}>
-          {WD_STATUS[w.status] ?? w.status}
+          {t(WD_STATUS[w.status] ?? w.status)}
         </Badge>
         <span className="ms-auto font-display text-lg font-black">{formatUsd(w.amount)}</span>
       </div>
@@ -500,7 +500,7 @@ function DepositRow({ d, onDone }: { d: DepositRowData; onDone: () => void }) {
       <div className="flex flex-wrap items-center gap-3">
         <span className="font-display font-bold">{d.display_name ?? d.email}</span>
         <Badge variant={d.status === "pending" ? "default" : "secondary"}>
-          {WD_STATUS[d.status] ?? d.status}
+          {t(WD_STATUS[d.status] ?? d.status)}
         </Badge>
         <span className="ms-auto font-display text-lg font-black">{formatUsd(d.amount)}</span>
       </div>
@@ -599,7 +599,7 @@ function SendNotification({ users }: { users: { id: string; display_name: string
     });
     setBusy(false);
     if (error) { toast.error(error.message); return; }
-    toast.success(`تم الإرسال إلى ${data} مستخدم`);
+    toast.success((t("تم الإرسال إلى ") + (data) + t(" مستخدم")));
     setTitle(""); setBody("");
   };
 

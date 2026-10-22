@@ -89,7 +89,7 @@ function OrdersPage() {
           return (
             <div key={o.id} className="glass rounded-2xl p-5">
               <div className="flex flex-wrap items-center gap-3">
-                <Badge variant="secondary">{STATUS[o.status] ?? o.status}</Badge>
+                <Badge variant="secondary">{t(STATUS[o.status] ?? o.status)}</Badge>
                 <span className="font-display font-bold">
                   {(o as { listings?: { title?: string } }).listings?.title ?? "عرض"}
                 </span>
@@ -101,7 +101,7 @@ function OrdersPage() {
 
               <div className="mt-2 text-xs text-muted-foreground">
                 {isBuyer ? t("أنت المشتري") : t("أنت البائع")} {t("• الرسوم")} {formatUsd(o.fee)}
-                {o.tracking_number ? ` • تتبع: ${o.shipping_carrier} ${o.tracking_number}` : ""}
+                {o.tracking_number ? (t(" • تتبع: ") + (o.shipping_carrier) + " " + (o.tracking_number)) : ""}
               </div>
 
               <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -252,7 +252,7 @@ function ReviewForm({
           <button
             key={n}
             type="button"
-            aria-label={`${n} نجوم`}
+            aria-label={((n) + t(" نجوم"))}
             onClick={() => setRating(n)}
             className="p-0.5"
           >

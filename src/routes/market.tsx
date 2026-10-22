@@ -72,7 +72,7 @@ function Market() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
       <h1 className="font-display text-4xl font-black">
-        {t("السوق")}{country ? ` — ${country}` : ""}
+        {t("السوق")}{country ? ` — ${t(country)}` : ""}
       </h1>
       {!isAccount && (
         <div className="mt-4 max-w-xs">
@@ -81,17 +81,17 @@ function Market() {
             <SelectTrigger><SelectValue placeholder={t("جميع الدول")} /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t("جميع الدول")}</SelectItem>
-              {COUNTRIES.map((c) => (<SelectItem key={c} value={c}>{c}</SelectItem>))}
+              {COUNTRIES.map((c) => (<SelectItem key={c} value={c}>{t(c)}</SelectItem>))}
             </SelectContent>
           </Select>
         </div>
       )}
       <p className="mt-2 text-muted-foreground">
-        {isLoading ? t("جاري التحميل…") : `${filtered.length} جهاز متاح${country ? ` في ${country}` : ""}`}
+        {isLoading ? t("جاري التحميل…") : ((filtered.length) + t(" جهاز متاح") + (country ? ` في ${country}` : ""))}
       </p>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[280px_1fr]">
-        <aside className="glass h-fit space-y-6 rounded-2xl p-5">
+      <div className="mt-8 grid gap-6 lg:grid-cols-[250px_minmax(0,1fr)]">
+        <aside className="grid h-fit gap-5 border-y border-border py-5 sm:grid-cols-2 lg:sticky lg:top-24 lg:grid-cols-1">
           <div>
             <Label className="mb-2 block">{t("بحث")}</Label>
             <div className="relative">
@@ -129,7 +129,7 @@ function Market() {
               <SelectContent>
                 {["all", "كالجديد", "ممتاز", "جيد جداً", "جيد", "مقبول"].map((c) => (
                   <SelectItem key={c} value={c}>
-                    {c === "all" ? t("الكل") : c}
+                    {c === "all" ? t("الكل") : t(c)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -162,9 +162,9 @@ function Market() {
           </div>
         </aside>
 
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid content-start gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.map((l) => (
-            <ListingCard key={l.id} listing={l} />
+            <ListingCard key={l.id} listing={t(l)} />
           ))}
           {!isLoading && filtered.length === 0 && (
             <p className="text-muted-foreground">{t("لا توجد نتائج مطابقة.")}</p>

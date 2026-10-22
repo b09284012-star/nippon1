@@ -107,9 +107,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
-  useLanguage();
+  const { language, direction } = useLanguage();
   return (
-    <html lang="ar" dir={useLanguage().direction} className="dark">
+    <html lang={language} dir={direction} className="dark">
       <head>
         <HeadContent />
       </head>

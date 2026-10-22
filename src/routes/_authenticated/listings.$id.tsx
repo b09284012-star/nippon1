@@ -174,7 +174,7 @@ function ListingDetail() {
 
         <div>
           <div className="flex flex-wrap gap-2">
-            <Badge>{listing.condition}</Badge>
+            <Badge>{t(listing.condition)}</Badge>
             <Badge variant="secondary">{listing.brand}</Badge>
             {listing.status === "sold" && <Badge variant="destructive">{t("تم البيع")}</Badge>}
           </div>
@@ -185,23 +185,23 @@ function ListingDetail() {
 
           <div className="mt-6 grid grid-cols-2 gap-3 text-sm">
             <Spec icon={Cpu} label={t("الهاش ريت")} value={listing.hashrate} />
-            <Spec icon={Zap} label={t("الاستهلاك")} value={`${listing.power_watts} واط`} />
+            <Spec icon={Zap} label={t("الاستهلاك")} value={((listing.power_watts) + t(" واط"))} />
             <Spec
               icon={ShieldCheck}
               label={t("الضمان")}
-              value={`${listing.warranty_months} شهر`}
+              value={((listing.warranty_months) + t(" شهر"))}
             />
             <Spec
               icon={Clock}
               label={t("ساعات التشغيل")}
-              value={listing.hours_used ? `${listing.hours_used} ساعة` : t("غير محدد")}
+              value={listing.hours_used ? ((listing.hours_used) + t(" ساعة")) : t("غير محدد")}
             />
-            <Spec icon={MapPin} label={t("الموقع")} value={listing.location ?? "—"} />
+            <Spec icon={MapPin} label={t("الموقع")} value={t(listing.location ?? "—")} />
             <Spec icon={Cpu} label={t("الخوارزمية")} value={listing.algorithm ?? "—"} />
             <Spec
               icon={Boxes}
               label={t("التوفر")}
-              value={onOrder ? t("حسب الطلب") : `متوفر: ${maxQty} قطعة`}
+              value={onOrder ? t("حسب الطلب") : (t("متوفر: ") + (maxQty) + t(" قطعة"))}
             />
           </div>
 
@@ -283,7 +283,7 @@ function ListingDetail() {
                       <Plus className="size-4" />
                     </Button>
                     <span className="text-xs text-muted-foreground">
-                      {maxQty ? `المتوفر: ${maxQty}` : t("حسب الطلب")}
+                      {maxQty ? (t("المتوفر: ") + (maxQty)) : t("حسب الطلب")}
                     </span>
                   </div>
                   <div className="mt-3 text-sm">
@@ -454,7 +454,7 @@ function EditListingDialog({
             <div><Label className="mb-1 block">{t("الضمان (شهر)")}</Label><Input name="warranty_months" type="number" defaultValue={listing.warranty_months} /></div>
             <div><Label className="mb-1 block">{t("الكمية")}</Label><Input name="quantity" type="number" defaultValue={listing.quantity} /></div>
           </div>
-          <div><Label className="mb-1 block">{t("الحالة")}</Label><Input name="condition" defaultValue={listing.condition} /></div>
+          <div><Label className="mb-1 block">{t("الحالة")}</Label><Input name="condition" defaultValue={t(listing.condition)} /></div>
           <div>
             <Label className="mb-1 block">{t("حالة العرض")}</Label>
             <select name="status" defaultValue={listing.status} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">

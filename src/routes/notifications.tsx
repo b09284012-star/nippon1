@@ -65,7 +65,7 @@ function NotificationsPage() {
   return <main className="mx-auto min-h-[70vh] w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
     <Button asChild variant="ghost" size="sm" className="mb-6"><Link to="/profile"><ArrowRight /> {t("حسابي")}</Link></Button>
     <header className="flex flex-wrap items-start justify-between gap-4 border-b border-border pb-6">
-      <div><h1 className="flex items-center gap-3 font-display text-3xl font-bold"><Bell className="size-7 text-primary" />{t("الإشعارات")}</h1><p className="mt-2 text-sm text-muted-foreground">{unread > 0 ? `${unread} إشعارات غير مقروءة` : t("جميع الإشعارات مقروءة")}</p></div>
+      <div><h1 className="flex items-center gap-3 font-display text-3xl font-bold"><Bell className="size-7 text-primary" />{t("الإشعارات")}</h1><p className="mt-2 text-sm text-muted-foreground">{unread > 0 ? ((unread) + t(" إشعارات غير مقروءة")) : t("جميع الإشعارات مقروءة")}</p></div>
       <div className="flex flex-wrap gap-2">
         {permission !== "granted" && <Button variant="outline" onClick={() => void enableAlerts()}><BellRing /> {t("تفعيل التنبيهات")}</Button>}
         <Button variant="ghost" size="icon" aria-label={t("تحديث الإشعارات")} title={t("تحديث الإشعارات")} disabled={q.isFetching} onClick={() => void q.refetch()}><RefreshCw className={cn(q.isFetching && "animate-spin motion-reduce:animate-none")} /></Button>

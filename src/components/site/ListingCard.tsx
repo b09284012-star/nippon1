@@ -39,7 +39,7 @@ export function ListingCard({ listing }: { listing: ListingRow }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
         <div className="absolute bottom-3 start-3 flex gap-2">
-          <Badge className="bg-primary/90 text-primary-foreground">{listing.condition}</Badge>
+          <Badge className="bg-primary/90 text-primary-foreground">{t(listing.condition)}</Badge>
           {listing.status === "sold" && <Badge variant="destructive">{t("تم البيع")}</Badge>}
         </div>
       </div>
@@ -58,7 +58,7 @@ export function ListingCard({ listing }: { listing: ListingRow }) {
           <span className="font-display text-xl font-black neon-text">
             {formatUsd(listing.price_usd)}
           </span>
-          <span className="text-xs text-muted-foreground">{listing.location ?? "—"}</span>
+          <span className="text-xs text-muted-foreground">{t(listing.location ?? "—")}</span>
         </div>
       </div>
     </Link>

@@ -62,7 +62,7 @@ function AuthPage() {
 
   const signIn = async () => {
     const parsed = schema.safeParse({ email, password });
-    if (!parsed.success) { toast.error(parsed.error.issues[0]?.message); return; }
+    if (!parsed.success) { toast.error(t(parsed.error.issues[0]?.message)); return; }
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
@@ -93,7 +93,7 @@ function AuthPage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-16">
-      <div className="glass rounded-3xl p-8">
+      <div className="border-t border-border pt-8">
         <h1 className="font-display text-3xl font-black">
           {t("مرحباً بك في")} <span className="neon-text">Nippon</span>
         </h1>
@@ -119,7 +119,7 @@ function AuthPage() {
             />
             <Button className="w-full" onClick={() => void signIn()} disabled={loading}>
               {t("دخول")} </Button>
-            <button type="button" className="text-sm text-primary" onClick={() => setForgot(true)}>{t("نسيت كلمة المرور؟")}</button>
+            <Button variant="link" onClick={() => setForgot(true)}>{t("نسيت كلمة المرور؟")}</Button>
           </TabsContent>
 
           <TabsContent value="signup" className="space-y-4 pt-4">
@@ -135,7 +135,7 @@ function AuthPage() {
                   </SelectTrigger>
                   <SelectContent>
                     {COUNTRIES.map((c) => (
-                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                      <SelectItem key={c} value={c}>{t(c)}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -177,7 +177,7 @@ function Field({
   return (
     <div>
       <Label className="mb-2 block">{label}</Label>
-      <Input type={type} value={value} onChange={(e) => onChange(e.target.value.slice(0, 255))} />
+      <Input dir={type === "email" || type === "tel" ? "ltr" : undefined} type={type} value={value} onChange={(e) => onChange(e.target.value.slice(0, 255))} />
     </div>
   );
 }

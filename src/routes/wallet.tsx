@@ -270,7 +270,7 @@ function WalletPage() {
               const s = WITHDRAWAL_STATUS[d.status] ?? { label: d.status, variant: "secondary" as const };
               return (
                 <div key={d.id} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
-                  <Badge variant={s.variant}>{s.label}</Badge>
+                  <Badge variant={s.variant}>{t(s.label)}</Badge>
                   <span className="font-display font-bold">{formatUsd(d.amount)}</span>
                   <span className="text-xs text-muted-foreground">{formatDate(d.created_at)}</span>
                   {d.admin_note && (
@@ -337,7 +337,7 @@ function WalletPage() {
             const s = WITHDRAWAL_STATUS[w.status] ?? { label: w.status, variant: "secondary" as const };
             return (
               <div key={w.id} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
-                <Badge variant={s.variant}>{s.label}</Badge>
+                <Badge variant={s.variant}>{t(s.label)}</Badge>
                 <span className="font-display font-bold">{formatUsd(w.amount)}</span>
                 <code className="max-w-[14rem] truncate text-xs text-muted-foreground">{w.address}</code>
                 <span className="text-xs text-muted-foreground">{formatDate(w.created_at)}</span>
@@ -358,17 +358,17 @@ function WalletPage() {
           {(data?.transactions ?? []).length === 0 && (
             <div className="px-6 py-8 text-sm text-muted-foreground">{t("لا عمليات بعد.")}</div>
           )}
-          {(data?.transactions ?? []).map((t) => (
-            <div key={t.id} className="flex items-center gap-3 px-6 py-4 text-sm">
-              <Badge variant="secondary">{TX_LABEL[t.type] ?? t.type}</Badge>
-              <span className="text-muted-foreground">{formatDate(t.created_at)}</span>
+          {(data?.transactions ?? []).map((transaction) => (
+            <div key={transaction.id} className="flex items-center gap-3 px-6 py-4 text-sm">
+              <Badge variant="secondary">{t(TX_LABEL[transaction.type] ?? transaction.type)}</Badge>
+              <span className="text-muted-foreground">{formatDate(transaction.created_at)}</span>
               <span
                 className={
                   "ms-auto font-display font-bold " +
-                  (Number(t.amount) < 0 ? "text-destructive" : "text-primary")
+                  (Number(transaction.amount) < 0 ? "text-destructive" : "text-primary")
                 }
               >
-                {formatUsd(t.amount)}
+                {formatUsd(transaction.amount)}
               </span>
             </div>
           ))}

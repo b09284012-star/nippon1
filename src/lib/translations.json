@@ -2,7 +2,7 @@
   "المبيعات": "Sales",
   "الأرباح": "Profit",
   "مكتمل": "Completed",
-  "في الضمان": "In escrow",
+  "في الضمان": "in escrow",
   "تم الشحن": "Shipped",
   "نزاع": "Disputed",
   "مسترد": "Refunded",
@@ -348,7 +348,7 @@
   "الإعلانات الرسمية": "Official announcements",
   "جارٍ تحميل الأسعار…": "Loading prices…",
   "تعذر جلب الأخبار حاليًا، حاول لاحقًا.": "Unable to load news right now. Please try later.",
-  "مستخدم": "User",
+  "مستخدم": "users",
   "اكتب رسالة أطول": "Write a longer message",
   "شارك خبرتك أو اسأل المجتمع…": "Share your experience or ask the community…",
   "اكتب إعلانًا رسميًا للمستخدمين…": "Write an official announcement…",
@@ -573,5 +573,8 @@
   "في": "in",
   "إشعارات غير مقروءة": "unread notifications",
   "• تتبع:": "• Tracking:",
-  "نجوم": "stars"
+  "نجوم": "stars",
+  "متصلون الآن (": "Online now (",
+  "غير متصلين (": "Offline (",
+  "+ سحب": "+ withdrawals"
 }

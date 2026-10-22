@@ -84,7 +84,7 @@ export function ProfitsAnalytics() {
         <h2 className="font-display text-2xl font-black">{t("تحليل الأرباح والمبيعات")}</h2>
         <div className="ms-auto flex flex-wrap gap-1">
           {RANGES.map((r) => (
-            <Button key={r.k} size="sm" variant={days === r.k ? "default" : "outline"} onClick={() => setDays(r.k)}>{r.l}</Button>
+            <Button key={r.k} size="sm" variant={days === r.k ? "default" : "outline"} onClick={() => setDays(r.k)}>{t(r.l)}</Button>
           ))}
         </div>
       </div>
@@ -94,18 +94,18 @@ export function ProfitsAnalytics() {
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          [Coins, "صافي أرباح الرسوم", formatUsd(stats.earned + stats.wdFees), `رسوم البيع ${formatUsd(stats.earned)} + سحب ${formatUsd(stats.wdFees)}`],
-          [TrendingUp, "حجم المبيعات", formatUsd(stats.volume), `${stats.count} صفقة مكتملة`],
+          [Coins, "صافي أرباح الرسوم", formatUsd(stats.earned + stats.wdFees), (t("رسوم البيع ") + (formatUsd(stats.earned)) + t(" + سحب ") + (formatUsd(stats.wdFees)))],
+          [TrendingUp, "حجم المبيعات", formatUsd(stats.volume), ((stats.count) + t(" صفقة مكتملة"))],
           [Clock, "أرباح معلّقة", formatUsd(stats.pending), "طلبات داخل الضمان"],
-          [ShoppingCart, "متوسط قيمة الصفقة", formatUsd(stats.avg), `${stats.total} طلب في الفترة`],
+          [ShoppingCart, "متوسط قيمة الصفقة", formatUsd(stats.avg), ((stats.total) + t(" طلب في الفترة"))],
         ].map(([Icon, l, v, h]) => {
           const I = Icon as typeof Coins;
           return (
-            <div key={l as string} className="glass card-3d rounded-2xl p-5">
+            <div key={t(l as string)} className="glass card-3d rounded-2xl p-5">
               <I className="size-5 text-primary" />
-              <div className="mt-2 text-xs text-muted-foreground">{l as string}</div>
+              <div className="mt-2 text-xs text-muted-foreground">{t(l as string)}</div>
               <div className="mt-1 font-display text-2xl font-black">{v as string}</div>
-              <div className="mt-1 text-xs text-muted-foreground">{h as string}</div>
+              <div className="mt-1 text-xs text-muted-foreground">{t(h as string)}</div>
             </div>
           );
         })}
