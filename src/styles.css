@@ -113,6 +113,7 @@
   }
 
   body {
+    font-variant-numeric: lining-nums tabular-nums;
     background-color: var(--color-background);
     color: var(--color-foreground);
     background-image:
@@ -190,4 +191,18 @@
   50% {
     transform: translateY(-18px) rotate(1deg);
   }
+}
+
+html[lang="en"] {
+  --font-sans: "Tajawal", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Tajawal", ui-sans-serif, system-ui, sans-serif;
+}
+
+main { min-width: 0; }
+input[type="number"], code { direction: ltr; unicode-bidi: isolate; }
+html[dir="ltr"] .lucide-arrow-left,
+html[dir="ltr"] .lucide-arrow-right { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) {
+  .card-3d-hover:hover { transform: none; }
+  *, *::before, *::after { scroll-behavior: auto; }
 }

@@ -16,3 +16,5 @@
 - Regular inventory feeds use regular_market_listing_cards to exclude company sellers centrally; company inventory uses company_market_listings and its own directory so seller type changes apply to existing offers too.
 - Public inventory RPCs expose only offer-card fields and deliberately public company branding; listing detail URLs live under the authenticated layout to require sign-in without changing existing links.
 - Auth return destinations are validated listing paths, preserving the selected offer while rejecting external redirects.
+- Site localization uses a shared language store and explicit translation dictionary; keep stored country/status values and user-entered content unchanged while translating presentation.
+- The retired company URL redirects to the marketplace; company records and separated inventory remain intact, but no company management controls are shown.

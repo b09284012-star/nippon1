@@ -1,3 +1,4 @@
+import { t, useLanguage, numberLocale } from "@/lib/i18n";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -22,13 +23,13 @@ const WITHDRAWAL_STATUS: Record<string, { label: string; variant: "secondary" | 
 export const Route = createFileRoute("/wallet")({
   head: () => ({
     meta: [
-      { title: "المحفظة | Nippon" },
+      { title: t("المحفظة | Nippon") },
       {
         name: "description",
-        content: "محفظة USDT خاصة بك: عنوان إيداع مستقل، الرصيد، المبالغ المحجوزة، وسجل العمليات.",
+        content: t("محفظة USDT خاصة بك: عنوان إيداع مستقل، الرصيد، المبالغ المحجوزة، وسجل العمليات."),
       },
-      { property: "og:title", content: "المحفظة | Nippon" },
-      { property: "og:description", content: "عنوان إيداع خاص لكل مستخدم مع حماية المشتري." },
+      { property: "og:title", content: t("المحفظة | Nippon") },
+      { property: "og:description", content: t("عنوان إيداع خاص لكل مستخدم مع حماية المشتري.") },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -52,6 +53,7 @@ const TX_LABEL: Record<string, string> = {
 };
 
 function WalletPage() {
+  const { t } = useLanguage();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [wdAmount, setWdAmount] = useState("");
@@ -98,11 +100,12 @@ function WalletPage() {
 
   const confirmDeposit = useMutation({
     mutationFn: async (vars: { amount: number; file: File | null }) => {
+      if (!user) throw new Error(t("دخول / تسجيل"));
       let receiptPath: string | null = null;
       if (vars.file) {
-        if (vars.file.size > 10 * 1024 * 1024) throw new Error("حجم الصورة أكبر من 10MB");
+        if (vars.file.size > 10 * 1024 * 1024) throw new Error(t("حجم الصورة أكبر من 10MB"));
         const ext = vars.file.name.split(".").pop() ?? "jpg";
-        receiptPath = `${user!.id}/${crypto.randomUUID()}.${ext}`;
+        receiptPath = `${user.id}/${crypto.randomUUID()}.${ext}`;
         const { error: upErr } = await supabase.storage
           .from("deposit-receipts")
           .upload(receiptPath, vars.file, vars.file.type ? { contentType: vars.file.type } : {});
@@ -115,7 +118,7 @@ function WalletPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("تم إرسال تأكيد الإيداع للمراجعة");
+      toast.success(t("تم إرسال تأكيد الإيداع للمراجعة"));
       setDepAmount("");
       setDepFile(null);
       void qc.invalidateQueries({ queryKey: ["my-deposit-requests"] });
@@ -132,7 +135,7 @@ function WalletPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("تم إرسال طلب السحب للمراجعة");
+      toast.success(t("تم إرسال طلب السحب للمراجعة"));
       setWdAmount("");
       setWdAddress("");
       void refetch();
@@ -144,11 +147,10 @@ function WalletPage() {
   if (!loading && !user) {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <h1 className="font-display text-2xl font-black">المحفظة</h1>
-        <p className="mt-2 text-sm text-muted-foreground">سجّل الدخول لعرض رصيدك وعنوان الإيداع.</p>
+        <h1 className="font-display text-2xl font-black">{t("المحفظة")}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t("سجّل الدخول لعرض رصيدك وعنوان الإيداع.")}</p>
         <Button className="mt-6" onClick={() => navigate({ to: "/auth" })}>
-          دخول / تسجيل
-        </Button>
+          {t("دخول / تسجيل")} </Button>
       </div>
     );
   }
@@ -158,27 +160,25 @@ function WalletPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
       <h1 className="font-display text-3xl font-black">
-        محفظة <span className="neon-text">USDT</span>
+        {t("محفظة")} <span className="neon-text">USDT</span>
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        رسوم الإيداع 1 دولار لكل عملية، ورسوم البيع 5% تُخصم عند تحرير المبلغ للبائع.
-      </p>
+        {t("رسوم الإيداع 1 دولار لكل عملية، ورسوم البيع 5% تُخصم عند تحرير المبلغ للبائع.")} </p>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        <Stat icon={Wallet2} label="الرصيد المتاح" value={formatUsd(wallet?.balance ?? 0)} />
-        <Stat icon={ShieldCheck} label="محجوز في الضمان" value={formatUsd(wallet?.held ?? 0)} />
+        <Stat icon={Wallet2} label={t("الرصيد المتاح")} value={formatUsd(wallet?.balance ?? 0)} />
+        <Stat icon={ShieldCheck} label={t("محجوز في الضمان")} value={formatUsd(wallet?.held ?? 0)} />
         <Stat
           icon={ArrowDownToLine}
-          label="معرّف الإيداع الخاص بك"
+          label={t("معرّف الإيداع الخاص بك")}
           value={wallet?.deposit_tag ?? "—"}
         />
       </div>
 
-      <div className="glass mt-8 rounded-3xl p-6">
-        <h2 className="font-display text-xl font-bold">إيداع كريبتو</h2>
+      <div className="mt-8 border-t border-border pt-6">
+        <h2 className="font-display text-xl font-bold">{t("إيداع كريبتو")}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          اختر شبكة الإيداع، ثم أرسل USDT إلى العنوان الظاهر. يُضاف المبلغ لرصيدك بعد خصم رسوم الإيداع (1 دولار).
-        </p>
+          {t("اختر شبكة الإيداع، ثم أرسل USDT إلى العنوان الظاهر. يُضاف المبلغ لرصيدك بعد خصم رسوم الإيداع (1 دولار).")} </p>
 
         <div className="mt-4 flex flex-wrap gap-2">
           {DEPOSIT_NETWORKS.map((n) => (
@@ -194,41 +194,39 @@ function WalletPage() {
         </div>
 
         {(() => {
-          const net = DEPOSIT_NETWORKS.find((n) => n.id === network)!;
+          const net = DEPOSIT_NETWORKS.find((n) => n.id === network) ?? DEPOSIT_NETWORKS[0];
           return (
             <div className="mt-4 rounded-2xl border border-border/60 bg-secondary/40 p-4">
-              <div className="text-xs text-muted-foreground">عنوان الإيداع — USDT ({net.label})</div>
+              <div className="text-xs text-muted-foreground">{t("عنوان الإيداع — USDT (")}{net.label})</div>
               <div className="mt-2 flex items-center gap-2">
-                <code className="flex-1 overflow-x-auto whitespace-nowrap rounded-lg bg-background/70 px-3 py-2 text-sm" dir="ltr">
+                <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap rounded-lg bg-background/70 px-3 py-2 text-sm" dir="ltr">
                   {net.address}
                 </code>
                 <Button
                   variant="outline"
                   size="icon"
-                  aria-label="نسخ العنوان"
+                  aria-label={t("نسخ العنوان")}
                   onClick={() => {
                     void navigator.clipboard.writeText(net.address);
-                    toast.success("تم نسخ العنوان");
+                    toast.success(t("تم نسخ العنوان"));
                   }}
                 >
                   <Copy className="size-4" />
                 </Button>
               </div>
               <p className="mt-3 text-xs text-destructive">
-                تأكد من الإرسال عبر شبكة {net.label} فقط، الإرسال عبر شبكة مختلفة قد يؤدي لفقدان المبلغ.
-              </p>
+                {t("تأكد من الإرسال عبر شبكة")} {net.label} {t("فقط، الإرسال عبر شبكة مختلفة قد يؤدي لفقدان المبلغ.")} </p>
             </div>
           );
         })()}
 
-        <div className="mt-6 rounded-2xl border border-border/60 p-4">
-          <h3 className="font-display font-bold">تأكيد الإيداع</h3>
+        <div className="mt-6 border-t border-border pt-6">
+          <h3 className="font-display font-bold">{t("تأكيد الإيداع")}</h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            بعد إرسال التحويل، أدخل القيمة وأرفق صورة سكرين التحويل، وسيراجعها الفريق ثم يُضاف المبلغ لرصيدك.
-          </p>
+            {t("بعد إرسال التحويل، أدخل القيمة وأرفق صورة سكرين التحويل، وسيراجعها الفريق ثم يُضاف المبلغ لرصيدك.")} </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div>
-              <Label className="mb-2 block">القيمة (USDT)</Label>
+              <Label className="mb-2 block">{t("القيمة (USDT)")}</Label>
               <Input
                 inputMode="decimal"
                 value={depAmount}
@@ -237,13 +235,13 @@ function WalletPage() {
               />
             </div>
             <div>
-              <Label className="mb-2 block">صورة سكرين للتحويل</Label>
+              <Label className="mb-2 block">{t("صورة سكرين للتحويل")}</Label>
               <Input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 onChange={(e) => setDepFile(e.target.files?.[0] ?? null)}
               />
-              <p className="mt-1 text-xs text-muted-foreground">لقطة شاشة لإثبات التحويل (حتى 10MB).</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("لقطة شاشة لإثبات التحويل (حتى 10MB).")}</p>
             </div>
           </div>
           <Button
@@ -252,32 +250,32 @@ function WalletPage() {
             onClick={() => {
               const n = Number(depAmount);
               if (!Number.isFinite(n) || n < 2) {
-                toast.error("أقل قيمة إيداع 2 USDT");
+                toast.error(t("أقل قيمة إيداع 2 USDT"));
                 return;
               }
               if (!depFile) {
-                toast.error("أرفق صورة سكرين للتحويل");
+                toast.error(t("أرفق صورة سكرين للتحويل"));
                 return;
               }
               confirmDeposit.mutate({ amount: n, file: depFile });
             }}
           >
-            {confirmDeposit.isPending ? "جارٍ الإرسال…" : "تأكيد الإيداع"}
+            {confirmDeposit.isPending ? t("جارٍ الإرسال…") : t("تأكيد الإيداع")}
           </Button>
 
           <div className="mt-6 divide-y divide-border/60 rounded-2xl border border-border/60">
             {(deposits.data ?? []).length === 0 && (
-              <div className="px-4 py-6 text-sm text-muted-foreground">لا طلبات تأكيد إيداع بعد.</div>
+              <div className="px-4 py-6 text-sm text-muted-foreground">{t("لا طلبات تأكيد إيداع بعد.")}</div>
             )}
             {(deposits.data ?? []).map((d) => {
               const s = WITHDRAWAL_STATUS[d.status] ?? { label: d.status, variant: "secondary" as const };
               return (
                 <div key={d.id} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
-                  <Badge variant={s.variant}>{s.label}</Badge>
+                  <Badge variant={s.variant}>{t(s.label)}</Badge>
                   <span className="font-display font-bold">{formatUsd(d.amount)}</span>
                   <span className="text-xs text-muted-foreground">{formatDate(d.created_at)}</span>
                   {d.admin_note && (
-                    <span className="w-full text-xs text-destructive">ملاحظة الإدارة: {d.admin_note}</span>
+                    <span className="w-full text-xs text-destructive">{t("ملاحظة الإدارة:")} {d.admin_note}</span>
                   )}
                 </div>
               );
@@ -286,16 +284,14 @@ function WalletPage() {
         </div>
       </div>
 
-      <div className="glass mt-8 rounded-3xl p-6">
+      <div className="mt-8 border-t border-border pt-6">
         <h2 className="flex items-center gap-2 font-display text-xl font-bold">
-          <ArrowUpFromLine className="size-5 text-primary" /> سحب الرصيد
-        </h2>
+          <ArrowUpFromLine className="size-5 text-primary" /> {t("سحب الرصيد")} </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          رسوم السحب 2.5 دولار تُضاف على المبلغ. يُخصم المبلغ مع الرسوم فور إرسال الطلب ويُراجع من الإدارة، وفي حال الرفض يُعاد كاملًا.
-        </p>
+          {t("رسوم السحب 2.5 دولار تُضاف على المبلغ. يُخصم المبلغ مع الرسوم فور إرسال الطلب ويُراجع من الإدارة، وفي حال الرفض يُعاد كاملًا.")} </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-[10rem_1fr_auto] sm:items-end">
           <div>
-            <Label className="mb-2 block">المبلغ (USDT)</Label>
+            <Label className="mb-2 block">{t("المبلغ (USDT)")}</Label>
             <Input
               inputMode="decimal"
               value={wdAmount}
@@ -304,7 +300,7 @@ function WalletPage() {
             />
           </div>
           <div>
-            <Label className="mb-2 block">عنوان المحفظة (TRC20)</Label>
+            <Label className="mb-2 block">{t("عنوان المحفظة (TRC20)")}</Label>
             <Input
               value={wdAddress}
               onChange={(e) => setWdAddress(e.target.value.trim())}
@@ -316,38 +312,38 @@ function WalletPage() {
             onClick={() => {
               const n = Number(wdAmount);
               if (!Number.isFinite(n) || n < 10) {
-                toast.error("أقل مبلغ للسحب 10 USDT");
+                toast.error(t("أقل مبلغ للسحب 10 USDT"));
                 return;
               }
               if (n + 2.5 > Number(wallet?.balance ?? 0)) {
-                toast.error("الرصيد غير كافٍ (المبلغ + رسوم 2.5 دولار)");
+                toast.error(t("الرصيد غير كافٍ (المبلغ + رسوم 2.5 دولار)"));
                 return;
               }
               if (wdAddress.length < 20) {
-                toast.error("عنوان المحفظة غير صحيح");
+                toast.error(t("عنوان المحفظة غير صحيح"));
                 return;
               }
               withdraw.mutate({ amount: n, address: wdAddress });
             }}
           >
-            {withdraw.isPending ? "جارٍ الإرسال…" : "طلب سحب"}
+            {withdraw.isPending ? t("جارٍ الإرسال…") : t("طلب سحب")}
           </Button>
         </div>
 
         <div className="mt-6 divide-y divide-border/60 rounded-2xl border border-border/60">
           {(withdrawals.data ?? []).length === 0 && (
-            <div className="px-4 py-6 text-sm text-muted-foreground">لا طلبات سحب بعد.</div>
+            <div className="px-4 py-6 text-sm text-muted-foreground">{t("لا طلبات سحب بعد.")}</div>
           )}
           {(withdrawals.data ?? []).map((w) => {
             const s = WITHDRAWAL_STATUS[w.status] ?? { label: w.status, variant: "secondary" as const };
             return (
               <div key={w.id} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
-                <Badge variant={s.variant}>{s.label}</Badge>
+                <Badge variant={s.variant}>{t(s.label)}</Badge>
                 <span className="font-display font-bold">{formatUsd(w.amount)}</span>
                 <code className="max-w-[14rem] truncate text-xs text-muted-foreground">{w.address}</code>
                 <span className="text-xs text-muted-foreground">{formatDate(w.created_at)}</span>
                 {w.reject_reason && (
-                  <span className="w-full text-xs text-destructive">سبب الرفض: {w.reject_reason}</span>
+                  <span className="w-full text-xs text-destructive">{t("سبب الرفض:")} {w.reject_reason}</span>
                 )}
               </div>
             );
@@ -358,22 +354,22 @@ function WalletPage() {
 
 
       <div className="glass mt-8 overflow-hidden rounded-3xl">
-        <h2 className="px-6 pt-6 font-display text-xl font-bold">سجل العمليات</h2>
+        <h2 className="px-6 pt-6 font-display text-xl font-bold">{t("سجل العمليات")}</h2>
         <div className="mt-4 divide-y divide-border/60">
           {(data?.transactions ?? []).length === 0 && (
-            <div className="px-6 py-8 text-sm text-muted-foreground">لا عمليات بعد.</div>
+            <div className="px-6 py-8 text-sm text-muted-foreground">{t("لا عمليات بعد.")}</div>
           )}
-          {(data?.transactions ?? []).map((t) => (
-            <div key={t.id} className="flex items-center gap-3 px-6 py-4 text-sm">
-              <Badge variant="secondary">{TX_LABEL[t.type] ?? t.type}</Badge>
-              <span className="text-muted-foreground">{formatDate(t.created_at)}</span>
+          {(data?.transactions ?? []).map((transaction) => (
+            <div key={transaction.id} className="flex flex-wrap items-center gap-3 px-6 py-4 text-sm">
+              <Badge variant="secondary">{t(TX_LABEL[transaction.type] ?? transaction.type)}</Badge>
+              <span className="text-muted-foreground">{formatDate(transaction.created_at)}</span>
               <span
                 className={
                   "ms-auto font-display font-bold " +
-                  (Number(t.amount) < 0 ? "text-destructive" : "text-primary")
+                  (Number(transaction.amount) < 0 ? "text-destructive" : "text-primary")
                 }
               >
-                {formatUsd(t.amount)}
+                {formatUsd(transaction.amount)}
               </span>
             </div>
           ))}
@@ -392,6 +388,7 @@ function Stat({
   label: string;
   value: string;
 }) {
+  const { t } = useLanguage();
   return (
     <div className="glass card-3d rounded-2xl p-5">
       <Icon className="size-5 text-primary" />

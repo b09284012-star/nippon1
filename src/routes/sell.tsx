@@ -1,3 +1,4 @@
+import { t, useLanguage, numberLocale } from "@/lib/i18n";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -13,13 +14,13 @@ import { COUNTRIES } from "@/lib/countries";
 export const Route = createFileRoute("/sell")({
   head: () => ({
     meta: [
-      { title: "أضف عرض جهاز تعدين | Nippon" },
+      { title: t("أضف عرض جهاز تعدين | Nippon") },
       {
         name: "description",
-        content: "اعرض جهاز التعدين المستعمل للبيع على Nippon: المواصفات، السعر بالـ USDT، والضمان إلزامي.",
+        content: t("اعرض جهاز التعدين المستعمل للبيع على Nippon: المواصفات، السعر بالـ USDT، والضمان إلزامي."),
       },
-      { property: "og:title", content: "أضف عرض جهاز تعدين | Nippon" },
-      { property: "og:description", content: "بيع جهازك بحماية المشتري وضمان موثّق." },
+      { property: "og:title", content: t("أضف عرض جهاز تعدين | Nippon") },
+      { property: "og:description", content: t("بيع جهازك بحماية المشتري وضمان موثّق.") },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -45,6 +46,7 @@ const schema = z.object({
 });
 
 function SellPage() {
+  const { t } = useLanguage();
   const { user, profile, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const [files, setFiles] = useState<FileList | null>(null);
@@ -54,11 +56,10 @@ function SellPage() {
   if (!loading && !user) {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <h1 className="font-display text-2xl font-black">أضف عرض</h1>
-        <p className="mt-2 text-sm text-muted-foreground">سجّل الدخول أولًا لإضافة عرض.</p>
+        <h1 className="font-display text-2xl font-black">{t("أضف عرض")}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t("سجّل الدخول أولًا لإضافة عرض.")}</p>
         <Button className="mt-6" onClick={() => navigate({ to: "/auth" })}>
-          دخول / تسجيل
-        </Button>
+          {t("دخول / تسجيل")} </Button>
       </div>
     );
   }
@@ -71,7 +72,7 @@ function SellPage() {
     const fd = new FormData(e.currentTarget);
     const parsed = schema.safeParse(Object.fromEntries(fd.entries()));
     if (!parsed.success) {
-      toast.error(parsed.error.issues[0]?.message ?? "تحقق من الحقول");
+      toast.error(t(parsed.error.issues[0]?.message) ?? "تحقق من الحقول");
       return;
     }
     setBusy(true);
@@ -97,7 +98,7 @@ function SellPage() {
         .select("id")
         .single();
       if (error) throw error;
-      toast.success("تم نشر العرض");
+      toast.success(t("تم نشر العرض"));
       navigate({ to: "/listings/$id", params: { id: data.id } });
     } catch (err) {
       toast.error((err as Error).message || "تعذر النشر");
@@ -109,52 +110,50 @@ function SellPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
       <h1 className="font-display text-3xl font-black">
-        أضف <span className="neon-text">{profile?.is_company ? "عرض شركة" : "عرض"}</span>
+        {t("أضف")} <span className="neon-text">{t("عرض")}</span>
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        السعر ومدة الضمان حقول إلزامية، والنشر متاح للبائعين المعتمدين من الإدارة فقط.
-      </p>
+        {t("السعر ومدة الضمان حقول إلزامية، والنشر متاح للبائعين المعتمدين من الإدارة فقط.")} </p>
 
       {!verified && (
         <div className="glass mt-6 rounded-2xl border border-accent/40 p-5">
           <p className="text-sm">
-            حسابك ليس بائعًا معتمدًا بعد. تواصل مع الدعم ليعتمدك فريق الإدارة كبائع موثوق ثم يمكنك النشر.
-          </p>
+            {t("حسابك ليس بائعًا معتمدًا بعد. تواصل مع الدعم ليعتمدك فريق الإدارة كبائع موثوق ثم يمكنك النشر.")} </p>
         </div>
       )}
 
       <form onSubmit={onSubmit} className="glass mt-8 grid gap-4 rounded-3xl p-6 sm:grid-cols-2">
-        <Field name="title" label="عنوان العرض" className="sm:col-span-2" />
-        <Field name="brand" label="الشركة المصنعة" placeholder="Bitmain" />
-        <Field name="model" label="الطراز" placeholder="Antminer S19j Pro" />
-        <Field name="algorithm" label="الخوارزمية (اختياري)" placeholder="SHA-256" />
-        <Field name="hashrate" label="الهاش ريت" placeholder="104 TH/s" />
-        <Field name="power_watts" label="الاستهلاك (واط)" type="number" />
-        <Field name="condition" label="الحالة" placeholder="مستعمل - ممتاز" />
-        <Field name="price_usd" label="السعر (USDT) *" type="number" step="0.01" />
-        <Field name="warranty_months" label="الضمان (شهور) *" type="number" />
+        <Field name="title" label={t("عنوان العرض")} className="sm:col-span-2" />
+        <Field name="brand" label={t("الشركة المصنعة")} placeholder="Bitmain" />
+        <Field name="model" label={t("الطراز")} placeholder="Antminer S19j Pro" />
+        <Field name="algorithm" label={t("الخوارزمية (اختياري)")} placeholder="SHA-256" />
+        <Field name="hashrate" label={t("الهاش ريت")} placeholder="104 TH/s" />
+        <Field name="power_watts" label={t("الاستهلاك (واط)")} type="number" />
+        <Field name="condition" label={t("الحالة")} placeholder={t("مستعمل - ممتاز")} />
+        <Field name="price_usd" label={t("السعر (USDT) *")} type="number" step="0.01" />
+        <Field name="warranty_months" label={t("الضمان (شهور) *")} type="number" />
         <div>
-          <Label className="mb-2 block">نوع التوفر *</Label>
+          <Label className="mb-2 block">{t("نوع التوفر *")}</Label>
           <select
             name="availability"
             value={availability}
             onChange={(e) => setAvailability(e.target.value as "in_stock" | "on_order")}
             className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
           >
-            <option value="in_stock">متوفر الآن</option>
-            <option value="on_order">حسب الطلب</option>
+            <option value="in_stock">{t("متوفر الآن")}</option>
+            <option value="on_order">{t("حسب الطلب")}</option>
           </select>
         </div>
         <Field
           name="quantity"
-          label={availability === "on_order" ? "الكمية القابلة للتوريد *" : "الكمية المتوفرة *"}
+          label={availability === "on_order" ? t("الكمية القابلة للتوريد *") : t("الكمية المتوفرة *")}
           type="number"
           min={1}
           defaultValue={1}
         />
-        <Field name="hours_used" label="ساعات التشغيل (اختياري)" type="number" />
+        <Field name="hours_used" label={t("ساعات التشغيل (اختياري)")} type="number" />
         <div>
-          <Label className="mb-2 block">الدولة *</Label>
+          <Label className="mb-2 block">{t("الدولة *")}</Label>
           <select
             name="location"
             required
@@ -162,23 +161,22 @@ function SellPage() {
             className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
           >
             <option value="" disabled>
-              اختر الدولة
-            </option>
+              {t("اختر الدولة")} </option>
             {COUNTRIES.map((c) => (
               <option key={c} value={c}>
-                {c}
+                {t(c)}
               </option>
             ))}
           </select>
         </div>
 
         <div className="sm:col-span-2">
-          <Label className="mb-2 block">الوصف</Label>
-          <Textarea name="description" rows={5} placeholder="حالة الجهاز، سبب البيع، الملحقات…" />
+          <Label className="mb-2 block">{t("الوصف")}</Label>
+          <Textarea name="description" rows={5} placeholder={t("حالة الجهاز، سبب البيع، الملحقات…")} />
         </div>
 
         <div className="sm:col-span-2">
-          <Label className="mb-2 block">الصور</Label>
+          <Label className="mb-2 block">{t("الصور")}</Label>
           <Input
             type="file"
             accept="image/*"
@@ -188,7 +186,7 @@ function SellPage() {
         </div>
 
         <Button type="submit" className="sm:col-span-2" disabled={busy || !verified}>
-          {busy ? "جارٍ النشر…" : "نشر العرض"}
+          {busy ? t("جارٍ النشر…") : t("نشر العرض")}
         </Button>
       </form>
     </div>
@@ -201,6 +199,7 @@ function Field({
   className,
   ...rest
 }: { name: string; label: string; className?: string } & React.ComponentProps<typeof Input>) {
+  const { t } = useLanguage();
   return (
     <div className={className}>
       <Label className="mb-2 block">{label}</Label>

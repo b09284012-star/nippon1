@@ -1,3 +1,4 @@
+import { t, useLanguage, numberLocale } from "@/lib/i18n";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -21,13 +22,13 @@ import { inventoryCountry } from "@/lib/listing-access";
 export const Route = createFileRoute("/market")({
   head: () => ({
     meta: [
-      { title: "السوق | أجهزة تعدين مستعملة على Nippon" },
+      { title: t("السوق | أجهزة تعدين مستعملة على Nippon") },
       {
         name: "description",
-        content: "تصفح أجهزة التعدين المستعملة حسب النوع والهاش ريت والسعر والضمان على منصة نيبون.",
+        content: t("تصفح أجهزة التعدين المستعملة حسب النوع والهاش ريت والسعر والضمان على منصة نيبون."),
       },
-      { property: "og:title", content: "السوق | أجهزة تعدين مستعملة على Nippon" },
-      { property: "og:description", content: "فلترة الأجهزة حسب السعر والضمان والحالة والماركة." },
+      { property: "og:title", content: t("السوق | أجهزة تعدين مستعملة على Nippon") },
+      { property: "og:description", content: t("فلترة الأجهزة حسب السعر والضمان والحالة والماركة.") },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -36,6 +37,7 @@ export const Route = createFileRoute("/market")({
 });
 
 function Market() {
+  const { t } = useLanguage();
   const [q, setQ] = useState("");
   const [brand, setBrand] = useState("all");
   const [condition, setCondition] = useState("all");
@@ -70,46 +72,46 @@ function Market() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
       <h1 className="font-display text-4xl font-black">
-        السوق{country ? ` — ${country}` : ""}
+        {t("السوق")}{country ? ` — ${t(country)}` : ""}
       </h1>
       {!isAccount && (
         <div className="mt-4 max-w-xs">
-          <Label className="mb-2 block">الدولة</Label>
+          <Label className="mb-2 block">{t("الدولة")}</Label>
           <Select value={country || "all"} onValueChange={(value) => setGuest(value === "all" ? "" : value)}>
-            <SelectTrigger><SelectValue placeholder="جميع الدول" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={t("جميع الدول")} /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">جميع الدول</SelectItem>
-              {COUNTRIES.map((c) => (<SelectItem key={c} value={c}>{c}</SelectItem>))}
+              <SelectItem value="all">{t("جميع الدول")}</SelectItem>
+              {COUNTRIES.map((c) => (<SelectItem key={c} value={c}>{t(c)}</SelectItem>))}
             </SelectContent>
           </Select>
         </div>
       )}
       <p className="mt-2 text-muted-foreground">
-        {isLoading ? "جاري التحميل…" : `${filtered.length} جهاز متاح${country ? ` في ${country}` : ""}`}
+        {isLoading ? t("جاري التحميل…") : ((filtered.length) + t(" جهاز متاح") + (country ? ` في ${country}` : ""))}
       </p>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[280px_1fr]">
-        <aside className="glass h-fit space-y-6 rounded-2xl p-5">
+      <div className="mt-8 grid gap-6 lg:grid-cols-[250px_minmax(0,1fr)]">
+        <aside className="grid h-fit gap-5 border-y border-border py-5 sm:grid-cols-2 lg:sticky lg:top-24 lg:grid-cols-1">
           <div>
-            <Label className="mb-2 block">بحث</Label>
+            <Label className="mb-2 block">{t("بحث")}</Label>
             <div className="relative">
               <Search className="absolute top-2.5 start-3 size-4 text-muted-foreground" />
               <Input
                 value={q}
                 onChange={(e) => setQ(e.target.value.slice(0, 100))}
-                placeholder="اسم الجهاز أو الموديل"
+                placeholder={t("اسم الجهاز أو الموديل")}
                 className="ps-9"
               />
             </div>
           </div>
           <div>
-            <Label className="mb-2 block">الماركة</Label>
+            <Label className="mb-2 block">{t("الماركة")}</Label>
             <Select value={brand} onValueChange={setBrand}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">الكل</SelectItem>
+                <SelectItem value="all">{t("الكل")}</SelectItem>
                 {brands.map((b) => (
                   <SelectItem key={b} value={b}>
                     {b}
@@ -119,7 +121,7 @@ function Market() {
             </Select>
           </div>
           <div>
-            <Label className="mb-2 block">الحالة</Label>
+            <Label className="mb-2 block">{t("الحالة")}</Label>
             <Select value={condition} onValueChange={setCondition}>
               <SelectTrigger>
                 <SelectValue />
@@ -127,14 +129,14 @@ function Market() {
               <SelectContent>
                 {["all", "كالجديد", "ممتاز", "جيد جداً", "جيد", "مقبول"].map((c) => (
                   <SelectItem key={c} value={c}>
-                    {c === "all" ? "الكل" : c}
+                    {c === "all" ? t("الكل") : t(c)}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label className="mb-2 block">الحد الأقصى للسعر: {maxPrice} USDT</Label>
+            <Label className="mb-2 block">{t("الحد الأقصى للسعر:")} {maxPrice} USDT</Label>
             <Slider
               value={[maxPrice]}
               min={100}
@@ -144,28 +146,28 @@ function Market() {
             />
           </div>
           <div>
-            <Label className="mb-2 block">أقل ضمان</Label>
+            <Label className="mb-2 block">{t("أقل ضمان")}</Label>
             <Select value={warranty} onValueChange={setWarranty}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">الكل</SelectItem>
-                <SelectItem value="1">شهر فأكثر</SelectItem>
-                <SelectItem value="3">3 أشهر فأكثر</SelectItem>
-                <SelectItem value="6">6 أشهر فأكثر</SelectItem>
-                <SelectItem value="12">سنة فأكثر</SelectItem>
+                <SelectItem value="all">{t("الكل")}</SelectItem>
+                <SelectItem value="1">{t("شهر فأكثر")}</SelectItem>
+                <SelectItem value="3">{t("3 أشهر فأكثر")}</SelectItem>
+                <SelectItem value="6">{t("6 أشهر فأكثر")}</SelectItem>
+                <SelectItem value="12">{t("سنة فأكثر")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </aside>
 
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid content-start gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.map((l) => (
-            <ListingCard key={l.id} listing={l} />
+            <ListingCard key={l.id} listing={t(l)} />
           ))}
           {!isLoading && filtered.length === 0 && (
-            <p className="text-muted-foreground">لا توجد نتائج مطابقة.</p>
+            <p className="text-muted-foreground">{t("لا توجد نتائج مطابقة.")}</p>
           )}
         </div>
       </div>

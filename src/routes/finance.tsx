@@ -1,3 +1,5 @@
+import { analyticsDollar as formatUsd } from "@/components/site/AnalyticsCharts";
+import { t, useLanguage, numberLocale } from "@/lib/i18n";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -9,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth";
-import { formatDate, formatUsd } from "@/lib/media";
+import { formatDate } from "@/lib/media";
 import { getBinanceOverview } from "@/lib/finance.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfitsAnalytics } from "@/components/site/ProfitsAnalytics";
@@ -17,13 +19,13 @@ import { ProfitsAnalytics } from "@/components/site/ProfitsAnalytics";
 export const Route = createFileRoute("/finance")({
   head: () => ({
     meta: [
-      { title: "اللوحة المالية | Nippon" },
+      { title: t("اللوحة المالية | Nippon") },
       {
         name: "description",
-        content: "لوحة مالية مستقلة تعرض رصيد باينانس الفعلي وسجل الإيداعات والسحوبات لإدارة Nippon.",
+        content: t("لوحة مالية مستقلة تعرض رصيد باينانس الفعلي وسجل الإيداعات والسحوبات لإدارة Nippon."),
       },
-      { property: "og:title", content: "اللوحة المالية | Nippon" },
-      { property: "og:description", content: "رصيد الأصول وسجل الحوالات لحظيًا." },
+      { property: "og:title", content: t("اللوحة المالية | Nippon") },
+      { property: "og:description", content: t("رصيد الأصول وسجل الحوالات لحظيًا.") },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -32,6 +34,7 @@ export const Route = createFileRoute("/finance")({
 });
 
 function FinancePage() {
+  const { t } = useLanguage();
   const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const fetchOverview = useServerFn(getBinanceOverview);
@@ -58,23 +61,23 @@ function FinancePage() {
     queryFn: async () => {
       const [d, w] = await Promise.all([supabase.rpc("admin_list_deposits"), supabase.rpc("admin_list_withdrawals")]);
       const rows = [
-        ...(d.data ?? []).map((x) => ({ id: x.id, kind: "إيداع", name: x.display_name ?? x.email, email: x.email, amount: Number(x.amount), status: x.status, ref: x.txid, at: x.created_at })),
-        ...(w.data ?? []).map((x) => ({ id: x.id, kind: "سحب", name: x.display_name ?? x.email, email: x.email, amount: Number(x.amount), status: x.status, ref: x.address, at: x.created_at })),
+        ...(d.data ?? []).map((x) => ({ id: x.id, kind: t("إيداع"), name: x.display_name ?? x.email, email: x.email, amount: Number(x.amount), status: x.status, ref: x.txid, at: x.created_at })),
+        ...(w.data ?? []).map((x) => ({ id: x.id, kind: t("سحب"), name: x.display_name ?? x.email, email: x.email, amount: Number(x.amount), status: x.status, ref: x.address, at: x.created_at })),
       ];
       return rows.sort((a, b) => b.at.localeCompare(a.at));
     },
   });
 
-  if (loading) return <div className="px-4 py-20 text-center text-muted-foreground">جارٍ التحميل…</div>;
+  if (loading) return <div className="px-4 py-20 text-center text-muted-foreground">{t("جارٍ التحميل…")}</div>;
 
   if (!user || !isAdmin) {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
         <Lock className="mx-auto size-8 text-muted-foreground" />
-        <h1 className="mt-4 font-display text-2xl font-black">اللوحة المالية</h1>
-        <p className="mt-2 text-sm text-muted-foreground">هذه اللوحة مغلقة ومخصّصة للإدارة فقط.</p>
+        <h1 className="mt-4 font-display text-2xl font-black">{t("اللوحة المالية")}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t("هذه اللوحة مغلقة ومخصّصة للإدارة فقط.")}</p>
         <Button className="mt-6" onClick={() => navigate({ to: user ? "/" : "/auth" })}>
-          {user ? "العودة للرئيسية" : "دخول"}
+          {user ? t("العودة للرئيسية") : t("دخول")}
         </Button>
       </div>
     );
@@ -85,9 +88,9 @@ function FinancePage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="font-display text-3xl font-black">لوحة البيانات المالية</h1>
+        <h1 className="font-display text-3xl font-black">{t("لوحة البيانات المالية")}</h1>
         <Badge variant={data?.connected ? "default" : "secondary"}>
-          {data?.connected ? "متصل بباينانس" : "غير متصل"}
+          {data?.connected ? t("متصل بباينانس") : t("غير متصل")}
         </Badge>
         <Button
           variant="outline"
@@ -96,15 +99,14 @@ function FinancePage() {
           onClick={() => void overview.refetch()}
           disabled={overview.isFetching}
         >
-          <RefreshCw className="size-4" /> تحديث
-        </Button>
+          <RefreshCw className="size-4" /> {t("تحديث")} </Button>
       </div>
 
       {data && !data.connected && (
         <div className="glass mt-6 rounded-2xl p-5 text-sm text-muted-foreground">
           {data.error === "BINANCE_KEYS_MISSING"
-            ? "لم يتم حفظ مفاتيح باينانس بعد. أضف مفتاح الـ API والمفتاح السري (صلاحية قراءة فقط) لتظهر الأرصدة والحوالات هنا."
-            : "تعذر الاتصال بباينانس. السبب الظاهر من باينانس:"}
+            ? t("لم يتم حفظ مفاتيح باينانس بعد. أضف مفتاح الـ API والمفتاح السري (صلاحية قراءة فقط) لتظهر الأرصدة والحوالات هنا.")
+            : t("تعذر الاتصال بباينانس. السبب الظاهر من باينانس:")}
           {data.error && data.error !== "BINANCE_KEYS_MISSING" && (
             <code className="mt-3 block overflow-x-auto whitespace-nowrap rounded-lg bg-background/70 px-3 py-2 text-xs" dir="ltr">
               {data.error}
@@ -115,21 +117,21 @@ function FinancePage() {
 
       <div className="glass mt-8 rounded-3xl p-6">
         <Coins className="size-5 text-primary" />
-        <div className="mt-3 text-xs text-muted-foreground">إجمالي رصيد باينانس (بالدولار)</div>
+        <div className="mt-3 text-xs text-muted-foreground">{t("إجمالي رصيد باينانس (بالدولار)")}</div>
         <div className="mt-1 font-display text-4xl font-black">{formatUsd(data?.totalUsd ?? 0)}</div>
       </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          ["قيمة الأجهزة المعروضة", formatUsd(Number(summary.data?.listed_value ?? 0)), `${summary.data?.listed_count ?? 0} عرض نشط`],
+          ["قيمة الأجهزة المعروضة", formatUsd(Number(summary.data?.listed_value ?? 0)), ((summary.data?.listed_count ?? 0) + t(" عرض نشط"))],
           ["أرباح متوقعة (5%)", formatUsd(Number(summary.data?.expected_fees ?? 0)), "من الأجهزة المعروضة"],
-          ["أرباح محققة", formatUsd(Number(summary.data?.earned_fees ?? 0)), `+ ${formatUsd(Number(summary.data?.held_fees ?? 0))} في الضمان`],
+          ["أرباح محققة", formatUsd(Number(summary.data?.earned_fees ?? 0)), ("+ " + (formatUsd(Number(summary.data?.held_fees ?? 0))) + t(" في الضمان"))],
           ["رسوم السحب", formatUsd(Number(summary.data?.withdrawal_fees ?? 0)), "2.5$ لكل سحب مكتمل"],
         ].map(([l, v, h]) => (
-          <div key={l} className="glass card-3d rounded-2xl p-5">
-            <div className="text-xs text-muted-foreground">{l}</div>
+          <div key={t(l)} className="glass card-3d rounded-2xl p-5">
+            <div className="text-xs text-muted-foreground">{t(l)}</div>
             <div className="mt-1 font-display text-2xl font-black">{v}</div>
-            <div className="mt-1 text-xs text-muted-foreground">{h}</div>
+            <div className="mt-1 text-xs text-muted-foreground">{t(h)}</div>
           </div>
         ))}
       </div>
@@ -151,17 +153,15 @@ function FinancePage() {
 
       <Tabs defaultValue="ledger" className="mt-10">
         <TabsList>
-          <TabsTrigger value="ledger">سجل المستخدمين</TabsTrigger>
+          <TabsTrigger value="ledger">{t("سجل المستخدمين")}</TabsTrigger>
           <TabsTrigger value="deposits">
-            <ArrowDownToLine className="size-4" /> الإيداعات
-          </TabsTrigger>
+            <ArrowDownToLine className="size-4" /> {t("الإيداعات")} </TabsTrigger>
           <TabsTrigger value="withdrawals">
-            <ArrowUpFromLine className="size-4" /> السحوبات
-          </TabsTrigger>
+            <ArrowUpFromLine className="size-4" /> {t("السحوبات")} </TabsTrigger>
         </TabsList>
 
         <TabsContent value="ledger" className="mt-6 grid gap-3">
-          {(ledger.data ?? []).length === 0 && <p className="text-sm text-muted-foreground">لا عمليات بعد.</p>}
+          {(ledger.data ?? []).length === 0 && <p className="text-sm text-muted-foreground">{t("لا عمليات بعد.")}</p>}
           {(ledger.data ?? []).map((r) => (
             <div key={r.id} className="glass rounded-2xl p-4">
               <div className="flex flex-wrap items-center gap-3">
@@ -171,7 +171,7 @@ function FinancePage() {
                 <span className="ms-auto font-display font-black">{formatUsd(r.amount)}</span>
               </div>
               <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted-foreground">
-                <span>{r.status === "completed" ? "مكتمل" : r.status === "rejected" ? "مرفوض" : "قيد الانتظار"}</span>
+                <span>{r.status === "completed" ? t("مكتمل") : r.status === "rejected" ? t("مرفوض") : t("قيد الانتظار")}</span>
                 <code className="truncate" dir="ltr">{r.ref}</code>
                 <span className="ms-auto">{formatDate(r.at)}</span>
               </div>
@@ -181,7 +181,7 @@ function FinancePage() {
 
         <TabsContent value="deposits" className="mt-6 grid gap-3">
           {(data?.deposits ?? []).length === 0 && (
-            <p className="text-sm text-muted-foreground">لا عمليات إيداع في آخر 60 يومًا.</p>
+            <p className="text-sm text-muted-foreground">{t("لا عمليات إيداع في آخر 60 يومًا.")}</p>
           )}
           {(data?.deposits ?? []).map((d) => (
             <TxRow
@@ -199,7 +199,7 @@ function FinancePage() {
 
         <TabsContent value="withdrawals" className="mt-6 grid gap-3">
           {(data?.withdrawals ?? []).length === 0 && (
-            <p className="text-sm text-muted-foreground">لا عمليات سحب في آخر 60 يومًا.</p>
+            <p className="text-sm text-muted-foreground">{t("لا عمليات سحب في آخر 60 يومًا.")}</p>
           )}
           {(data?.withdrawals ?? []).map((w) => (
             <TxRow
@@ -236,13 +236,14 @@ function TxRow({
   time: string;
   ok: boolean;
 }) {
+  const { t } = useLanguage();
   return (
     <div className="glass rounded-2xl p-4">
       <div className="flex flex-wrap items-center gap-3">
         <span className="font-display text-lg font-black">
           {coin === "USDT" || coin === "USDC" ? formatUsd(amount) : `${amount} ${coin}`}
         </span>
-        <Badge variant={ok ? "default" : "secondary"}>{ok ? "مكتمل" : "قيد المعالجة"}</Badge>
+        <Badge variant={ok ? "default" : "secondary"}>{ok ? t("مكتمل") : t("قيد المعالجة")}</Badge>
         <span className="text-xs text-muted-foreground">{network}</span>
         <span className="ms-auto text-xs text-muted-foreground">{formatDate(time)}</span>
       </div>
@@ -259,6 +260,7 @@ function TxRow({
 }
 
 function ManualCredit() {
+  const { t } = useLanguage();
   const [q, setQ] = useState("");
   const [target, setTarget] = useState<{ id: string; label: string } | null>(null);
   const [amount, setAmount] = useState("");
@@ -279,20 +281,20 @@ function ManualCredit() {
 
   const submit = async () => {
     const n = Number(amount);
-    if (!target || !Number.isFinite(n) || n === 0) { toast.error("اختر مستخدمًا وأدخل مبلغًا صحيحًا"); return; }
+    if (!target || !Number.isFinite(n) || n === 0) { toast.error(t("اختر مستخدمًا وأدخل مبلغًا صحيحًا")); return; }
     setBusy(true);
     const { error } = await supabase.rpc("admin_credit_user", { _user_id: target.id, _amount: n, _note: note.trim() || "إضافة يدوية" });
     setBusy(false);
-    if (error) { toast.error(error.message === "NEGATIVE_BALANCE" ? "الرصيد لا يكفي للخصم" : error.message); return; }
-    toast.success(n > 0 ? `تمت إضافة ${formatUsd(n)}` : `تم خصم ${formatUsd(-n)}`);
+    if (error) { toast.error(error.message === "NEGATIVE_BALANCE" ? t("الرصيد لا يكفي للخصم") : error.message); return; }
+    toast.success(n > 0 ? (t("تمت إضافة ") + (formatUsd(n))) : (t("تم خصم ") + (formatUsd(-n))));
     setAmount(""); setNote(""); void users.refetch();
   };
 
   return (
     <div className="glass mt-8 rounded-2xl p-6">
-      <h2 className="font-display text-xl font-bold">إضافة رصيد يدويًا</h2>
-      <p className="mt-1 text-sm text-muted-foreground">ابحث بالاسم أو البريد أو معرّف المحفظة. استخدم مبلغًا سالبًا للخصم.</p>
-      <Input className="mt-4" placeholder="بحث عن مستخدم..." value={q} onChange={(e) => setQ(e.target.value)} />
+      <h2 className="font-display text-xl font-bold">{t("إضافة رصيد يدويًا")}</h2>
+      <p className="mt-1 text-sm text-muted-foreground">{t("ابحث بالاسم أو البريد أو معرّف المحفظة. استخدم مبلغًا سالبًا للخصم.")}</p>
+      <Input className="mt-4" placeholder={t("بحث عن مستخدم...")} value={q} onChange={(e) => setQ(e.target.value)} />
       {matches.length > 0 && (
         <div className="mt-2 grid gap-1">
           {matches.map((u) => (
@@ -303,11 +305,11 @@ function ManualCredit() {
           ))}
         </div>
       )}
-      {target && <p className="mt-3 text-sm">المستخدم: <span className="font-semibold text-primary">{target.label}</span></p>}
+      {target && <p className="mt-3 text-sm">{t("المستخدم:")} <span className="font-semibold text-primary">{target.label}</span></p>}
       <div className="mt-3 grid gap-3 sm:grid-cols-[160px_1fr_auto]">
-        <Input type="number" placeholder="المبلغ $" value={amount} onChange={(e) => setAmount(e.target.value)} />
-        <Input placeholder="ملاحظة (اختياري)" value={note} maxLength={120} onChange={(e) => setNote(e.target.value)} />
-        <Button disabled={busy || !target} onClick={() => void submit()}>تنفيذ</Button>
+        <Input type="number" placeholder={t("المبلغ $")} value={amount} onChange={(e) => setAmount(e.target.value)} />
+        <Input placeholder={t("ملاحظة (اختياري)")} value={note} maxLength={120} onChange={(e) => setNote(e.target.value)} />
+        <Button disabled={busy || !target} onClick={() => void submit()}>{t("تنفيذ")}</Button>
       </div>
     </div>
   );

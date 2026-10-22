@@ -1,3 +1,7 @@
+- [x] Add Arabic/English switching across site pages and controls.
+- [x] Standardize Western digits and improve page layout in both directions.
+- [x] Remove company section and company controls without deleting existing data.
+- [x] Verify language switching, page layouts, and company option removal.
 - [x] Show public regular/company offers without requiring a country, preserving private data.
 - [x] Require sign-in for listing details and return to the same listing.
 - [x] Test public browsing and sign-in return flow (company feeds are reachable publicly; no live company offers currently exist).

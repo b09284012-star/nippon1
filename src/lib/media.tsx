@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import heroMiners from "@/assets/hero-miners.jpeg.asset.json";
+import { numberLocale } from "@/lib/language-store";
 
 export const FALLBACK_IMAGE = heroMiners.url;
 
@@ -18,11 +19,11 @@ export function useStorageUrl(bucket: string, path?: string | null) {
 
 export function formatUsd(value: number | string) {
   const n = typeof value === "string" ? Number(value) : value;
-  return new Intl.NumberFormat("ar", { maximumFractionDigits: 2 }).format(n) + " USDT";
+  return new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(n) + " USDT";
 }
 
 export function formatDate(value: string) {
-  return new Intl.DateTimeFormat("ar", { dateStyle: "medium", timeStyle: "short" }).format(
+  return new Intl.DateTimeFormat(numberLocale(), { dateStyle: "medium", timeStyle: "short" }).format(
     new Date(value),
   );
 }

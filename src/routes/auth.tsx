@@ -1,3 +1,4 @@
+import { t, useLanguage, numberLocale } from "@/lib/i18n";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -17,10 +18,10 @@ export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>): { redirect?: string | undefined } => ({ redirect: listingReturnPath(search["redirect"]) }),
   head: () => ({
     meta: [
-      { title: "الدخول والتسجيل | Nippon" },
-      { name: "description", content: "أنشئ حساب نيبون أو سجّل الدخول للبيع والشراء بحماية." },
-      { property: "og:title", content: "الدخول والتسجيل | Nippon" },
-      { property: "og:description", content: "حساب موثق للبيع والشراء على منصة نيبون." },
+      { title: t("الدخول والتسجيل | Nippon") },
+      { name: "description", content: t("أنشئ حساب نيبون أو سجّل الدخول للبيع والشراء بحماية.") },
+      { property: "og:title", content: t("الدخول والتسجيل | Nippon") },
+      { property: "og:description", content: t("حساب موثق للبيع والشراء على منصة نيبون.") },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -35,6 +36,7 @@ const schema = z.object({
 });
 
 function AuthPage() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { redirect } = Route.useSearch();
   const { user } = useAuth();
@@ -60,21 +62,21 @@ function AuthPage() {
 
   const signIn = async () => {
     const parsed = schema.safeParse({ email, password });
-    if (!parsed.success) { toast.error(parsed.error.issues[0]?.message); return; }
+    if (!parsed.success) { toast.error(t(parsed.error.issues[0]?.message)); return; }
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) { toast.error("تعذر الدخول", { description: error.message }); return; }
-    toast.success("أهلاً بعودتك");
+    if (error) { toast.error(t("تعذر الدخول"), { description: error.message }); return; }
+    toast.success(t("أهلاً بعودتك"));
   };
 
   const signUp = async () => {
     const parsed = schema.safeParse({ email, password, name });
     if (!parsed.success) { toast.error(parsed.error.issues[0]?.message); return; }
-    if (fullName.trim().length < 5) { toast.error("أدخل الاسم الحقيقي الكامل"); return; }
-    if (phone.trim().length < 7) { toast.error("أدخل رقم هاتف صحيح"); return; }
-    if (country.trim().length < 2 || city.trim().length < 2) { toast.error("أدخل الدولة والمدينة"); return; }
-    if (addr.trim().length < 8) { toast.error("أدخل العنوان بالتفصيل"); return; }
+    if (fullName.trim().length < 5) { toast.error(t("أدخل الاسم الحقيقي الكامل")); return; }
+    if (phone.trim().length < 7) { toast.error(t("أدخل رقم هاتف صحيح")); return; }
+    if (country.trim().length < 2 || city.trim().length < 2) { toast.error(t("أدخل الدولة والمدينة")); return; }
+    if (addr.trim().length < 8) { toast.error(t("أدخل العنوان بالتفصيل")); return; }
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email,
@@ -85,77 +87,72 @@ function AuthPage() {
       },
     });
     setLoading(false);
-    if (error) { toast.error("تعذر التسجيل", { description: error.message }); return; }
-    toast.success("تم إنشاء الحساب", { description: "تفقد بريدك لتأكيد الحساب إن طُلب منك" });
+    if (error) { toast.error(t("تعذر التسجيل"), { description: error.message }); return; }
+    toast.success(t("تم إنشاء الحساب"), { description: t("تفقد بريدك لتأكيد الحساب إن طُلب منك") });
   };
 
   return (
     <div className="mx-auto max-w-md px-4 py-16">
-      <div className="glass rounded-3xl p-8">
+      <div className="border-t border-border pt-8">
         <h1 className="font-display text-3xl font-black">
-          مرحباً بك في <span className="neon-text">Nippon</span>
+          {t("مرحباً بك في")} <span className="neon-text">Nippon</span>
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          سجّل للوصول إلى الدردشة والمحفظة ونظام حماية المشتري.
-        </p>
+          {t("سجّل للوصول إلى الدردشة والمحفظة ونظام حماية المشتري.")} </p>
 
         {forgot ? <ForgotPassword onClose={() => setForgot(false)} /> : (
         <Tabs defaultValue="signin" className="mt-6">
           <TabsList className="w-full">
             <TabsTrigger value="signin" className="flex-1">
-              دخول
-            </TabsTrigger>
+              {t("دخول")} </TabsTrigger>
             <TabsTrigger value="signup" className="flex-1">
-              حساب جديد
-            </TabsTrigger>
+              {t("حساب جديد")} </TabsTrigger>
           </TabsList>
 
           <TabsContent value="signin" className="space-y-4 pt-4">
-            <Field label="البريد الإلكتروني" value={email} onChange={setEmail} type="email" />
+            <Field label={t("البريد الإلكتروني")} value={email} onChange={setEmail} type="email" />
             <Field
-              label="كلمة المرور"
+              label={t("كلمة المرور")}
               value={password}
               onChange={setPassword}
               type="password"
             />
             <Button className="w-full" onClick={() => void signIn()} disabled={loading}>
-              دخول
-            </Button>
-            <button type="button" className="text-sm text-primary" onClick={() => setForgot(true)}>نسيت كلمة المرور؟</button>
+              {t("دخول")} </Button>
+            <Button variant="link" onClick={() => setForgot(true)}>{t("نسيت كلمة المرور؟")}</Button>
           </TabsContent>
 
           <TabsContent value="signup" className="space-y-4 pt-4">
-            <Field label="الاسم الظاهر للمستخدمين (يمكن أن يكون وهميًا)" value={name} onChange={setName} />
-            <Field label="الاسم الحقيقي الكامل" value={fullName} onChange={setFullName} />
-            <Field label="رقم الهاتف" value={phone} onChange={setPhone} type="tel" />
+            <Field label={t("الاسم الظاهر للمستخدمين (يمكن أن يكون وهميًا)")} value={name} onChange={setName} />
+            <Field label={t("الاسم الحقيقي الكامل")} value={fullName} onChange={setFullName} />
+            <Field label={t("رقم الهاتف")} value={phone} onChange={setPhone} type="tel" />
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="mb-1.5 block text-sm">الدولة</Label>
+                <Label className="mb-1.5 block text-sm">{t("الدولة")}</Label>
                 <Select value={country} onValueChange={setCountry}>
                   <SelectTrigger>
-                    <SelectValue placeholder="اختر الدولة" />
+                    <SelectValue placeholder={t("اختر الدولة")} />
                   </SelectTrigger>
                   <SelectContent>
                     {COUNTRIES.map((c) => (
-                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                      <SelectItem key={c} value={c}>{t(c)}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-              <Field label="المدينة" value={city} onChange={setCity} />
+              <Field label={t("المدينة")} value={city} onChange={setCity} />
             </div>
-            <Field label="العنوان بالتفصيل" value={addr} onChange={setAddr} />
-            <p className="text-xs text-muted-foreground">بياناتك الحقيقية تظهر للإدارة فقط، والآخرون يرون الاسم الظاهر فقط.</p>
-            <Field label="البريد الإلكتروني" value={email} onChange={setEmail} type="email" />
+            <Field label={t("العنوان بالتفصيل")} value={addr} onChange={setAddr} />
+            <p className="text-xs text-muted-foreground">{t("بياناتك الحقيقية تظهر للإدارة فقط، والآخرون يرون الاسم الظاهر فقط.")}</p>
+            <Field label={t("البريد الإلكتروني")} value={email} onChange={setEmail} type="email" />
             <Field
-              label="كلمة المرور"
+              label={t("كلمة المرور")}
               value={password}
               onChange={setPassword}
               type="password"
             />
             <Button className="w-full" onClick={() => void signUp()} disabled={loading}>
-              إنشاء حساب
-            </Button>
+              {t("إنشاء حساب")} </Button>
           </TabsContent>
         </Tabs>
         )}
@@ -176,10 +173,11 @@ function Field({
   onChange: (v: string) => void;
   type?: string;
 }) {
+  const { t } = useLanguage();
   return (
     <div>
       <Label className="mb-2 block">{label}</Label>
-      <Input type={type} value={value} onChange={(e) => onChange(e.target.value.slice(0, 255))} />
+      <Input dir={type === "email" || type === "tel" ? "ltr" : undefined} type={type} value={value} onChange={(e) => onChange(e.target.value.slice(0, 255))} />
     </div>
   );
 }

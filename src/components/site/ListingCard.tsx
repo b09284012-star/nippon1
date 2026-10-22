@@ -1,3 +1,4 @@
+import { t, useLanguage, numberLocale } from "@/lib/i18n";
 import { Link } from "@tanstack/react-router";
 import { Cpu, ShieldCheck, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +21,7 @@ export type ListingRow = {
 };
 
 export function ListingCard({ listing }: { listing: ListingRow }) {
+  const { t } = useLanguage();
   const { data: url } = useStorageUrl("listing-images", listing.images?.[0]);
 
   return (
@@ -37,8 +39,8 @@ export function ListingCard({ listing }: { listing: ListingRow }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
         <div className="absolute bottom-3 start-3 flex gap-2">
-          <Badge className="bg-primary/90 text-primary-foreground">{listing.condition}</Badge>
-          {listing.status === "sold" && <Badge variant="destructive">تم البيع</Badge>}
+          <Badge className="bg-primary/90 text-primary-foreground">{t(listing.condition)}</Badge>
+          {listing.status === "sold" && <Badge variant="destructive">{t("تم البيع")}</Badge>}
         </div>
       </div>
       <div className="space-y-3 p-4">
@@ -48,17 +50,15 @@ export function ListingCard({ listing }: { listing: ListingRow }) {
             <Cpu className="size-3.5 text-primary" /> {listing.hashrate}
           </span>
           <span className="inline-flex items-center gap-1">
-            <Zap className="size-3.5 text-warning" /> {listing.power_watts} واط
-          </span>
+            <Zap className="size-3.5 text-warning" /> {listing.power_watts} {t("واط")} </span>
           <span className="inline-flex items-center gap-1">
-            <ShieldCheck className="size-3.5 text-success" /> ضمان {listing.warranty_months} شهر
-          </span>
+            <ShieldCheck className="size-3.5 text-success" /> {t("ضمان")} {listing.warranty_months} {t("شهر")} </span>
         </div>
         <div className="flex items-center justify-between pt-1">
           <span className="font-display text-xl font-black neon-text">
             {formatUsd(listing.price_usd)}
           </span>
-          <span className="text-xs text-muted-foreground">{listing.location ?? "—"}</span>
+          <span className="text-xs text-muted-foreground">{t(listing.location ?? "—")}</span>
         </div>
       </div>
     </Link>
