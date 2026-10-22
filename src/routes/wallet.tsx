@@ -158,7 +158,7 @@ function WalletPage() {
   }
 
   const wallet = data?.wallet;
-  const net = DEPOSIT_NETWORKS.find((n) => n.id === network) ?? DEPOSIT_NETWORKS[0];
+  const net = DEPOSIT_NETWORKS.find((n) => n.id === network) ?? DEPOSIT_NETWORKS[0]!;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
