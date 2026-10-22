@@ -1,3 +1,4 @@
+import { t, useLanguage, numberLocale } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { TrendingUp, ShoppingCart, Coins, Clock } from "lucide-react";
@@ -13,6 +14,7 @@ const RANGES = [
 ] as const;
 
 export function ProfitsAnalytics() {
+  useLanguage();
   const isAdmin = true;
   const [days, setDays] = useState<number>(30);
   const [metric, setMetric] = useState<"volume" | "fee">("volume");
@@ -66,7 +68,7 @@ export function ProfitsAnalytics() {
     const byProduct = new Map<string, { qty: number; volume: number; fee: number }>();
     for (const o of done) {
       const l = o.listings as { title?: string; brand?: string; model?: string } | null;
-      const name = l ? `${l.brand ?? ""} ${l.model ?? l.title ?? ""}`.trim() : "عرض محذوف";
+      const name = l ? `${l.brand ?? ""} ${l.model ?? l.title ?? ""}`.trim() : t("عرض محذوف");
       const c = byProduct.get(name) ?? { qty: 0, volume: 0, fee: 0 };
       byProduct.set(name, { qty: c.qty + (o.quantity ?? 1), volume: c.volume + Number(o.amount), fee: c.fee + Number(o.fee) });
     }
@@ -79,7 +81,7 @@ export function ProfitsAnalytics() {
   return (
     <div className="mt-10">
       <div className="flex flex-wrap items-center gap-3">
-        <h2 className="font-display text-2xl font-black">تحليل الأرباح والمبيعات</h2>
+        <h2 className="font-display text-2xl font-black">{t("تحليل الأرباح والمبيعات")}</h2>
         <div className="ms-auto flex flex-wrap gap-1">
           {RANGES.map((r) => (
             <Button key={r.k} size="sm" variant={days === r.k ? "default" : "outline"} onClick={() => setDays(r.k)}>{r.l}</Button>
@@ -87,8 +89,8 @@ export function ProfitsAnalytics() {
         </div>
       </div>
 
-      {q.isPending && <p role="status" className="mt-6 text-sm text-muted-foreground">جارٍ تحميل التحليل…</p>}
-      {q.isError && <div role="alert" className="mt-6 flex flex-wrap items-center gap-3 text-sm text-destructive">تعذر تحميل بيانات التحليل.<Button size="sm" variant="outline" onClick={() => void q.refetch()}>إعادة المحاولة</Button></div>}
+      {q.isPending && <p role="status" className="mt-6 text-sm text-muted-foreground">{t("جارٍ تحميل التحليل…")}</p>}
+      {q.isError && <div role="alert" className="mt-6 flex flex-wrap items-center gap-3 text-sm text-destructive">{t("تعذر تحميل بيانات التحليل.")}<Button size="sm" variant="outline" onClick={() => void q.refetch()}>{t("إعادة المحاولة")}</Button></div>}
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
@@ -109,9 +111,9 @@ export function ProfitsAnalytics() {
         })}
       </div>
 
-      <div className="mt-6 flex gap-2" role="group" aria-label="نوع التحليل">
-        <Button size="sm" variant={metric === "volume" ? "default" : "outline"} aria-pressed={metric === "volume"} onClick={() => setMetric("volume")}><ShoppingCart className="size-4" /> المبيعات</Button>
-        <Button size="sm" variant={metric === "fee" ? "default" : "outline"} aria-pressed={metric === "fee"} onClick={() => setMetric("fee")}><TrendingUp className="size-4" /> الأرباح</Button>
+      <div className="mt-6 flex gap-2" role="group" aria-label={t("نوع التحليل")}>
+        <Button size="sm" variant={metric === "volume" ? "default" : "outline"} aria-pressed={metric === "volume"} onClick={() => setMetric("volume")}><ShoppingCart className="size-4" /> {t("المبيعات")}</Button>
+        <Button size="sm" variant={metric === "fee" ? "default" : "outline"} aria-pressed={metric === "fee"} onClick={() => setMetric("fee")}><TrendingUp className="size-4" /> {t("الأرباح")}</Button>
       </div>
       {q.isSuccess && <AnalyticsCharts series={stats.series} top={stats.top} statusCount={stats.statusCount} metric={metric} />}
     </div>

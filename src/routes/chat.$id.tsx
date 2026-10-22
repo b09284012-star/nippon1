@@ -1,3 +1,4 @@
+import { t, useLanguage, numberLocale } from "@/lib/i18n";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
@@ -14,13 +15,13 @@ import { ChatAttachment } from "@/components/site/ChatAttachment";
 export const Route = createFileRoute("/chat/$id")({
   head: () => ({
     meta: [
-      { title: "محادثة | Nippon" },
+      { title: t("محادثة | Nippon") },
       {
         name: "description",
-        content: "محادثة مباشرة مع الطرف الآخر لمناقشة تفاصيل جهاز التعدين قبل الشراء.",
+        content: t("محادثة مباشرة مع الطرف الآخر لمناقشة تفاصيل جهاز التعدين قبل الشراء."),
       },
-      { property: "og:title", content: "محادثة | Nippon" },
-      { property: "og:description", content: "دردشة فورية داخل منصة Nippon." },
+      { property: "og:title", content: t("محادثة | Nippon") },
+      { property: "og:description", content: t("دردشة فورية داخل منصة Nippon.") },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -29,6 +30,7 @@ export const Route = createFileRoute("/chat/$id")({
 });
 
 function ChatRoomPage() {
+  useLanguage();
   const { id } = Route.useParams();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -89,10 +91,9 @@ function ChatRoomPage() {
   if (!loading && !user) {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <h1 className="font-display text-2xl font-black">المحادثة</h1>
+        <h1 className="font-display text-2xl font-black">{t("المحادثة")}</h1>
         <Button className="mt-6" onClick={() => navigate({ to: "/auth" })}>
-          دخول / تسجيل
-        </Button>
+          {t("دخول / تسجيل")} </Button>
       </div>
     );
   }
@@ -115,7 +116,7 @@ function ChatRoomPage() {
   const sendFile = async (file: File) => {
     if (!user) return;
     if (file.size > 20 * 1024 * 1024) {
-      toast.error("الحد الأقصى لحجم الملف 20 ميغابايت");
+      toast.error(t("الحد الأقصى لحجم الملف 20 ميغابايت"));
       return;
     }
     setUploading(true);
@@ -124,7 +125,7 @@ function ChatRoomPage() {
     const { error: upErr } = await supabase.storage.from("chat-files").upload(path, file, { contentType: file.type });
     if (upErr) {
       setUploading(false);
-      toast.error("تعذر رفع الملف");
+      toast.error(t("تعذر رفع الملف"));
       return;
     }
     const { error } = await supabase.from("messages").insert({
@@ -148,13 +149,13 @@ function ChatRoomPage() {
           <span className={cn("absolute bottom-0 end-0 size-3 rounded-full border-2 border-background", otherOnline ? "bg-primary" : "bg-muted-foreground/50")} />
         </div>
         <div>
-          <h1 className="font-display text-xl font-black">{other && !other.isParty ? "دردشة النزاع (الإدارة)" : other?.display_name ?? "المحادثة"}</h1>
-          <p className="text-xs text-muted-foreground">{otherOnline ? "نشط الآن" : "غير متصل"}</p>
+          <h1 className="font-display text-xl font-black">{other && !other.isParty ? t("دردشة النزاع (الإدارة)") : other?.display_name ?? "المحادثة"}</h1>
+          <p className="text-xs text-muted-foreground">{otherOnline ? t("نشط الآن") : t("غير متصل")}</p>
         </div>
       </div>
       <div className="glass mt-6 grid max-h-[60vh] gap-3 overflow-y-auto rounded-3xl p-5">
         {(messages ?? []).length === 0 && (
-          <p className="text-sm text-muted-foreground">ابدأ المحادثة برسالة.</p>
+          <p className="text-sm text-muted-foreground">{t("ابدأ المحادثة برسالة.")}</p>
         )}
         {(messages ?? []).map((m) => {
           const mine = m.sender_id === user?.id;
@@ -167,10 +168,10 @@ function ChatRoomPage() {
               )}
             >
               {other && m.sender_id !== other.buyer_id && m.sender_id !== other.seller_id && (
-                <span className="mb-1 block text-[10px] font-bold">الإدارة</span>
+                <span className="mb-1 block text-[10px] font-bold">{t("الإدارة")}</span>
               )}
               {other && !other.isParty && !mine && (
-                <span className="mb-1 block text-[10px] font-bold">{m.sender_id === other.buyer_id ? "المشتري" : "البائع"}</span>
+                <span className="mb-1 block text-[10px] font-bold">{m.sender_id === other.buyer_id ? t("المشتري") : t("البائع")}</span>
               )}
               {m.attachment_path && <ChatAttachment path={m.attachment_path} name={m.attachment_name} type={m.attachment_type} />}
               {m.body && <p className="whitespace-pre-wrap">{m.body}</p>}
@@ -183,7 +184,7 @@ function ChatRoomPage() {
 
       <div className="mt-4 flex items-center gap-2">
         <input ref={fileRef} type="file" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) void sendFile(f); }} />
-        <Button variant="secondary" disabled={uploading} onClick={() => fileRef.current?.click()} aria-label="إرفاق صورة أو ملف">
+        <Button variant="secondary" disabled={uploading} onClick={() => fileRef.current?.click()} aria-label={t("إرفاق صورة أو ملف")}>
           {uploading ? "…" : "📎"}
         </Button>
         <Input
@@ -192,13 +193,12 @@ function ChatRoomPage() {
           onKeyDown={(e) => {
             if (e.key === "Enter") void send();
           }}
-          placeholder="اكتب رسالتك…"
+          placeholder={t("اكتب رسالتك…")}
         />
-        <Button onClick={() => void send()}>إرسال</Button>
+        <Button onClick={() => void send()}>{t("إرسال")}</Button>
       </div>
       <p className="mt-3 text-xs text-muted-foreground">
-        لا تُتم أي دفعة خارج المنصة — استخدم نظام الضمان لحماية أموالك.
-      </p>
+        {t("لا تُتم أي دفعة خارج المنصة — استخدم نظام الضمان لحماية أموالك.")} </p>
     </div>
   );
 }

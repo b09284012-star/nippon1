@@ -1,3 +1,4 @@
+import { t, useLanguage, numberLocale } from "@/lib/i18n";
 import { useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { Bell } from "lucide-react";
@@ -8,6 +9,7 @@ import { useAuth } from "@/lib/auth";
 import { useNotifications } from "@/lib/notifications";
 
 export function NotificationsBell() {
+  useLanguage();
   const { user } = useAuth();
   const q = useNotifications(user?.id);
 
@@ -48,7 +50,7 @@ export function NotificationsBell() {
   return (
     <div className="relative">
       <Button variant="ghost" size="sm" asChild>
-        <Link to="/notifications" aria-label="الإشعارات">
+        <Link to="/notifications" aria-label={t("الإشعارات")}>
         <Bell className="size-4" />
         {unread > 0 && (
           <span className="absolute -top-0.5 end-0.5 grid min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">

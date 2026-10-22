@@ -1,3 +1,4 @@
+import { t, useLanguage, numberLocale } from "@/lib/i18n";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -14,13 +15,13 @@ import { formatDate, formatUsd } from "@/lib/media";
 export const Route = createFileRoute("/orders")({
   head: () => ({
     meta: [
-      { title: "طلباتي | Nippon" },
+      { title: t("طلباتي | Nippon") },
       {
         name: "description",
-        content: "تابع حالة صفقاتك: المبلغ محجوز، تم الشحن، تأكيد الاستلام، أو فتح نزاع.",
+        content: t("تابع حالة صفقاتك: المبلغ محجوز، تم الشحن، تأكيد الاستلام، أو فتح نزاع."),
       },
-      { property: "og:title", content: "طلباتي | Nippon" },
-      { property: "og:description", content: "إدارة صفقات أجهزة التعدين بحماية المشتري." },
+      { property: "og:title", content: t("طلباتي | Nippon") },
+      { property: "og:description", content: t("إدارة صفقات أجهزة التعدين بحماية المشتري.") },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -39,6 +40,7 @@ const STATUS: Record<string, string> = {
 };
 
 function OrdersPage() {
+  useLanguage();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [tracking, setTracking] = useState<Record<string, string>>({});
@@ -58,10 +60,9 @@ function OrdersPage() {
   if (!loading && !user) {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <h1 className="font-display text-2xl font-black">طلباتي</h1>
+        <h1 className="font-display text-2xl font-black">{t("طلباتي")}</h1>
         <Button className="mt-6" onClick={() => navigate({ to: "/auth" })}>
-          دخول / تسجيل
-        </Button>
+          {t("دخول / تسجيل")} </Button>
       </div>
     );
   }
@@ -78,10 +79,10 @@ function OrdersPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
-      <h1 className="font-display text-3xl font-black">طلباتي</h1>
+      <h1 className="font-display text-3xl font-black">{t("طلباتي")}</h1>
       <div className="mt-8 grid gap-4">
         {(orders ?? []).length === 0 && (
-          <div className="glass rounded-2xl p-8 text-sm text-muted-foreground">لا طلبات بعد.</div>
+          <div className="glass rounded-2xl p-8 text-sm text-muted-foreground">{t("لا طلبات بعد.")}</div>
         )}
         {(orders ?? []).map((o) => {
           const isBuyer = o.buyer_id === user?.id;
@@ -99,7 +100,7 @@ function OrdersPage() {
               </div>
 
               <div className="mt-2 text-xs text-muted-foreground">
-                {isBuyer ? "أنت المشتري" : "أنت البائع"} • الرسوم {formatUsd(o.fee)}
+                {isBuyer ? t("أنت المشتري") : t("أنت البائع")} {t("• الرسوم")} {formatUsd(o.fee)}
                 {o.tracking_number ? ` • تتبع: ${o.shipping_carrier} ${o.tracking_number}` : ""}
               </div>
 
@@ -108,7 +109,7 @@ function OrdersPage() {
                   <>
                     <Input
                       className="w-56"
-                      placeholder="الشركة ورقم التتبع"
+                      placeholder={t("الشركة ورقم التتبع")}
                       value={tracking[o.id] ?? ""}
                       onChange={(e) =>
                         setTracking((t) => ({ ...t, [o.id]: e.target.value.slice(0, 80) }))
@@ -119,7 +120,7 @@ function OrdersPage() {
                       onClick={() => {
                         const [carrier, ...rest] = (tracking[o.id] ?? "").trim().split(" ");
                         if (!carrier || rest.length === 0) {
-                          toast.error("اكتب اسم الشركة ثم رقم التتبع");
+                          toast.error(t("اكتب اسم الشركة ثم رقم التتبع"));
                           return;
                         }
                         void run(
@@ -129,12 +130,11 @@ function OrdersPage() {
                               _carrier: carrier,
                               _tracking: rest.join(" "),
                             }),
-                          "تم تحديث حالة الشحن",
+                          t("تم تحديث حالة الشحن"),
                         );
                       }}
                     >
-                      تم الشحن
-                    </Button>
+                      {t("تم الشحن")} </Button>
                   </>
                 )}
 
@@ -144,12 +144,11 @@ function OrdersPage() {
                     onClick={() =>
                       void run(
                         () => supabase.rpc("release_escrow", { _order_id: o.id }),
-                        "تم تحرير المبلغ للبائع",
+                        t("تم تحرير المبلغ للبائع"),
                       )
                     }
                   >
-                    تأكيد الاستلام وتحرير المبلغ
-                  </Button>
+                    {t("تأكيد الاستلام وتحرير المبلغ")} </Button>
                 )}
 
                 {isBuyer && o.status === "completed" && (
@@ -166,16 +165,15 @@ function OrdersPage() {
                     size="sm"
                     variant="outline"
                     onClick={() => {
-                      const reason = window.prompt("سبب النزاع؟")?.trim();
+                      const reason = window.prompt(t("سبب النزاع؟"))?.trim();
                       if (!reason || reason.length < 5) return;
                       void run(
                         () => supabase.rpc("open_dispute", { _order_id: o.id, _reason: reason }),
-                        "تم فتح النزاع وستراجعه الإدارة",
+                        t("تم فتح النزاع وستراجعه الإدارة"),
                       );
                     }}
                   >
-                    فتح نزاع
-                  </Button>
+                    {t("فتح نزاع")} </Button>
                 )}
               </div>
             </div>
@@ -197,6 +195,7 @@ function ReviewForm({
   reviewerId: string;
   onDone: () => void;
 }) {
+  useLanguage();
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [busy, setBusy] = useState(false);
@@ -216,7 +215,7 @@ function ReviewForm({
   if (existing) {
     return (
       <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
-        <span>تقييمك:</span>
+        <span>{t("تقييمك:")}</span>
         <Stars value={existing.rating} />
         {existing.comment ? <span>— {existing.comment}</span> : null}
       </div>
@@ -225,7 +224,7 @@ function ReviewForm({
 
   const submit = async () => {
     if (rating < 1) {
-      toast.error("اختر عدد النجوم أولًا");
+      toast.error(t("اختر عدد النجوم أولًا"));
       return;
     }
     setBusy(true);
@@ -241,13 +240,13 @@ function ReviewForm({
       toast.error(error.message);
       return;
     }
-    toast.success("شكرًا! تم إرسال تقييمك للبائع");
+    toast.success(t("شكرًا! تم إرسال تقييمك للبائع"));
     onDone();
   };
 
   return (
     <div className="glass mt-3 rounded-xl p-3">
-      <div className="text-sm font-bold">قيّم البائع بعد اكتمال الصفقة</div>
+      <div className="text-sm font-bold">{t("قيّم البائع بعد اكتمال الصفقة")}</div>
       <div className="mt-2 flex items-center gap-1">
         {[1, 2, 3, 4, 5].map((n) => (
           <button
@@ -267,18 +266,19 @@ function ReviewForm({
       </div>
       <Textarea
         className="mt-2"
-        placeholder="اكتب تجربتك مع البائع (اختياري)"
+        placeholder={t("اكتب تجربتك مع البائع (اختياري)")}
         value={comment}
         onChange={(e) => setComment(e.target.value.slice(0, 500))}
       />
       <Button size="sm" className="mt-2" onClick={() => void submit()} disabled={busy}>
-        {busy ? "جارٍ الإرسال…" : "إرسال التقييم"}
+        {busy ? t("جارٍ الإرسال…") : t("إرسال التقييم")}
       </Button>
     </div>
   );
 }
 
 function Stars({ value }: { value: number }) {
+  useLanguage();
   return (
     <span className="inline-flex items-center gap-0.5">
       {[1, 2, 3, 4, 5].map((n) => (

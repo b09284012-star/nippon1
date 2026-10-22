@@ -1,3 +1,4 @@
+import { t, useLanguage, numberLocale } from "@/lib/i18n";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,13 +9,13 @@ import { formatDate } from "@/lib/media";
 export const Route = createFileRoute("/chat/")({
   head: () => ({
     meta: [
-      { title: "الدردشة | Nippon" },
+      { title: t("الدردشة | Nippon") },
       {
         name: "description",
-        content: "تحدّث مباشرة مع البائع أو المشتري حول أجهزة التعدين قبل إتمام الصفقة.",
+        content: t("تحدّث مباشرة مع البائع أو المشتري حول أجهزة التعدين قبل إتمام الصفقة."),
       },
-      { property: "og:title", content: "الدردشة | Nippon" },
-      { property: "og:description", content: "محادثات مباشرة بين المشتري والبائع داخل Nippon." },
+      { property: "og:title", content: t("الدردشة | Nippon") },
+      { property: "og:description", content: t("محادثات مباشرة بين المشتري والبائع داخل Nippon.") },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/chat/")({
 });
 
 function ChatListPage() {
+  useLanguage();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -41,10 +43,9 @@ function ChatListPage() {
   if (!loading && !user) {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <h1 className="font-display text-2xl font-black">الدردشة</h1>
+        <h1 className="font-display text-2xl font-black">{t("الدردشة")}</h1>
         <Button className="mt-6" onClick={() => navigate({ to: "/auth" })}>
-          دخول / تسجيل
-        </Button>
+          {t("دخول / تسجيل")} </Button>
       </div>
     );
   }
@@ -52,13 +53,12 @@ function ChatListPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
       <h1 className="font-display text-3xl font-black">
-        <span className="neon-text">المحادثات</span>
+        <span className="neon-text">{t("المحادثات")}</span>
       </h1>
       <div className="mt-8 grid gap-3">
         {(conversations ?? []).length === 0 && (
           <div className="glass rounded-2xl p-8 text-sm text-muted-foreground">
-            لا محادثات بعد. ابدأ محادثة من صفحة أي جهاز.
-          </div>
+            {t("لا محادثات بعد. ابدأ محادثة من صفحة أي جهاز.")} </div>
         )}
         {(conversations ?? []).map((c) => (
           <Link

@@ -1,3 +1,4 @@
+import { t, useLanguage, numberLocale } from "@/lib/i18n";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -16,13 +17,13 @@ import { getMarketNews } from "@/lib/finance.functions";
 export const Route = createFileRoute("/forum")({
   head: () => ({
     meta: [
-      { title: "المنتدى والأخبار | Nippon" },
+      { title: t("المنتدى والأخبار | Nippon") },
       {
         name: "description",
-        content: "أسعار الكريبتو المباشرة، أخبار التعدين، نقاش مفتوح بين المستخدمين، وإعلانات إدارة Nippon الرسمية.",
+        content: t("أسعار الكريبتو المباشرة، أخبار التعدين، نقاش مفتوح بين المستخدمين، وإعلانات إدارة Nippon الرسمية."),
       },
-      { property: "og:title", content: "المنتدى والأخبار | Nippon" },
-      { property: "og:description", content: "أخبار السوق ونقاش مجتمع Nippon في مكان واحد." },
+      { property: "og:title", content: t("المنتدى والأخبار | Nippon") },
+      { property: "og:description", content: t("أخبار السوق ونقاش مجتمع Nippon في مكان واحد.") },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -40,6 +41,7 @@ type Post = {
 };
 
 function ForumPage() {
+  useLanguage();
   const fetchNews = useServerFn(getMarketNews);
 
   const news = useQuery({
@@ -51,23 +53,19 @@ function ForumPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
       <h1 className="font-display text-3xl font-black">
-        منتدى <span className="neon-text">Nippon</span>
+        {t("منتدى")} <span className="neon-text">Nippon</span>
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        أخبار السوق لحظة بلحظة، نقاش بين المعدّنين، وإعلانات رسمية من الإدارة.
-      </p>
+        {t("أخبار السوق لحظة بلحظة، نقاش بين المعدّنين، وإعلانات رسمية من الإدارة.")} </p>
 
       <Tabs defaultValue="news" className="mt-8">
         <TabsList className="flex-wrap">
           <TabsTrigger value="news">
-            <Newspaper className="size-4" /> الأخبار المباشرة
-          </TabsTrigger>
+            <Newspaper className="size-4" /> {t("الأخبار المباشرة")} </TabsTrigger>
           <TabsTrigger value="general">
-            <MessagesSquare className="size-4" /> القروب الجماعي
-          </TabsTrigger>
+            <MessagesSquare className="size-4" /> {t("القروب الجماعي")} </TabsTrigger>
           <TabsTrigger value="announcements">
-            <Megaphone className="size-4" /> الإعلانات الرسمية
-          </TabsTrigger>
+            <Megaphone className="size-4" /> {t("الإعلانات الرسمية")} </TabsTrigger>
         </TabsList>
 
         <TabsContent value="news" className="mt-6">
@@ -86,7 +84,7 @@ function ForumPage() {
                 </div>
               </div>
             ))}
-            {news.isLoading && <p className="text-sm text-muted-foreground">جارٍ تحميل الأسعار…</p>}
+            {news.isLoading && <p className="text-sm text-muted-foreground">{t("جارٍ تحميل الأسعار…")}</p>}
           </div>
 
           <div className="mt-8 grid gap-4">
@@ -115,7 +113,7 @@ function ForumPage() {
               </a>
             ))}
             {news.data && news.data.news.length === 0 && (
-              <p className="text-sm text-muted-foreground">تعذر جلب الأخبار حاليًا، حاول لاحقًا.</p>
+              <p className="text-sm text-muted-foreground">{t("تعذر جلب الأخبار حاليًا، حاول لاحقًا.")}</p>
             )}
           </div>
         </TabsContent>
@@ -133,6 +131,7 @@ function ForumPage() {
 }
 
 function Channel({ channel }: { channel: "general" | "announcements" }) {
+  useLanguage();
   const { user, isAdmin, profile } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -176,7 +175,7 @@ function Channel({ channel }: { channel: "general" | "announcements" }) {
     if (!user) return;
     const text = body.trim();
     if (text.length < 2) {
-      toast.error("اكتب رسالة أطول");
+      toast.error(t("اكتب رسالة أطول"));
       return;
     }
     setBusy(true);
@@ -200,48 +199,47 @@ function Channel({ channel }: { channel: "general" | "announcements" }) {
           <Textarea
             value={body}
             onChange={(e) => setBody(e.target.value.slice(0, 4000))}
-            placeholder={channel === "general" ? "شارك خبرتك أو اسأل المجتمع…" : "اكتب إعلانًا رسميًا للمستخدمين…"}
+            placeholder={channel === "general" ? t("شارك خبرتك أو اسأل المجتمع…") : t("اكتب إعلانًا رسميًا للمستخدمين…")}
             rows={3}
           />
           <div className="mt-3 flex items-center gap-3">
             <Button disabled={busy} onClick={() => void submit()}>
-              <Send className="size-4" /> {busy ? "جارٍ النشر…" : "نشر"}
+              <Send className="size-4" /> {busy ? t("جارٍ النشر…") : t("نشر")}
             </Button>
             <span className="text-xs text-muted-foreground">
-              باسم {profile?.display_name ?? "مستخدم"}
+              {t("باسم")} {profile?.display_name ?? "مستخدم"}
             </span>
           </div>
         </div>
       ) : (
         <div className="glass rounded-2xl p-4 text-sm text-muted-foreground">
           {user
-            ? "قسم الإعلانات مخصّص لنشر الإدارة فقط، ويمكنك قراءة كل الإعلانات هنا."
-            : "سجّل الدخول للمشاركة في النقاش."}
+            ? t("قسم الإعلانات مخصّص لنشر الإدارة فقط، ويمكنك قراءة كل الإعلانات هنا.")
+            : t("سجّل الدخول للمشاركة في النقاش.")}
           {!user && (
             <Button className="ms-3" size="sm" onClick={() => navigate({ to: "/auth" })}>
-              دخول
-            </Button>
+              {t("دخول")} </Button>
           )}
         </div>
       )}
 
       <div className="mt-6 grid gap-3">
         {(posts.data ?? []).length === 0 && (
-          <p className="text-sm text-muted-foreground">لا منشورات بعد.</p>
+          <p className="text-sm text-muted-foreground">{t("لا منشورات بعد.")}</p>
         )}
         {(posts.data ?? []).map((p) => (
           <article key={p.id} className="glass rounded-2xl p-4">
             <div className="flex flex-wrap items-center gap-3">
               <span className="font-display font-bold">{p.profiles?.display_name ?? "مستخدم"}</span>
               {channel === "announcements" && (
-                <Badge className="bg-accent text-accent-foreground">إعلان رسمي</Badge>
+                <Badge className="bg-accent text-accent-foreground">{t("إعلان رسمي")}</Badge>
               )}
               <span className="text-xs text-muted-foreground">{formatDate(p.created_at)}</span>
               {(isAdmin || p.author_id === user?.id) && (
                 <Button
                   variant="ghost"
                   size="icon"
-                  aria-label="حذف المنشور"
+                  aria-label={t("حذف المنشور")}
                   className="ms-auto"
                   onClick={async () => {
                     const { error } = await supabase.from("forum_posts").delete().eq("id", p.id);
