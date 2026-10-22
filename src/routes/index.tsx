@@ -76,7 +76,7 @@ function Home() {
         <div className="absolute inset-0 bg-background/85" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,var(--background)_95%)]" />
 
-        <div className="relative z-10 mx-auto max-w-4xl px-4 py-16 text-center">
+        <div className="relative z-10 mx-auto max-w-4xl px-4 py-10 text-center sm:py-16">
           <p className="text-sm font-bold tracking-normal text-primary uppercase">
             {t("سوق موثوق لأجهزة التعدين")} </p>
           <h1 className="mt-6 font-display text-4xl leading-tight font-black sm:text-6xl">
@@ -94,7 +94,7 @@ function Home() {
               <Link to="/sell">{t("أضف عرضك")}</Link>
             </Button>
           </div>
-          <dl className="mx-auto mt-14 grid max-w-xl grid-cols-3 gap-4">
+          <dl className="mx-auto mt-8 grid sm:mt-14 max-w-xl grid-cols-3 gap-4">
             {[
               ["5%", "رسوم المنصة"],
               ["100%", "مبالغ محجوزة بالضمان"],

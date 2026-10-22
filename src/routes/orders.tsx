@@ -151,11 +151,11 @@ function OrdersPage() {
                     {t("تأكيد الاستلام وتحرير المبلغ")} </Button>
                 )}
 
-                {isBuyer && o.status === "completed" && (
+                {isBuyer && user && o.status === "completed" && (
                   <ReviewForm
                     orderId={o.id}
                     sellerId={o.seller_id}
-                    reviewerId={user!.id}
+                    reviewerId={user.id}
                     onDone={() => void refetch()}
                   />
                 )}

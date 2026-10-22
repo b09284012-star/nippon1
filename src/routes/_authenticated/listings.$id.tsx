@@ -78,10 +78,11 @@ function ListingDetail() {
     queryKey: ["seller-reviews", listing?.seller_id],
     enabled: Boolean(listing?.seller_id),
     queryFn: async () => {
+      if (!listing) return [];
       const { data } = await supabase
         .from("reviews")
         .select("id, rating, comment, created_at, reviewer_id")
-        .eq("seller_id", listing!.seller_id)
+        .eq("seller_id", listing.seller_id)
         .order("created_at", { ascending: false })
         .limit(20);
       return data ?? [];
