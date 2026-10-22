@@ -189,10 +189,9 @@ function WalletPage() {
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           <div className="glass rounded-3xl p-5">
             <Label className="mb-2 block">{t("القيمة (USDT)")}</Label>
-            <div className="relative">
+            <div className="relative" dir="ltr">
               <Input
                 inputMode="decimal"
-                dir="ltr"
                 className="pe-20 font-display text-lg font-bold"
                 value={depAmount}
                 onChange={(e) => setDepAmount(e.target.value.slice(0, 10))}
