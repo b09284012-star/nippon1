@@ -12,3 +12,4 @@
 - [x] Add company branding, logo upload, and explicitly public business contact details.
 - [x] Give company offers a distinct presentation and exclude them from regular market/home feeds.
 - [x] Verify company profile saving and inventory separation with a temporary offer and logo, then remove test data.
+- [x] Cancel the deposit request UI: wallet restored to the previous deposit flow (network buttons, address, amount + screenshot confirmation).
