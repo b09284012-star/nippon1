@@ -4,7 +4,7 @@ import logo from "@/assets/nippon-logo.png.asset.json";
 import { SUPPORT_WHATSAPP, SUPPORT_WHATSAPP_URL } from "@/components/site/SupportWhatsApp";
 
 export function Footer() {
-  useLanguage();
+  const { t } = useLanguage();
   return (
     <footer className="mt-24 border-t border-border/60 bg-card/40">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">

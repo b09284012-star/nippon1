@@ -27,7 +27,7 @@ export const Route = createFileRoute("/profile")({
 });
 
 function ProfilePage() {
-  useLanguage();
+  const { t } = useLanguage();
   const { user, profile, loading, refreshProfile, signOut } = useAuth();
   const navigate = useNavigate();
   const del = useServerFn(deleteMyAccount);
@@ -137,6 +137,6 @@ function ProfilePage() {
 }
 
 function F({ label, ...p }: { label: string } & React.ComponentProps<typeof Input>) {
-  useLanguage();
+  const { t } = useLanguage();
   return <div><Label className="mb-2 block">{label}</Label><Input {...p} /></div>;
 }

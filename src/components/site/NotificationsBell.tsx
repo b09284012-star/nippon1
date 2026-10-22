@@ -9,7 +9,7 @@ import { useAuth } from "@/lib/auth";
 import { useNotifications } from "@/lib/notifications";
 
 export function NotificationsBell() {
-  useLanguage();
+  const { t } = useLanguage();
   const { user } = useAuth();
   const q = useNotifications(user?.id);
 

@@ -24,7 +24,7 @@ export const Route = createFileRoute("/chat/")({
 });
 
 function ChatListPage() {
-  useLanguage();
+  const { t } = useLanguage();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 

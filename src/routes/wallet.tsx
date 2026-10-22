@@ -53,7 +53,7 @@ const TX_LABEL: Record<string, string> = {
 };
 
 function WalletPage() {
-  useLanguage();
+  const { t } = useLanguage();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [wdAmount, setWdAmount] = useState("");
@@ -387,7 +387,7 @@ function Stat({
   label: string;
   value: string;
 }) {
-  useLanguage();
+  const { t } = useLanguage();
   return (
     <div className="glass card-3d rounded-2xl p-5">
       <Icon className="size-5 text-primary" />

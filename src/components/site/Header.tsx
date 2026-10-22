@@ -18,7 +18,7 @@ const links = [
 ] as const;
 
 export function Header() {
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);

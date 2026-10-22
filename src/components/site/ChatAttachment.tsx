@@ -2,7 +2,7 @@ import { t, useLanguage, numberLocale } from "@/lib/i18n";
 import { useStorageUrl } from "@/lib/media";
 
 export function ChatAttachment({ path, name, type }: { path: string; name?: string | null; type?: string | null }) {
-  useLanguage();
+  const { t } = useLanguage();
   const { data: url } = useStorageUrl("chat-files", path);
   if (!url) return <p className="text-xs opacity-70">{t("جارٍ تحميل المرفق…")}</p>;
   if (type?.startsWith("image/")) {

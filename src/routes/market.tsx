@@ -37,7 +37,7 @@ export const Route = createFileRoute("/market")({
 });
 
 function Market() {
-  useLanguage();
+  const { t } = useLanguage();
   const [q, setQ] = useState("");
   const [brand, setBrand] = useState("all");
   const [condition, setCondition] = useState("all");

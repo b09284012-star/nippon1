@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export function ForgotPassword({ onClose }: { onClose: () => void }) {
-  useLanguage();
+  const { t } = useLanguage();
   const [step, setStep] = useState<"email" | "code" | "password">("email");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");

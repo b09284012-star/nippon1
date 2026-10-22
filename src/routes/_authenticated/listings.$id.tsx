@@ -41,7 +41,7 @@ export const Route = createFileRoute("/_authenticated/listings/$id")({
 });
 
 function ListingDetail() {
-  useLanguage();
+  const { t } = useLanguage();
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -369,7 +369,7 @@ function Spec({
   label: string;
   value: string;
 }) {
-  useLanguage();
+  const { t } = useLanguage();
   return (
     <div className="glass rounded-xl p-3">
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -381,7 +381,7 @@ function Spec({
 }
 
 function OnlineStatus({ userId }: { userId: string }) {
-  useLanguage();
+  const { t } = useLanguage();
   const online = useIsOnline(userId);
   return (
     <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -413,7 +413,7 @@ function EditListingDialog({
   listing: EditableListing;
   onSaved: () => void;
 }) {
-  useLanguage();
+  const { t } = useLanguage();
   const [busy, setBusy] = useState(false);
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

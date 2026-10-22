@@ -22,7 +22,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { LanguageInitializer } from "@/lib/i18n";
 
 function NotFoundComponent() {
-  useLanguage();
+  const { t } = useLanguage();
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
@@ -43,7 +43,7 @@ function NotFoundComponent() {
 }
 
 function ErrorComponent({ error, reset }: ErrorComponentProps) {
-  useLanguage();
+  const { t } = useLanguage();
   console.error(error);
   const router = useRouter();
   useEffect(() => {

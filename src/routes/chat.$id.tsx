@@ -30,7 +30,7 @@ export const Route = createFileRoute("/chat/$id")({
 });
 
 function ChatRoomPage() {
-  useLanguage();
+  const { t } = useLanguage();
   const { id } = Route.useParams();
   const { user, loading } = useAuth();
   const navigate = useNavigate();

@@ -19,7 +19,7 @@ type Props = {
 };
 
 export function AnalyticsCharts({ series, top, statusCount, metric }: Props) {
-  const { direction } = useLanguage();
+  const { direction, t } = useLanguage();
   const timeline = series.map(([date, values]) => ({ date, ...values }));
   const statuses = Object.entries(statusCount).map(([status, value]) => ({ name: t(labels[status] ?? status), value, fill: colors[status] ?? "var(--chart-4)" }));
   const total = statuses.reduce((sum, item) => sum + item.value, 0);
@@ -79,6 +79,6 @@ export function AnalyticsCharts({ series, top, statusCount, metric }: Props) {
 }
 
 function EmptyChart({ text }: { text: string }) {
-  useLanguage();
+  const { t } = useLanguage();
   return <div className="mt-4 flex h-64 items-center justify-center border-b border-dashed border-border bg-muted/20 px-4 text-center text-sm text-muted-foreground">{text}</div>;
 }

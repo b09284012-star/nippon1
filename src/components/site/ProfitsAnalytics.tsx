@@ -14,7 +14,7 @@ const RANGES = [
 ] as const;
 
 export function ProfitsAnalytics() {
-  useLanguage();
+  const { t } = useLanguage();
   const isAdmin = true;
   const [days, setDays] = useState<number>(30);
   const [metric, setMetric] = useState<"volume" | "fee">("volume");

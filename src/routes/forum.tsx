@@ -41,7 +41,7 @@ type Post = {
 };
 
 function ForumPage() {
-  useLanguage();
+  const { t } = useLanguage();
   const fetchNews = useServerFn(getMarketNews);
 
   const news = useQuery({
@@ -131,7 +131,7 @@ function ForumPage() {
 }
 
 function Channel({ channel }: { channel: "general" | "announcements" }) {
-  useLanguage();
+  const { t } = useLanguage();
   const { user, isAdmin, profile } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();

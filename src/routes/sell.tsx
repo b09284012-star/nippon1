@@ -46,7 +46,7 @@ const schema = z.object({
 });
 
 function SellPage() {
-  useLanguage();
+  const { t } = useLanguage();
   const { user, profile, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const [files, setFiles] = useState<FileList | null>(null);
@@ -199,7 +199,7 @@ function Field({
   className,
   ...rest
 }: { name: string; label: string; className?: string } & React.ComponentProps<typeof Input>) {
-  useLanguage();
+  const { t } = useLanguage();
   return (
     <div className={className}>
       <Label className="mb-2 block">{label}</Label>

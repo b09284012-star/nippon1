@@ -18,7 +18,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { adminAccountAction, adminListBans } from "@/lib/account.functions";
 
 function AccountActions({ userId, bannedUntil, onDone }: { userId: string; bannedUntil?: string | undefined; onDone: () => void }) {
-  useLanguage();
+  const { t } = useLanguage();
   const act = useServerFn(adminAccountAction);
   const [days, setDays] = useState("7");
   const [busy, setBusy] = useState(false);
@@ -81,7 +81,7 @@ const WD_STATUS: Record<string, string> = {
 };
 
 function AdminPage() {
-  useLanguage();
+  const { t } = useLanguage();
   const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -376,7 +376,7 @@ type WithdrawalRowData = {
 };
 
 function WithdrawalRow({ w, onDone }: { w: WithdrawalRowData; onDone: () => void }) {
-  useLanguage();
+  const { t } = useLanguage();
   const [reason, setReason] = useState("");
   const [showReason, setShowReason] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -463,7 +463,7 @@ function StatCard({
   value: string;
   live?: boolean;
 }) {
-  useLanguage();
+  const { t } = useLanguage();
   return (
     <div className="glass card-3d rounded-2xl p-5">
       <div className="flex items-center gap-2">
@@ -489,7 +489,7 @@ type DepositRowData = {
 };
 
 function DepositRow({ d, onDone }: { d: DepositRowData; onDone: () => void }) {
-  useLanguage();
+  const { t } = useLanguage();
   const [reason, setReason] = useState("");
   const [showReason, setShowReason] = useState(false);
   const receiptUrl = useStorageUrl("deposit-receipts", d.receipt_image_path);
@@ -576,7 +576,7 @@ function DepositRow({ d, onDone }: { d: DepositRowData; onDone: () => void }) {
 }
 
 function SendNotification({ users }: { users: { id: string; display_name: string; email: string | null }[] }) {
-  useLanguage();
+  const { t } = useLanguage();
   const [target, setTarget] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [title, setTitle] = useState("");

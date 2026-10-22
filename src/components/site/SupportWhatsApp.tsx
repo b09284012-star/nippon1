@@ -5,7 +5,7 @@ export const SUPPORT_WHATSAPP = "+44 77 2333 5221";
 export const SUPPORT_WHATSAPP_URL = "https://wa.me/447723335221";
 
 export function SupportWhatsAppButton() {
-  useLanguage();
+  const { t } = useLanguage();
   return (
     <a
       href={SUPPORT_WHATSAPP_URL}

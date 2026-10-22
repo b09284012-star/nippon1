@@ -23,7 +23,7 @@ export const Route = createFileRoute("/notifications")({
 });
 
 function NotificationsPage() {
-  useLanguage();
+  const { t } = useLanguage();
   const { user, loading } = useAuth();
   const q = useNotifications(user?.id);
   const navigate = useNavigate();

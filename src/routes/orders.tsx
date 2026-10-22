@@ -40,7 +40,7 @@ const STATUS: Record<string, string> = {
 };
 
 function OrdersPage() {
-  useLanguage();
+  const { t } = useLanguage();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [tracking, setTracking] = useState<Record<string, string>>({});
@@ -195,7 +195,7 @@ function ReviewForm({
   reviewerId: string;
   onDone: () => void;
 }) {
-  useLanguage();
+  const { t } = useLanguage();
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [busy, setBusy] = useState(false);
@@ -278,7 +278,7 @@ function ReviewForm({
 }
 
 function Stars({ value }: { value: number }) {
-  useLanguage();
+  const { t } = useLanguage();
   return (
     <span className="inline-flex items-center gap-0.5">
       {[1, 2, 3, 4, 5].map((n) => (

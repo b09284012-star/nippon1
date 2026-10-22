@@ -54,7 +54,7 @@ const steps = [
 ];
 
 function Home() {
-  useLanguage();
+  const { t } = useLanguage();
   const { country } = useMyCountry();
   const { data: listings } = useQuery({
     queryKey: ["latest-listings", country],

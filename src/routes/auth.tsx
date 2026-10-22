@@ -36,7 +36,7 @@ const schema = z.object({
 });
 
 function AuthPage() {
-  useLanguage();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { redirect } = Route.useSearch();
   const { user } = useAuth();
@@ -173,7 +173,7 @@ function Field({
   onChange: (v: string) => void;
   type?: string;
 }) {
-  useLanguage();
+  const { t } = useLanguage();
   return (
     <div>
       <Label className="mb-2 block">{label}</Label>

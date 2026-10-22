@@ -21,7 +21,7 @@ export type ListingRow = {
 };
 
 export function ListingCard({ listing }: { listing: ListingRow }) {
-  useLanguage();
+  const { t } = useLanguage();
   const { data: url } = useStorageUrl("listing-images", listing.images?.[0]);
 
   return (

@@ -33,7 +33,7 @@ export const Route = createFileRoute("/finance")({
 });
 
 function FinancePage() {
-  useLanguage();
+  const { t } = useLanguage();
   const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const fetchOverview = useServerFn(getBinanceOverview);
@@ -235,7 +235,7 @@ function TxRow({
   time: string;
   ok: boolean;
 }) {
-  useLanguage();
+  const { t } = useLanguage();
   return (
     <div className="glass rounded-2xl p-4">
       <div className="flex flex-wrap items-center gap-3">
@@ -259,7 +259,7 @@ function TxRow({
 }
 
 function ManualCredit() {
-  useLanguage();
+  const { t } = useLanguage();
   const [q, setQ] = useState("");
   const [target, setTarget] = useState<{ id: string; label: string } | null>(null);
   const [amount, setAmount] = useState("");
