@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/lib/auth";
-import { COUNTRIES } from "@/lib/countries";
+import { useMyCountry } from "@/lib/my-country";
 
 export const Route = createFileRoute("/sell")({
   head: () => ({
@@ -52,6 +52,7 @@ function SellPage() {
   const [files, setFiles] = useState<FileList | null>(null);
   const [busy, setBusy] = useState(false);
   const [availability, setAvailability] = useState<"in_stock" | "on_order">("in_stock");
+  const { country: accountCountry } = useMyCountry();
 
   if (!loading && !user) {
     return (
