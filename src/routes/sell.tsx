@@ -65,6 +65,7 @@ function SellPage() {
   }
 
   const verified = Boolean(profile?.is_verified_seller) || isAdmin;
+  const myCountry = accountCountry;
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -84,14 +85,14 @@ function SellPage() {
         if (error) throw error;
         paths.push(path);
       }
-      const { algorithm, hours_used, location, ...rest } = parsed.data;
+      const { algorithm, hours_used, location: _ignored, ...rest } = parsed.data;
       const { data, error } = await supabase
         .from("listings")
         .insert({
           ...rest,
           algorithm: algorithm ?? null,
           hours_used: hours_used ?? null,
-          location: location ?? null,
+          location: myCountry || null,
           images: paths,
           seller_id: user.id,
         })
@@ -153,21 +154,10 @@ function SellPage() {
         />
         <Field name="hours_used" label={t("ساعات التشغيل (اختياري)")} type="number" />
         <div>
-          <Label className="mb-2 block">{t("الدولة *")}</Label>
-          <select
-            name="location"
-            required
-            defaultValue=""
-            className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-          >
-            <option value="" disabled>
-              {t("اختر الدولة")} </option>
-            {COUNTRIES.map((c) => (
-              <option key={c} value={c}>
-                {t(c)}
-              </option>
-            ))}
-          </select>
+          <Label className="mb-2 block">{t("الدولة")}</Label>
+          <p className="flex h-10 items-center rounded-md border border-input bg-muted px-3 text-sm">
+            {myCountry ? t(myCountry) : t("الدولة")}
+          </p>
         </div>
 
         <div className="sm:col-span-2">
