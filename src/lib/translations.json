@@ -301,7 +301,7 @@
   "محادثات مباشرة بين المشتري والبائع داخل Nippon.": "Direct conversations between buyers and sellers on Nippon.",
   "المحادثات": "Conversations",
   "لا محادثات بعد. ابدأ محادثة من صفحة أي جهاز.": "No conversations yet. Start one from a device listing.",
-  "عرض": "Listing",
+  "عرض": "Offer",
   "اللوحة المالية | Nippon": "Finance dashboard | Nippon",
   "لوحة مالية مستقلة تعرض رصيد باينانس الفعلي وسجل الإيداعات والسحوبات لإدارة Nippon.": "View actual Binance balances and deposit and withdrawal history for Nippon administrators.",
   "رصيد الأصول وسجل الحوالات لحظيًا.": "Live asset balances and transfer history.",
@@ -348,7 +348,7 @@
   "الإعلانات الرسمية": "Official announcements",
   "جارٍ تحميل الأسعار…": "Loading prices…",
   "تعذر جلب الأخبار حاليًا، حاول لاحقًا.": "Unable to load news right now. Please try later.",
-  "مستخدم": "users",
+  "مستخدم": "User",
   "اكتب رسالة أطول": "Write a longer message",
   "شارك خبرتك أو اسأل المجتمع…": "Share your experience or ask the community…",
   "اكتب إعلانًا رسميًا للمستخدمين…": "Write an official announcement…",
@@ -585,5 +585,12 @@
   "سيُضاف المبلغ لرصيدك تلقائيًا بعد تأكيد الشبكة (عادة دقائق). سيُضاف للرصيد:": "Your balance is credited automatically after network confirmation (usually minutes). Credited:",
   "طلبات الإيداع السابقة": "Previous deposit requests",
   "تعذر إنشاء عنوان الإيداع، حاول لاحقًا": "Could not create a deposit address, try again later",
-  "اختر الشبكة وأدخل المبلغ لعرض عنوان إيداع خاص بعمليتك. يُضاف المبلغ تلقائيًا بعد خصم رسوم الإيداع (1 دولار).": "Choose a network and amount to get a deposit address for your payment. It's credited automatically minus the 1 USD deposit fee."
+  "اختر الشبكة وأدخل المبلغ لعرض عنوان إيداع خاص بعمليتك. يُضاف المبلغ تلقائيًا بعد خصم رسوم الإيداع (1 دولار).": "Choose a network and amount to get a deposit address for your payment. It's credited automatically minus the 1 USD deposit fee.",
+  "بائع": "Seller",
+  "إدارة / نزاع": "Admin / Dispute",
+  "صورة مرفقة": "Image attached",
+  "ملف مرفق": "File attached",
+  "لا رسائل بعد": "No messages yet",
+  "بخصوص:": "About:",
+  "أنت:": "You:"
 }
