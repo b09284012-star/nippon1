@@ -19,7 +19,7 @@ const links = [
 
 export function Header() {
   const { language, setLanguage, t: translate } = useLanguage();
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, canModerateForum, canManageDisputes, signOut } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -44,12 +44,12 @@ export function Header() {
               {translate(l.label)}
             </Link>
           ))}
-          {isAdmin && (
+          {(isAdmin || canModerateForum || canManageDisputes) && (
             <>
               <Link to="/admin" className="text-sm font-medium text-primary transition-colors hover:text-foreground">
                 {translate("الإدارة")} </Link>
-              <Link to="/finance" className="text-sm font-medium text-primary transition-colors hover:text-foreground">
-                {translate("المالية والمبيعات")} </Link>
+              {isAdmin && <Link to="/finance" className="text-sm font-medium text-primary transition-colors hover:text-foreground">
+                 {translate("المالية والمبيعات")} </Link>}
             </>
           )}
         </nav>
@@ -101,12 +101,12 @@ export function Header() {
               {translate(l.label)}
             </Link>
           ))}
-          {isAdmin && (
+          {(isAdmin || canModerateForum || canManageDisputes) && (
             <>
               <Link to="/admin" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm text-accent">
                 {translate("الإدارة")} </Link>
-              <Link to="/finance" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm text-accent">
-                {translate("المالية والمبيعات")} </Link>
+              {isAdmin && <Link to="/finance" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm text-accent">
+                 {translate("المالية والمبيعات")} </Link>}
             </>
           )}
         </nav>

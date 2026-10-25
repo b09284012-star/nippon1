@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { staffPermissions } from "@/lib/staff-permissions";
 
 export type Profile = {
   id: string;
@@ -20,6 +21,8 @@ type AuthValue = {
   user: User | null;
   profile: Profile | null;
   isAdmin: boolean;
+  canModerateForum: boolean;
+  canManageDisputes: boolean;
   loading: boolean;
   refreshProfile: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -30,6 +33,8 @@ const AuthContext = createContext<AuthValue>({
   user: null,
   profile: null,
   isAdmin: false,
+  canModerateForum: false,
+  canManageDisputes: false,
   loading: true,
   refreshProfile: async () => {},
   signOut: async () => {},
@@ -39,15 +44,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [responsibilities, setResponsibilities] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadExtras = async (userId: string) => {
-    const [{ data: p }, { data: roles }] = await Promise.all([
+    const [{ data: p }, { data: roles }, { data: staff }] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", userId),
+      supabase.from("staff_assignments").select("responsibility").eq("user_id", userId),
     ]);
     setProfile((p as Profile) ?? null);
     setIsAdmin(Boolean(roles?.some((r) => r.role === "admin")));
+    setResponsibilities(staff?.map(s => s.responsibility) ?? []);
   };
 
   useEffect(() => {
@@ -58,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setProfile(null);
         setIsAdmin(false);
+        setResponsibilities([]);
       }
     });
 
@@ -75,6 +84,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user: session?.user ?? null,
     profile,
     isAdmin,
+    canModerateForum: staffPermissions(isAdmin, responsibilities).forum,
+    canManageDisputes: staffPermissions(isAdmin, responsibilities).disputes,
     loading,
     refreshProfile: async () => {
       if (session?.user) await loadExtras(session.user.id);
@@ -83,6 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await supabase.auth.signOut();
       setProfile(null);
       setIsAdmin(false);
+      setResponsibilities([]);
     },
   };
 
