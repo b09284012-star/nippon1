@@ -59,15 +59,17 @@ function WalletPage() {
   const [wdAmount, setWdAmount] = useState("");
   const [wdAddress, setWdAddress] = useState("");
   const [depAmount, setDepAmount] = useState("");
-  const [depFile, setDepFile] = useState<File | null>(null);
   const [network, setNetwork] = useState<string>("TRC20");
+  const [payment, setPayment] = useState<Awaited<ReturnType<typeof createDepositAddress>> | null>(null);
   const fetchWallet = useServerFn(getMyWallet);
+  const createDeposit = useServerFn(createDepositAddress);
   const qc = useQueryClient();
 
   const { data, refetch } = useQuery({
     queryKey: ["my-wallet"],
     enabled: Boolean(user),
     queryFn: () => fetchWallet(),
+    refetchInterval: payment ? 15000 : false,
   });
 
   const withdrawals = useQuery({
