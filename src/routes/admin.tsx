@@ -82,6 +82,8 @@ const WD_STATUS: Record<string, string> = {
 
 function AdminPage() {
   const { t } = useLanguage();
+  const [wdSearch, setWdSearch] = useState("");
+  const [wdFilter, setWdFilter] = useState("all");
   const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -383,6 +385,7 @@ function AdminPage() {
 
 type WithdrawalRowData = {
   id: string;
+  user_id?: string;
   display_name: string | null;
   email: string | null;
   amount: number;
