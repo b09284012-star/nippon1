@@ -171,10 +171,6 @@ function AdminPage() {
           <Badge className="gap-1 bg-accent text-accent-foreground">
             <BellRing className="size-3.5" /> {pendingCount} {t("طلب سحب جديد")} </Badge>
         )}
-        {pendingDeposits > 0 && (
-          <Badge className="gap-1" variant="secondary">
-            <ArrowDownToLine className="size-3.5" /> {pendingDeposits} {t("تأكيد إيداع")} </Badge>
-        )}
       </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
