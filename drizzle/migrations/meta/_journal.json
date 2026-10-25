@@ -85,6 +85,20 @@
       "when": 1792229817252,
       "tag": "0011_public_inventory_cards",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1792896496452,
+      "tag": "0012_country_communities_delegated_staff",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792896696172,
+      "tag": "0013_tighten_staff_privacy_and_active_community_access",
+      "breakpoints": true
     }
   ]
 }

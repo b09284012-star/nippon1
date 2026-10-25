@@ -169,6 +169,7 @@ export type Database = {
           author_id: string
           body: string
           channel: string
+          country: string | null
           created_at: string
           id: string
         }
@@ -176,6 +177,7 @@ export type Database = {
           author_id: string
           body: string
           channel: string
+          country?: string | null
           created_at?: string
           id?: string
         }
@@ -183,6 +185,7 @@ export type Database = {
           author_id?: string
           body?: string
           channel?: string
+          country?: string | null
           created_at?: string
           id?: string
         }
@@ -511,6 +514,27 @@ export type Database = {
           },
         ]
       }
+      staff_assignments: {
+        Row: {
+          assigned_by: string
+          created_at: string
+          responsibility: string
+          user_id: string
+        }
+        Insert: {
+          assigned_by: string
+          created_at?: string
+          responsibility: string
+          user_id: string
+        }
+        Update: {
+          assigned_by?: string
+          created_at?: string
+          responsibility?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_private_info: {
         Row: {
           address: string
@@ -683,6 +707,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      account_country: { Args: { _user_id: string }; Returns: string }
       admin_credit_user: {
         Args: { _amount: number; _note: string; _user_id: string }
         Returns: undefined
@@ -796,6 +821,12 @@ export type Database = {
         Args: { _id: string; _tx_hash?: string }
         Returns: undefined
       }
+      assign_staff: {
+        Args: { _enabled: boolean; _responsibility: string; _user_id: string }
+        Returns: undefined
+      }
+      can_access_conversation: { Args: { _id: string }; Returns: boolean }
+      community_account_active: { Args: never; Returns: boolean }
       company_directory: {
         Args: never
         Returns: {
@@ -845,6 +876,11 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_staff: {
+        Args: { _responsibility: string; _user_id: string }
+        Returns: boolean
+      }
+      is_dispute_conversation: { Args: { _id: string }; Returns: boolean }
       is_public_inventory_image: { Args: { _name: string }; Returns: boolean }
       mark_order_shipped: {
         Args: { _carrier: string; _order_id: string; _tracking: string }
@@ -923,6 +959,11 @@ export type Database = {
         Args: { _address: string; _amount: number }
         Returns: string
       }
+      resolve_staff_dispute: {
+        Args: { _order_id: string; _refund: boolean }
+        Returns: undefined
+      }
+      same_community: { Args: { _a: string; _b: string }; Returns: boolean }
       search_user_by_wallet: {
         Args: { _tag: string }
         Returns: {
@@ -944,6 +985,19 @@ export type Database = {
           _user_id: string
         }
         Returns: undefined
+      }
+      staff_disputes: {
+        Args: never
+        Returns: {
+          created_at: string
+          id: string
+          opened_by: string
+          order_id: string
+          orders: Json
+          reason: string
+          resolution: string
+          status: string
+        }[]
       }
       submit_deposit_confirmation: {
         Args: { _amount: number; _receipt_path?: string }

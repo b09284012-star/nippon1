@@ -16,6 +16,7 @@ export function Footer() {
         <div>
           <h4 className="text-sm font-bold">{t("المنصة")}</h4>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+            <li><Link to="/about">{t("من نحن")}</Link></li>
             <li>
               <Link to="/market">{t("تصفح الأجهزة")}</Link>
             </li>
