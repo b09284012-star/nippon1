@@ -592,5 +592,10 @@
   "ملف مرفق": "File attached",
   "لا رسائل بعد": "No messages yet",
   "بخصوص:": "About:",
-  "أنت:": "You:"
+  "أنت:": "You:",
+  "ابحث بالمعرف أو الاسم أو البريد أو العنوان": "Search by ID, name, email or address",
+  "ابحث بالمعرف أو الاسم أو السبب": "Search by ID, name or reason",
+  "مفتوح": "Open",
+  "مغلق": "Closed",
+  "عنوان السحب": "Withdrawal address"
 }
