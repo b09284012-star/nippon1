@@ -32,10 +32,23 @@ export const getMyWallet = createServerFn({ method: "GET" })
  * Creates a dedicated NOWPayments deposit address for the signed-in user
  * and stores it on their wallet.
  */
+const PAY_CURRENCY: Record<string, string> = {
+  TRC20: "usdttrc20",
+  BEP20: "usdtbsc",
+  ERC20: "usdterc20",
+};
+
+const SITE_URL = "https://nipponminers.com";
+
 export const createDepositAddress = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ amountUsd: z.number().min(10).max(100000) }).parse(input),
+    z
+      .object({
+        amountUsd: z.number().min(10).max(100000),
+        network: z.enum(["TRC20", "BEP20", "ERC20"]),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const apiKey = process.env["CRYPTO_WALLET_API_KEY"];
@@ -44,13 +57,13 @@ export const createDepositAddress = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: wallet } = await supabase
       .from("wallets")
-      .select("deposit_tag, deposit_currency, deposit_network")
+      .select("deposit_tag")
       .eq("user_id", userId)
       .maybeSingle();
-    if (!wallet) throw new Error("المحفظة غير موجودة");
+    if (!wallet?.deposit_tag) throw new Error("المحفظة غير موجودة");
 
     const orderId = `${wallet.deposit_tag}-${Date.now()}`;
-    const origin = process.env["PUBLIC_SITE_URL"] ?? "";
+    const origin = process.env["PUBLIC_SITE_URL"] || SITE_URL;
 
     const res = await fetch(`${NOWPAYMENTS_API}/payment`, {
       method: "POST",
@@ -58,15 +71,19 @@ export const createDepositAddress = createServerFn({ method: "POST" })
       body: JSON.stringify({
         price_amount: data.amountUsd,
         price_currency: "usd",
-        pay_currency: wallet.deposit_currency,
+        pay_currency: PAY_CURRENCY[data.network],
         order_id: orderId,
-        order_description: `إيداع محفظة Nippon (${wallet.deposit_tag})`,
-        ...(origin ? { ipn_callback_url: `${origin}/api/public/nowpayments` } : {}),
+        order_description: `Nippon wallet deposit (${wallet.deposit_tag})`,
+        ipn_callback_url: `${origin}/api/public/nowpayments`,
       }),
     });
 
     if (!res.ok) {
-      console.error("nowpayments create payment failed", res.status, await res.text());
+      const body = await res.text();
+      console.error("nowpayments create payment failed", res.status, body);
+      if (body.toLowerCase().includes("less than minimal")) {
+        throw new Error("المبلغ أقل من الحد الأدنى لهذه الشبكة، جرّب مبلغًا أكبر أو شبكة أخرى");
+      }
       throw new Error("تعذر إنشاء عنوان الإيداع، حاول لاحقًا");
     }
 
@@ -77,20 +94,10 @@ export const createDepositAddress = createServerFn({ method: "POST" })
       pay_currency: string;
     };
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin.rpc("set_deposit_address", {
-      _user_id: userId,
-      _address: payment.pay_address,
-      _network: wallet.deposit_network,
-      _currency: wallet.deposit_currency,
-    });
-
     return {
       address: payment.pay_address,
       payAmount: payment.pay_amount,
-      payCurrency: payment.pay_currency,
-      network: wallet.deposit_network,
-      depositTag: wallet.deposit_tag,
+      network: data.network,
       paymentId: String(payment.payment_id),
       feeUsd: DEPOSIT_FEE_USD,
       creditedUsd: Math.max(data.amountUsd - DEPOSIT_FEE_USD, 0),
