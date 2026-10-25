@@ -5,14 +5,12 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { Coins, ArrowDownToLine, ArrowUpFromLine, RefreshCw, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth";
 import { formatDate } from "@/lib/media";
-import { getBinanceOverview } from "@/lib/finance.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfitsAnalytics } from "@/components/site/ProfitsAnalytics";
 
@@ -22,10 +20,10 @@ export const Route = createFileRoute("/finance")({
       { title: t("اللوحة المالية | Nippon") },
       {
         name: "description",
-        content: t("لوحة مالية مستقلة تعرض رصيد باينانس الفعلي وسجل الإيداعات والسحوبات لإدارة Nippon."),
+        content: t("لوحة مالية مستقلة تعرض أرباح ومبيعات Nippon للإدارة."),
       },
       { property: "og:title", content: t("اللوحة المالية | Nippon") },
-      { property: "og:description", content: t("رصيد الأصول وسجل الحوالات لحظيًا.") },
+      { property: "og:description", content: t("أرباح المنصة وتحليل المبيعات.") },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -37,14 +35,6 @@ function FinancePage() {
   const { t } = useLanguage();
   const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
-  const fetchOverview = useServerFn(getBinanceOverview);
-
-  const overview = useQuery({
-    queryKey: ["binance-overview"],
-    enabled: isAdmin,
-    refetchInterval: 60000,
-    queryFn: () => fetchOverview(),
-  });
 
   const summary = useQuery({
     queryKey: ["finance-summary"],
@@ -53,18 +43,6 @@ function FinancePage() {
       const { data, error } = await supabase.rpc("admin_finance_summary");
       if (error) throw error;
       return data?.[0] ?? null;
-    },
-  });
-  const ledger = useQuery({
-    queryKey: ["finance-ledger"],
-    enabled: isAdmin,
-    queryFn: async () => {
-      const [d, w] = await Promise.all([supabase.rpc("admin_list_deposits"), supabase.rpc("admin_list_withdrawals")]);
-      const rows = [
-        ...(d.data ?? []).map((x) => ({ id: x.id, kind: t("إيداع"), name: x.display_name ?? x.email, email: x.email, amount: Number(x.amount), status: x.status, ref: x.txid, at: x.created_at })),
-        ...(w.data ?? []).map((x) => ({ id: x.id, kind: t("سحب"), name: x.display_name ?? x.email, email: x.email, amount: Number(x.amount), status: x.status, ref: x.address, at: x.created_at })),
-      ];
-      return rows.sort((a, b) => b.at.localeCompare(a.at));
     },
   });
 
@@ -83,43 +61,12 @@ function FinancePage() {
     );
   }
 
-  const data = overview.data;
-
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="font-display text-3xl font-black">{t("لوحة البيانات المالية")}</h1>
-        <Badge variant={data?.connected ? "default" : "secondary"}>
-          {data?.connected ? t("متصل بباينانس") : t("غير متصل")}
-        </Badge>
-        <Button
-          variant="outline"
-          size="sm"
-          className="ms-auto"
-          onClick={() => void overview.refetch()}
-          disabled={overview.isFetching}
-        >
-          <RefreshCw className="size-4" /> {t("تحديث")} </Button>
       </div>
 
-      {data && !data.connected && (
-        <div className="glass mt-6 rounded-2xl p-5 text-sm text-muted-foreground">
-          {data.error === "BINANCE_KEYS_MISSING"
-            ? t("لم يتم حفظ مفاتيح باينانس بعد. أضف مفتاح الـ API والمفتاح السري (صلاحية قراءة فقط) لتظهر الأرصدة والحوالات هنا.")
-            : t("تعذر الاتصال بباينانس. السبب الظاهر من باينانس:")}
-          {data.error && data.error !== "BINANCE_KEYS_MISSING" && (
-            <code className="mt-3 block overflow-x-auto whitespace-nowrap rounded-lg bg-background/70 px-3 py-2 text-xs" dir="ltr">
-              {data.error}
-            </code>
-          )}
-        </div>
-      )}
-
-      <div className="glass mt-8 rounded-3xl p-6">
-        <Coins className="size-5 text-primary" />
-        <div className="mt-3 text-xs text-muted-foreground">{t("إجمالي رصيد باينانس (بالدولار)")}</div>
-        <div className="mt-1 font-display text-4xl font-black">{formatUsd(data?.totalUsd ?? 0)}</div>
-      </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
@@ -136,125 +83,11 @@ function FinancePage() {
         ))}
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {(data?.balances ?? []).filter((b) => b.usdValue >= 0.01).map((b) => (
-          <div key={b.asset} className="glass card-3d rounded-2xl p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">{b.asset}</span>
-              <span className="font-display text-lg font-black text-primary">{formatUsd(b.usdValue)}</span>
-            </div>
-          </div>
-        ))}
-      </div>
 
       <ManualCredit />
 
       <ProfitsAnalytics />
 
-      <Tabs defaultValue="ledger" className="mt-10">
-        <TabsList>
-          <TabsTrigger value="ledger">{t("سجل المستخدمين")}</TabsTrigger>
-          <TabsTrigger value="deposits">
-            <ArrowDownToLine className="size-4" /> {t("الإيداعات")} </TabsTrigger>
-          <TabsTrigger value="withdrawals">
-            <ArrowUpFromLine className="size-4" /> {t("السحوبات")} </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="ledger" className="mt-6 grid gap-3">
-          {(ledger.data ?? []).length === 0 && <p className="text-sm text-muted-foreground">{t("لا عمليات بعد.")}</p>}
-          {(ledger.data ?? []).map((r) => (
-            <div key={r.id} className="glass rounded-2xl p-4">
-              <div className="flex flex-wrap items-center gap-3">
-                <Badge variant={r.kind === "إيداع" ? "default" : "secondary"}>{r.kind}</Badge>
-                <span className="font-bold">{r.name}</span>
-                <span className="text-xs text-muted-foreground">{r.email}</span>
-                <span className="ms-auto font-display font-black">{formatUsd(r.amount)}</span>
-              </div>
-              <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted-foreground">
-                <span>{r.status === "completed" ? t("مكتمل") : r.status === "rejected" ? t("مرفوض") : t("قيد الانتظار")}</span>
-                <code className="truncate" dir="ltr">{r.ref}</code>
-                <span className="ms-auto">{formatDate(r.at)}</span>
-              </div>
-            </div>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="deposits" className="mt-6 grid gap-3">
-          {(data?.deposits ?? []).length === 0 && (
-            <p className="text-sm text-muted-foreground">{t("لا عمليات إيداع في آخر 60 يومًا.")}</p>
-          )}
-          {(data?.deposits ?? []).map((d) => (
-            <TxRow
-              key={`${d.txId}-${d.time}`}
-              amount={d.amount}
-              coin={d.coin}
-              network={d.network}
-              address={d.address}
-              txId={d.txId}
-              time={d.time}
-              ok={d.status === 1}
-            />
-          ))}
-        </TabsContent>
-
-        <TabsContent value="withdrawals" className="mt-6 grid gap-3">
-          {(data?.withdrawals ?? []).length === 0 && (
-            <p className="text-sm text-muted-foreground">{t("لا عمليات سحب في آخر 60 يومًا.")}</p>
-          )}
-          {(data?.withdrawals ?? []).map((w) => (
-            <TxRow
-              key={`${w.txId}-${w.time}`}
-              amount={w.amount}
-              coin={w.coin}
-              network={w.network}
-              address={w.address}
-              txId={w.txId}
-              time={w.time}
-              ok={w.status === 6}
-            />
-          ))}
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-}
-
-function TxRow({
-  amount,
-  coin,
-  network,
-  address,
-  txId,
-  time,
-  ok,
-}: {
-  amount: number;
-  coin: string;
-  network: string;
-  address: string;
-  txId: string;
-  time: string;
-  ok: boolean;
-}) {
-  const { t } = useLanguage();
-  return (
-    <div className="glass rounded-2xl p-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="font-display text-lg font-black">
-          {coin === "USDT" || coin === "USDC" ? formatUsd(amount) : `${amount} ${coin}`}
-        </span>
-        <Badge variant={ok ? "default" : "secondary"}>{ok ? t("مكتمل") : t("قيد المعالجة")}</Badge>
-        <span className="text-xs text-muted-foreground">{network}</span>
-        <span className="ms-auto text-xs text-muted-foreground">{formatDate(time)}</span>
-      </div>
-      <code className="mt-2 block overflow-x-auto whitespace-nowrap rounded-lg bg-background/70 px-3 py-2 text-xs">
-        {address}
-      </code>
-      {txId && (
-        <code className="mt-1 block overflow-x-auto whitespace-nowrap text-[11px] text-muted-foreground">
-          TxID: {txId}
-        </code>
-      )}
     </div>
   );
 }
