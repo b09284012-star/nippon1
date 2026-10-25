@@ -98,32 +98,11 @@ function WalletPage() {
     },
   });
 
-  const confirmDeposit = useMutation({
-    mutationFn: async (vars: { amount: number; file: File | null }) => {
-      if (!user) throw new Error(t("دخول / تسجيل"));
-      let receiptPath: string | null = null;
-      if (vars.file) {
-        if (vars.file.size > 10 * 1024 * 1024) throw new Error(t("حجم الصورة أكبر من 10MB"));
-        const ext = vars.file.name.split(".").pop() ?? "jpg";
-        receiptPath = `${user.id}/${crypto.randomUUID()}.${ext}`;
-        const { error: upErr } = await supabase.storage
-          .from("deposit-receipts")
-          .upload(receiptPath, vars.file, vars.file.type ? { contentType: vars.file.type } : {});
-        if (upErr) throw upErr;
-      }
-      const { error } = await supabase.rpc("submit_deposit_confirmation", {
-        _amount: vars.amount,
-        ...(receiptPath ? { _receipt_path: receiptPath } : {}),
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success(t("تم إرسال تأكيد الإيداع للمراجعة"));
-      setDepAmount("");
-      setDepFile(null);
-      void qc.invalidateQueries({ queryKey: ["my-deposit-requests"] });
-    },
-    onError: (e: Error) => toast.error(e.message || "تعذر إرسال تأكيد الإيداع"),
+  const autoDeposit = useMutation({
+    mutationFn: (vars: { amountUsd: number; network: "TRC20" | "BEP20" | "ERC20" }) =>
+      createDeposit({ data: vars }),
+    onSuccess: (res) => setPayment(res),
+    onError: (e: Error) => toast.error(e.message || t("تعذر إنشاء عنوان الإيداع، حاول لاحقًا")),
   });
 
   const withdraw = useMutation({
