@@ -193,75 +193,63 @@ function WalletPage() {
           ))}
         </div>
 
-        {(() => {
-          const net = DEPOSIT_NETWORKS.find((n) => n.id === network) ?? DEPOSIT_NETWORKS[0];
-          return (
-            <div className="mt-4 rounded-2xl border border-border/60 bg-secondary/40 p-4">
-              <div className="text-xs text-muted-foreground">{t("عنوان الإيداع — USDT (")}{net.label})</div>
-              <div className="mt-2 flex items-center gap-2">
-                <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap rounded-lg bg-background/70 px-3 py-2 text-sm" dir="ltr">
-                  {net.address}
-                </code>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  aria-label={t("نسخ العنوان")}
-                  onClick={() => {
-                    void navigator.clipboard.writeText(net.address);
-                    toast.success(t("تم نسخ العنوان"));
-                  }}
-                >
-                  <Copy className="size-4" />
-                </Button>
-              </div>
-              <p className="mt-3 text-xs text-destructive">
-                {t("تأكد من الإرسال عبر شبكة")} {net.label} {t("فقط، الإرسال عبر شبكة مختلفة قد يؤدي لفقدان المبلغ.")} </p>
-            </div>
-          );
-        })()}
-
-        <div className="mt-6 border-t border-border pt-6">
-          <h3 className="font-display font-bold">{t("تأكيد الإيداع")}</h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t("بعد إرسال التحويل، أدخل القيمة وأرفق صورة سكرين التحويل، وسيراجعها الفريق ثم يُضاف المبلغ لرصيدك.")} </p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <div>
-              <Label className="mb-2 block">{t("القيمة (USDT)")}</Label>
-              <Input
-                inputMode="decimal"
-                value={depAmount}
-                onChange={(e) => setDepAmount(e.target.value.slice(0, 10))}
-                placeholder="100"
-              />
-            </div>
-            <div>
-              <Label className="mb-2 block">{t("صورة سكرين للتحويل")}</Label>
-              <Input
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={(e) => setDepFile(e.target.files?.[0] ?? null)}
-              />
-              <p className="mt-1 text-xs text-muted-foreground">{t("لقطة شاشة لإثبات التحويل (حتى 10MB).")}</p>
-            </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-[12rem_auto] sm:items-end">
+          <div>
+            <Label className="mb-2 block">{t("مبلغ الإيداع (USD)")}</Label>
+            <Input
+              inputMode="decimal"
+              value={depAmount}
+              onChange={(e) => setDepAmount(e.target.value.slice(0, 10))}
+              placeholder="100"
+            />
           </div>
           <Button
-            className="mt-4"
-            disabled={confirmDeposit.isPending}
+            disabled={autoDeposit.isPending}
             onClick={() => {
               const n = Number(depAmount);
-              if (!Number.isFinite(n) || n < 2) {
-                toast.error(t("أقل قيمة إيداع 2 USDT"));
+              if (!Number.isFinite(n) || n < 10) {
+                toast.error(t("أقل قيمة إيداع 10 USDT"));
                 return;
               }
-              if (!depFile) {
-                toast.error(t("أرفق صورة سكرين للتحويل"));
-                return;
-              }
-              confirmDeposit.mutate({ amount: n, file: depFile });
+              autoDeposit.mutate({ amountUsd: n, network: network as "TRC20" | "BEP20" | "ERC20" });
             }}
           >
-            {confirmDeposit.isPending ? t("جارٍ الإرسال…") : t("تأكيد الإيداع")}
+            {autoDeposit.isPending ? t("جارٍ التجهيز…") : t("عرض عنوان الإيداع")}
           </Button>
+        </div>
+
+        {payment && (
+          <div className="mt-4 rounded-2xl border border-border/60 bg-secondary/40 p-4">
+            <div className="text-xs text-muted-foreground">
+              {t("أرسل بالضبط")} <span dir="ltr" className="font-display font-bold text-foreground">{payment.payAmount} USDT</span> ({payment.network})
+            </div>
+            <div className="mt-2 flex items-center gap-2">
+              <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap rounded-lg bg-background/70 px-3 py-2 text-sm" dir="ltr">
+                {payment.address}
+              </code>
+              <Button
+                variant="outline"
+                size="icon"
+                aria-label={t("نسخ العنوان")}
+                onClick={() => {
+                  void navigator.clipboard.writeText(payment.address);
+                  toast.success(t("تم نسخ العنوان"));
+                }}
+              >
+                <Copy className="size-4" />
+              </Button>
+            </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              {t("سيُضاف المبلغ لرصيدك تلقائيًا بعد تأكيد الشبكة (عادة دقائق). سيُضاف للرصيد:")} {formatUsd(payment.creditedUsd)}
+            </p>
+            <p className="mt-2 text-xs text-destructive">
+              {t("تأكد من الإرسال عبر شبكة")} {payment.network} {t("فقط، الإرسال عبر شبكة مختلفة قد يؤدي لفقدان المبلغ.")}
+            </p>
+          </div>
+        )}
+
+        <div className="mt-6 border-t border-border pt-6">
+          <h3 className="font-display font-bold">{t("طلبات الإيداع السابقة")}</h3>
 
           <div className="mt-6 divide-y divide-border/60 rounded-2xl border border-border/60">
             {(deposits.data ?? []).length === 0 && (
