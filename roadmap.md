@@ -13,3 +13,7 @@
 - [x] Give company offers a distinct presentation and exclude them from regular market/home feeds.
 - [x] Verify company profile saving and inventory separation with a temporary offer and logo, then remove test data.
 - [x] Cancel the deposit request UI: wallet restored to the previous deposit flow (network buttons, address, amount + screenshot confirmation).
+- [ ] Enforce country isolation for forum rooms and private chats, preserving assigned staff access.
+- [ ] Add manager-assigned forum/dispute administrators with restricted dashboards and secure moderation.
+- [ ] Add bilingual About page with at least 150 substantive lines and footer link.
+- [ ] Test permissions, country boundaries, and the visible administration/community flows.
