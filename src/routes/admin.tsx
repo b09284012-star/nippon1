@@ -16,6 +16,7 @@ import { useOnlineKeys } from "@/lib/presence";
 import { cn } from "@/lib/utils";
 import { useServerFn } from "@tanstack/react-start";
 import { adminAccountAction, adminListBans } from "@/lib/account.functions";
+import { ForumModeration } from "@/components/site/ForumModeration";
 
 function AccountActions({ userId, bannedUntil, onDone }: { userId: string; bannedUntil?: string | undefined; onDone: () => void }) {
   const { t } = useLanguage();
@@ -86,7 +87,7 @@ function AdminPage() {
   const [wdFilter, setWdFilter] = useState("all");
   const [dsSearch, setDsSearch] = useState("");
   const [dsFilter, setDsFilter] = useState("all");
-  const { user, isAdmin, loading } = useAuth();
+  const { user, isAdmin, canModerateForum, canManageDisputes, loading, refreshProfile } = useAuth();
   const navigate = useNavigate();
 
   const withdrawals = useQuery({
@@ -137,22 +138,37 @@ function AdminPage() {
   const onlineKeys = useOnlineKeys(isAdmin);
 
   const [q, setQ] = useState("");
+  const assignments = useQuery({ queryKey: ["staff-assignments", user?.id], enabled: isAdmin, queryFn: async () => {
+    const { data, error } = await supabase.from("staff_assignments").select("user_id,responsibility");
+    if (error) throw error;
+    return data ?? [];
+  } });
+  const disputeNames = useQuery({ queryKey: ["dispute-names", user?.id], enabled: canManageDisputes, queryFn: async () => {
+    const { data, error } = await supabase.from("disputes").select("orders(buyer_id,seller_id)");
+    if (error) throw error;
+    const ids = [...new Set((data ?? []).flatMap(d => d.orders ? [d.orders.buyer_id, d.orders.seller_id] : []))];
+    if (!ids.length) return [];
+    const result = await supabase.rpc("public_profile_names", { _ids: ids });
+    if (result.error) throw result.error;
+    return result.data ?? [];
+  } });
 
   const disputes = useQuery({
     queryKey: ["admin-disputes"],
-    enabled: isAdmin,
+    enabled: canManageDisputes,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("disputes")
         .select("*, orders(amount, buyer_id, seller_id, status)")
         .order("created_at", { ascending: false });
+      if (error) throw error;
       return data ?? [];
     },
   });
 
   if (loading) return <div className="px-4 py-20 text-center text-muted-foreground">{t("جارٍ التحميل…")}</div>;
 
-  if (!user || !isAdmin) {
+  if (!user || !(isAdmin || canModerateForum || canManageDisputes)) {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
         <h1 className="font-display text-2xl font-black">{t("لوحة الإدارة")}</h1>
@@ -166,7 +182,7 @@ function AdminPage() {
 
   const nameOf = (id?: string | null) => {
     const u = (users.data ?? []).find((x: { id: string }) => x.id === id) as { display_name?: string; email?: string | null } | undefined;
-    return u?.display_name || u?.email || (id ? id.slice(0, 8) : "—");
+    return u?.display_name || disputeNames.data?.find(p => p.id === id)?.display_name || (id ? id.slice(0, 8) : "—");
   };
   const dsQ = dsSearch.trim().toLowerCase();
   const sortedDisputes = (disputes.data ?? [])
@@ -210,26 +226,27 @@ function AdminPage() {
         )}
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {isAdmin && <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard icon={Radio} label={t("المستخدمون المتصلون الآن")} value={String(onlineKeys.size)} live />
         <StatCard icon={Users} label={t("إجمالي المستخدمين")} value={String(users.data?.length ?? stats.data?.total_users ?? 0)} />
         <StatCard icon={UserPlus} label={t("حسابات جديدة (7 أيام)")} value={String(stats.data?.new_users_7d ?? 0)} />
         <StatCard icon={Package} label={t("العروض / الطلبات")} value={`${stats.data?.total_listings ?? 0} / ${stats.data?.total_orders ?? 0}`} />
-      </div>
+      </div>}
 
-      <Tabs defaultValue="withdrawals" className="mt-8">
+      <Tabs defaultValue={isAdmin ? "withdrawals" : canManageDisputes ? "disputes" : "forum"} className="mt-8">
         <TabsList className="flex-wrap">
-          <TabsTrigger value="withdrawals">
-            <Wallet2 className="size-4" /> {t("طلبات السحب")} </TabsTrigger>
-          <TabsTrigger value="users">
-            <Users className="size-4" /> {t("إدارة المستخدمين")} </TabsTrigger>
-          <TabsTrigger value="disputes">
-            <Gavel className="size-4" /> {t("النزاعات")} </TabsTrigger>
-          <TabsTrigger value="notify">
-            <BellRing className="size-4" /> {t("إرسال إشعار")} </TabsTrigger>
+          {isAdmin && <TabsTrigger value="withdrawals">
+            <Wallet2 className="size-4" /> {t("طلبات السحب")} </TabsTrigger>}
+          {isAdmin && <TabsTrigger value="users">
+            <Users className="size-4" /> {t("إدارة المستخدمين")} </TabsTrigger>}
+          {canManageDisputes && <TabsTrigger value="disputes">
+            <Gavel className="size-4" /> {t("النزاعات")} </TabsTrigger>}
+          {isAdmin && <TabsTrigger value="notify">
+            <BellRing className="size-4" /> {t("إرسال إشعار")} </TabsTrigger>}
+          {canModerateForum && <TabsTrigger value="forum">{t("إدارة المنتدى")}</TabsTrigger>}
         </TabsList>
 
-        <TabsContent value="withdrawals" className="mt-6 grid gap-4">
+        {isAdmin && <TabsContent value="withdrawals" className="mt-6 grid gap-4">
           <div className="grid grid-cols-[1fr_auto] gap-2">
             <Input
               className="min-w-0"
@@ -254,11 +271,11 @@ function AdminPage() {
           {sortedWithdrawals.map((w) => (
             <WithdrawalRow key={w.id} w={w} onDone={() => void withdrawals.refetch()} />
           ))}
-        </TabsContent>
+        </TabsContent>}
 
 
 
-        <TabsContent value="users" className="mt-6 grid gap-3">
+        {isAdmin && <TabsContent value="users" className="mt-6 grid gap-3">
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value.slice(0, 60))}
@@ -331,7 +348,14 @@ function AdminPage() {
                             else { toast.success(t("تم تحديث الصلاحية")); void users.refetch(); }
                           }}
                         />
-                        {t("مدير")} </label>
+                        {t("المدير العام")} </label>
+                      {(["forum", "disputes"] as const).map(responsibility => <label key={responsibility} className="flex items-center gap-2">
+                        <Switch checked={Boolean(assignments.data?.some(a => a.user_id === u.id && a.responsibility === responsibility))} onCheckedChange={async enabled => {
+                          const { error } = await supabase.rpc("assign_staff", { _user_id: u.id, _responsibility: responsibility, _enabled: enabled });
+                          if (error) toast.error(error.message);
+                          else { toast.success(t("تم تحديث الصلاحية")); void assignments.refetch(); void refreshProfile(); }
+                        }} />{t(responsibility === "forum" ? "أدمن المنتدى" : "أدمن النزاعات")}
+                      </label>)}
                     </div>
                     {u.id !== user.id && <AccountActions userId={u.id} bannedUntil={bans.data?.[u.id]} onDone={() => { void bans.refetch(); void users.refetch(); }} />}
                   </div>
@@ -339,9 +363,9 @@ function AdminPage() {
               </div>
             );
           })}
-        </TabsContent>
+        </TabsContent>}
 
-        <TabsContent value="disputes" className="mt-6 grid gap-4">
+        {canManageDisputes && <TabsContent value="disputes" className="mt-6 grid gap-4">
           <div className="grid grid-cols-[1fr_auto] gap-2">
             <Input
               className="min-w-0"
@@ -390,7 +414,8 @@ function AdminPage() {
                   <Button
                     size="sm"
                     onClick={async () => {
-                      const { error } = await supabase.rpc("release_escrow", { _order_id: d.order_id });
+                      if (!confirm(t("تأكيد حسم النزاع وتحرير المبلغ للبائع؟"))) return;
+                      const { error } = await supabase.rpc("resolve_staff_dispute", { _order_id: d.order_id, _refund: false });
                       if (error) toast.error(error.message);
                       else {
                         toast.success(t("تم تحرير المبلغ للبائع"));
@@ -403,7 +428,8 @@ function AdminPage() {
                     size="sm"
                     variant="destructive"
                     onClick={async () => {
-                      const { error } = await supabase.rpc("refund_escrow", { _order_id: d.order_id });
+                      if (!confirm(t("تأكيد حسم النزاع وإرجاع المبلغ للمشتري؟"))) return;
+                      const { error } = await supabase.rpc("resolve_staff_dispute", { _order_id: d.order_id, _refund: true });
                       if (error) toast.error(error.message);
                       else {
                         toast.success(t("تم استرجاع المبلغ للمشتري"));
@@ -416,11 +442,12 @@ function AdminPage() {
               )}
             </div>
           ))}
-        </TabsContent>
+        </TabsContent>}
 
-        <TabsContent value="notify" className="mt-6">
+        {isAdmin && <TabsContent value="notify" className="mt-6">
           <SendNotification users={(users.data ?? []) as { id: string; display_name: string; email: string | null }[]} />
-        </TabsContent>
+        </TabsContent>}
+        {canModerateForum && <TabsContent value="forum" className="mt-6"><ForumModeration /></TabsContent>}
       </Tabs>
     </div>
   );
