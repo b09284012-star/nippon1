@@ -84,6 +84,8 @@ function AdminPage() {
   const { t } = useLanguage();
   const [wdSearch, setWdSearch] = useState("");
   const [wdFilter, setWdFilter] = useState("all");
+  const [dsSearch, setDsSearch] = useState("");
+  const [dsFilter, setDsFilter] = useState("all");
   const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -162,6 +164,25 @@ function AdminPage() {
     );
   }
 
+  const nameOf = (id?: string | null) => {
+    const u = (users.data ?? []).find((x: { id: string }) => x.id === id) as { display_name?: string; email?: string | null } | undefined;
+    return u?.display_name || u?.email || (id ? id.slice(0, 8) : "—");
+  };
+  const dsQ = dsSearch.trim().toLowerCase();
+  const sortedDisputes = (disputes.data ?? [])
+    .filter((d) => dsFilter === "all" || (dsFilter === "open" ? d.status === "open" : d.status !== "open"))
+    .filter((d) =>
+      !dsQ ||
+      [d.id, d.order_id, d.opened_by, d.reason, d.orders?.buyer_id, d.orders?.seller_id, nameOf(d.orders?.buyer_id), nameOf(d.orders?.seller_id)]
+        .some((v) => String(v ?? "").toLowerCase().includes(dsQ)),
+    )
+    .sort((a, b) => {
+      const ap = a.status === "open" ? 0 : 1;
+      const bp = b.status === "open" ? 0 : 1;
+      if (ap !== bp) return ap - bp;
+      const d = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      return ap === 0 ? d : -d;
+    });
   const pendingCount = (withdrawals.data ?? []).filter((w) => w.status === "pending").length;
   const wdQ = wdSearch.trim().toLowerCase();
   const sortedWithdrawals = (withdrawals.data ?? [])
@@ -209,15 +230,15 @@ function AdminPage() {
         </TabsList>
 
         <TabsContent value="withdrawals" className="mt-6 grid gap-4">
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-[1fr_auto] gap-2">
             <Input
-              className="min-w-0 flex-1"
+              className="min-w-0"
               placeholder={t("ابحث بالمعرف أو الاسم أو البريد أو العنوان")}
               value={wdSearch}
               onChange={(e) => setWdSearch(e.target.value)}
             />
             <select
-              className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+              className="h-9 rounded-md border border-input bg-background px-2 text-sm"
               value={wdFilter}
               onChange={(e) => setWdFilter(e.target.value)}
             >
@@ -321,16 +342,38 @@ function AdminPage() {
         </TabsContent>
 
         <TabsContent value="disputes" className="mt-6 grid gap-4">
-          {(disputes.data ?? []).length === 0 && (
+          <div className="grid grid-cols-[1fr_auto] gap-2">
+            <Input
+              className="min-w-0"
+              placeholder={t("ابحث بالمعرف أو الاسم أو السبب")}
+              value={dsSearch}
+              onChange={(e) => setDsSearch(e.target.value)}
+            />
+            <select
+              className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+              value={dsFilter}
+              onChange={(e) => setDsFilter(e.target.value)}
+            >
+              <option value="all">{t("الكل")}</option>
+              <option value="open">{t("مفتوح")}</option>
+              <option value="closed">{t("مغلق")}</option>
+            </select>
+          </div>
+          {sortedDisputes.length === 0 && (
             <p className="text-sm text-muted-foreground">{t("لا نزاعات.")}</p>
           )}
-          {(disputes.data ?? []).map((d) => (
-            <div key={d.id} className="glass rounded-2xl p-5">
-              <div className="flex flex-wrap items-center gap-3">
-                <Badge variant="secondary">{d.status}</Badge>
-                <span className="text-xs text-muted-foreground">{formatDate(d.created_at)}</span>
+          {sortedDisputes.map((d) => (
+            <div key={d.id} className={cn("glass min-w-0 rounded-2xl p-4", d.status === "open" && "border-s-4 border-s-warning")}>
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant={d.status === "open" ? "default" : "secondary"}>{d.status === "open" ? t("مفتوح") : t("مغلق")}</Badge>
+                <span className="ms-auto font-display font-black">{formatUsd(Number(d.orders?.amount ?? 0))}</span>
               </div>
-              <p className="mt-2 text-sm">{d.reason}</p>
+              <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                <div className="min-w-0 rounded-lg bg-background/60 p-2"><span className="text-muted-foreground">{t("المشتري")}</span><p className="truncate font-bold">{nameOf(d.orders?.buyer_id)}</p></div>
+                <div className="min-w-0 rounded-lg bg-background/60 p-2"><span className="text-muted-foreground">{t("البائع")}</span><p className="truncate font-bold">{nameOf(d.orders?.seller_id)}</p></div>
+              </div>
+              <p className="mt-3 break-words text-sm">{d.reason}</p>
+              <p className="mt-2 text-xs text-muted-foreground">{formatDate(d.created_at)}</p>
               <Button
                 size="sm"
                 variant="outline"
@@ -403,18 +446,29 @@ function WithdrawalRow({ w, onDone }: { w: WithdrawalRowData; onDone: () => void
   const [busy, setBusy] = useState(false);
 
   return (
-    <div className="glass rounded-2xl p-5">
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="font-display font-bold">{w.display_name ?? w.email}</span>
-        <Badge variant={w.status === "pending" ? "default" : "secondary"}>
-          {t(WD_STATUS[w.status] ?? w.status)}
-        </Badge>
-        <span className="ms-auto font-display text-lg font-black">{formatUsd(w.amount)}</span>
+    <div className={cn("glass min-w-0 overflow-hidden rounded-2xl p-4", w.status === "pending" && "border-s-4 border-s-primary")}>
+      <div className="flex items-start gap-3">
+        <div className="grid size-10 shrink-0 place-items-center rounded-full bg-primary/15 font-display font-black text-primary">
+          {(w.display_name ?? w.email ?? "?").charAt(0).toUpperCase()}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-display font-bold">{w.display_name ?? w.email}</p>
+          <p className="truncate text-xs text-muted-foreground">{w.email}</p>
+        </div>
+        <div className="shrink-0 text-end">
+          <p className="font-display text-lg font-black">{formatUsd(w.amount)}</p>
+          <Badge variant={w.status === "pending" ? "default" : "secondary"}>
+            {t(WD_STATUS[w.status] ?? w.status)}
+          </Badge>
+        </div>
       </div>
-      <p className="mt-2 text-xs text-muted-foreground">{w.email}</p>
-      <code className="mt-2 block overflow-x-auto whitespace-nowrap rounded-lg bg-background/70 px-3 py-2 text-xs">
-        {w.address} · {w.network}
-      </code>
+      <div className="mt-3 rounded-lg bg-background/70 p-3">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>{t("عنوان السحب")}</span>
+          <Badge variant="outline">{w.network}</Badge>
+        </div>
+        <code dir="ltr" className="mt-1 block break-all text-xs">{w.address}</code>
+      </div>
       <p className="mt-2 text-xs text-muted-foreground">{formatDate(w.created_at)}</p>
       {w.reject_reason && <p className="mt-2 text-xs text-destructive">{t("سبب الرفض:")} {w.reject_reason}</p>}
 
