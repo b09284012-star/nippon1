@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { formatDate } from "@/lib/media";
 import { useIsOnline } from "@/lib/presence";
+import { useMyCountry } from "@/lib/my-country";
 
 export const Route = createFileRoute("/chat/")({
   head: () => ({
@@ -27,16 +28,18 @@ export const Route = createFileRoute("/chat/")({
 function ChatListPage() {
   const { t } = useLanguage();
   const { user, loading } = useAuth();
+  const { country, isAccount } = useMyCountry();
   const navigate = useNavigate();
 
   const { data: conversations } = useQuery({
-    queryKey: ["conversations", user?.id],
+    queryKey: ["conversations", user?.id, country],
     enabled: Boolean(user),
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("conversations")
         .select("*, listings(title, price_usd)")
         .order("last_message_at", { ascending: false });
+      if (error) throw error;
       const convs = data ?? [];
       if (!user || convs.length === 0) return [];
       const otherIds = [...new Set(convs.map((c) => (c.buyer_id === user.id ? c.seller_id : c.buyer_id)))];
@@ -87,6 +90,7 @@ function ChatListPage() {
       <h1 className="font-display text-3xl font-black">
         <span className="neon-text">{t("المحادثات")}</span>
       </h1>
+      {isAccount && <p className="mt-3 text-sm text-muted-foreground">{t("دردشة الدولة")}: {t(country)}</p>}
       <div className="mt-8 grid gap-3">
         {(conversations ?? []).length === 0 && (
           <div className="glass rounded-2xl p-8 text-sm text-muted-foreground">

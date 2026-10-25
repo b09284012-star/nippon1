@@ -13,6 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth";
 import { formatDate } from "@/lib/media";
 import { getMarketNews } from "@/lib/finance.functions";
+import { useMyCountry } from "@/lib/my-country";
+import { COUNTRIES } from "@/lib/countries";
 
 export const Route = createFileRoute("/forum")({
   head: () => ({
@@ -132,20 +134,25 @@ function ForumPage() {
 
 function Channel({ channel }: { channel: "general" | "announcements" }) {
   const { t } = useLanguage();
-  const { user, isAdmin, profile } = useAuth();
+  const { user, canModerateForum, profile } = useAuth();
+  const { country: accountCountry, isAccount } = useMyCountry();
+  const [selectedCountry, setSelectedCountry] = useState("");
+  const country = canModerateForum && selectedCountry ? selectedCountry : isAccount ? accountCountry : "";
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
-  const canPost = Boolean(user) && (channel === "general" || isAdmin);
+  const canPost = Boolean(user && country) && (channel === "general" || canModerateForum);
 
   const posts = useQuery({
-    queryKey: ["forum", channel, user?.id],
+    queryKey: ["forum", channel, user?.id, country],
+    enabled: Boolean(user && country),
     queryFn: async () => {
       const { data, error } = await supabase
         .from("forum_posts")
         .select("id, channel, author_id, body, created_at")
         .eq("channel", channel)
+        .eq("country", country)
         .order("created_at", { ascending: false })
         .limit(100);
       if (error) throw error;
@@ -158,8 +165,9 @@ function Channel({ channel }: { channel: "general" | "announcements" }) {
   });
 
   useEffect(() => {
+    if (!user || !country) return;
     const ch = supabase
-      .channel(`forum-${channel}`)
+      .channel(`forum-${channel}-${country}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "forum_posts", filter: `channel=eq.${channel}` },
@@ -169,7 +177,7 @@ function Channel({ channel }: { channel: "general" | "announcements" }) {
     return () => {
       void supabase.removeChannel(ch);
     };
-  }, [channel, qc]);
+  }, [channel, qc, country, user]);
 
   const submit = async () => {
     if (!user) return;
@@ -183,6 +191,7 @@ function Channel({ channel }: { channel: "general" | "announcements" }) {
       channel,
       author_id: user.id,
       body: text,
+      country,
     });
     setBusy(false);
     if (error) toast.error(error.message);
@@ -194,6 +203,13 @@ function Channel({ channel }: { channel: "general" | "announcements" }) {
 
   return (
     <div>
+      <div className="mb-5 flex flex-wrap items-center gap-3 border-b border-border pb-4">
+        <Badge variant="outline">{t("منتدى الدولة")}: {t(country || "اختر الدولة")}</Badge>
+        {canModerateForum && <select aria-label={t("إدارة منتديات الدول")} className="h-10 max-w-full rounded-md border border-input bg-background px-3 text-sm" value={selectedCountry || country} onChange={e => setSelectedCountry(e.target.value)}>
+          <option value="">{t("اختر الدولة")}</option>
+          {COUNTRIES.map(c => <option key={c} value={c}>{t(c)}</option>)}
+        </select>}
+      </div>
       {canPost ? (
         <div className="glass rounded-2xl p-4">
           <Textarea
@@ -235,7 +251,7 @@ function Channel({ channel }: { channel: "general" | "announcements" }) {
                 <Badge className="bg-accent text-accent-foreground">{t("إعلان رسمي")}</Badge>
               )}
               <span className="text-xs text-muted-foreground">{formatDate(p.created_at)}</span>
-              {(isAdmin || p.author_id === user?.id) && (
+              {(canModerateForum || p.author_id === user?.id) && (
                 <Button
                   variant="ghost"
                   size="icon"

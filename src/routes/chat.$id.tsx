@@ -39,7 +39,7 @@ function ChatRoomPage() {
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
 
-  const { data: other } = useQuery({
+  const { data: other, isPending: conversationPending } = useQuery({
     queryKey: ["conv-other", id, user?.id],
     enabled: Boolean(user),
     queryFn: async () => {
@@ -97,6 +97,8 @@ function ChatRoomPage() {
       </div>
     );
   }
+  if (user && conversationPending) return <p className="px-4 py-20 text-center text-muted-foreground">{t("جارٍ التحميل…")}</p>;
+  if (user && !other) return <div className="mx-auto max-w-3xl px-4 py-20 text-center"><h1 className="text-xl font-bold">{t("المحادثة غير متاحة")}</h1><p className="mt-3 text-muted-foreground">{t("المحادثات الخاصة متاحة داخل دولة حسابك فقط، باستثناء الإدارة المختصة.")}</p><Button className="mt-5" onClick={() => navigate({ to: "/chat" })}>{t("المحادثات")}</Button></div>;
 
   const send = async () => {
     if (!user) return;
