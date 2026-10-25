@@ -1,0 +1,10 @@
+DROP POLICY orders_disputes_staff_read ON public.orders;
+CREATE FUNCTION public.staff_disputes() RETURNS TABLE(id uuid,order_id uuid,opened_by uuid,reason text,status text,resolution text,created_at timestamptz,orders jsonb) LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path=public AS $$ BEGIN IF NOT (public.has_role(auth.uid(),'admin') OR public.has_staff(auth.uid(),'disputes')) THEN RAISE EXCEPTION 'FORBIDDEN'; END IF; RETURN QUERY SELECT d.id,d.order_id,d.opened_by,d.reason,d.status,d.resolution,d.created_at,jsonb_build_object('amount',o.amount,'buyer_id',o.buyer_id,'seller_id',o.seller_id,'status',o.status) FROM public.disputes d JOIN public.orders o ON o.id=d.order_id ORDER BY d.created_at DESC; END $$;
+REVOKE ALL ON FUNCTION public.staff_disputes() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.staff_disputes() TO authenticated;
+CREATE FUNCTION public.community_account_active() RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path=public AS $$ SELECT EXISTS(SELECT 1 FROM auth.users u WHERE u.id=auth.uid() AND (u.banned_until IS NULL OR u.banned_until<=now())); $$;
+REVOKE ALL ON FUNCTION public.community_account_active() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.community_account_active() TO authenticated;
+CREATE POLICY forum_active_account ON public.forum_posts AS RESTRICTIVE FOR ALL TO authenticated USING(public.community_account_active()) WITH CHECK(public.community_account_active());
+CREATE POLICY conversations_active_account ON public.conversations AS RESTRICTIVE FOR ALL TO authenticated USING(public.community_account_active()) WITH CHECK(public.community_account_active());
+CREATE POLICY messages_active_account ON public.messages AS RESTRICTIVE FOR ALL TO authenticated USING(public.community_account_active()) WITH CHECK(public.community_account_active());

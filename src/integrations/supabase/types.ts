@@ -826,6 +826,7 @@ export type Database = {
         Returns: undefined
       }
       can_access_conversation: { Args: { _id: string }; Returns: boolean }
+      community_account_active: { Args: never; Returns: boolean }
       company_directory: {
         Args: never
         Returns: {
@@ -984,6 +985,19 @@ export type Database = {
           _user_id: string
         }
         Returns: undefined
+      }
+      staff_disputes: {
+        Args: never
+        Returns: {
+          created_at: string
+          id: string
+          opened_by: string
+          order_id: string
+          orders: Json
+          reason: string
+          resolution: string
+          status: string
+        }[]
       }
       submit_deposit_confirmation: {
         Args: { _amount: number; _receipt_path?: string }
