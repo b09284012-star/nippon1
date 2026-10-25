@@ -188,8 +188,6 @@ function AdminPage() {
         <TabsList className="flex-wrap">
           <TabsTrigger value="withdrawals">
             <Wallet2 className="size-4" /> {t("طلبات السحب")} </TabsTrigger>
-          <TabsTrigger value="deposits">
-            <ArrowDownToLine className="size-4" /> {t("تأكيدات الإيداع")} </TabsTrigger>
           <TabsTrigger value="users">
             <Users className="size-4" /> {t("إدارة المستخدمين")} </TabsTrigger>
           <TabsTrigger value="disputes">
@@ -207,14 +205,6 @@ function AdminPage() {
           ))}
         </TabsContent>
 
-        <TabsContent value="deposits" className="mt-6 grid gap-4">
-          {(deposits.data ?? []).length === 0 && (
-            <p className="text-sm text-muted-foreground">{t("لا تأكيدات إيداع.")}</p>
-          )}
-          {(deposits.data ?? []).map((d) => (
-            <DepositRow key={d.id} d={d} onDone={() => void deposits.refetch()} />
-          ))}
-        </TabsContent>
 
 
         <TabsContent value="users" className="mt-6 grid gap-3">
