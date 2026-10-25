@@ -82,6 +82,8 @@ const WD_STATUS: Record<string, string> = {
 
 function AdminPage() {
   const { t } = useLanguage();
+  const [wdSearch, setWdSearch] = useState("");
+  const [wdFilter, setWdFilter] = useState("all");
   const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -161,6 +163,20 @@ function AdminPage() {
   }
 
   const pendingCount = (withdrawals.data ?? []).filter((w) => w.status === "pending").length;
+  const wdQ = wdSearch.trim().toLowerCase();
+  const sortedWithdrawals = (withdrawals.data ?? [])
+    .filter((w) => wdFilter === "all" || w.status === wdFilter)
+    .filter((w) =>
+      !wdQ ||
+      [w.user_id, w.id, w.display_name, w.email, w.address].some((v) => String(v ?? "").toLowerCase().includes(wdQ)),
+    )
+    .sort((a, b) => {
+      const ap = a.status === "pending" ? 0 : 1;
+      const bp = b.status === "pending" ? 0 : 1;
+      if (ap !== bp) return ap - bp;
+      const d = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      return ap === 0 ? d : -d;
+    });
   const pendingDeposits = (deposits.data ?? []).filter((d) => d.status === "pending").length;
 
   return (
@@ -193,10 +209,28 @@ function AdminPage() {
         </TabsList>
 
         <TabsContent value="withdrawals" className="mt-6 grid gap-4">
-          {(withdrawals.data ?? []).length === 0 && (
+          <div className="flex flex-wrap gap-2">
+            <Input
+              className="min-w-0 flex-1"
+              placeholder={t("ابحث بالمعرف أو الاسم أو البريد أو العنوان")}
+              value={wdSearch}
+              onChange={(e) => setWdSearch(e.target.value)}
+            />
+            <select
+              className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+              value={wdFilter}
+              onChange={(e) => setWdFilter(e.target.value)}
+            >
+              <option value="all">{t("الكل")}</option>
+              <option value="pending">{t("قيد المراجعة")}</option>
+              <option value="completed">{t("مكتمل")}</option>
+              <option value="rejected">{t("مرفوض")}</option>
+            </select>
+          </div>
+          {sortedWithdrawals.length === 0 && (
             <p className="text-sm text-muted-foreground">{t("لا طلبات سحب.")}</p>
           )}
-          {(withdrawals.data ?? []).map((w) => (
+          {sortedWithdrawals.map((w) => (
             <WithdrawalRow key={w.id} w={w} onDone={() => void withdrawals.refetch()} />
           ))}
         </TabsContent>
@@ -351,6 +385,7 @@ function AdminPage() {
 
 type WithdrawalRowData = {
   id: string;
+  user_id?: string;
   display_name: string | null;
   email: string | null;
   amount: number;
