@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth";
 import { formatUsd, formatDate } from "@/lib/media";
 import { supabase } from "@/integrations/supabase/client";
-import { getMyWallet } from "@/lib/wallet.functions";
+import { getMyWallet, createDepositAddress } from "@/lib/wallet.functions";
 
 const WITHDRAWAL_STATUS: Record<string, { label: string; variant: "secondary" | "default" | "destructive" | "outline" }> = {
   pending: { label: "قيد المراجعة", variant: "secondary" },
@@ -159,7 +159,7 @@ function WalletPage() {
       <div className="mt-8 border-t border-border pt-6">
         <h2 className="font-display text-xl font-bold">{t("إيداع كريبتو")}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          {t("اختر شبكة الإيداع، ثم أرسل USDT إلى العنوان الظاهر. يُضاف المبلغ لرصيدك بعد خصم رسوم الإيداع (1 دولار).")} </p>
+          {t("اختر الشبكة وأدخل المبلغ لعرض عنوان إيداع خاص بعمليتك. يُضاف المبلغ تلقائيًا بعد خصم رسوم الإيداع (1 دولار).")} </p>
 
         <div className="mt-4 flex flex-wrap gap-2">
           {DEPOSIT_NETWORKS.map((n) => (
@@ -167,7 +167,7 @@ function WalletPage() {
               key={n.id}
               variant={network === n.id ? "default" : "outline"}
               size="sm"
-              onClick={() => setNetwork(n.id)}
+              onClick={() => { setNetwork(n.id); setPayment(null); }}
             >
               {n.label}
             </Button>

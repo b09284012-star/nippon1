@@ -576,5 +576,14 @@
   "نجوم": "stars",
   "متصلون الآن (": "Online now (",
   "غير متصلين (": "Offline (",
-  "+ سحب": "+ withdrawals"
+  "+ سحب": "+ withdrawals",
+  "مبلغ الإيداع (USD)": "Deposit amount (USD)",
+  "أقل قيمة إيداع 10 USDT": "Minimum deposit is 10 USDT",
+  "جارٍ التجهيز…": "Preparing…",
+  "عرض عنوان الإيداع": "Show deposit address",
+  "أرسل بالضبط": "Send exactly",
+  "سيُضاف المبلغ لرصيدك تلقائيًا بعد تأكيد الشبكة (عادة دقائق). سيُضاف للرصيد:": "Your balance is credited automatically after network confirmation (usually minutes). Credited:",
+  "طلبات الإيداع السابقة": "Previous deposit requests",
+  "تعذر إنشاء عنوان الإيداع، حاول لاحقًا": "Could not create a deposit address, try again later",
+  "اختر الشبكة وأدخل المبلغ لعرض عنوان إيداع خاص بعمليتك. يُضاف المبلغ تلقائيًا بعد خصم رسوم الإيداع (1 دولار).": "Choose a network and amount to get a deposit address for your payment. It's credited automatically minus the 1 USD deposit fee."
 }
