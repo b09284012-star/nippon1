@@ -106,8 +106,8 @@ type Row = {
   name: string;
   role: "seller" | "buyer" | "admin";
   listingTitle: string;
-  price?: number;
-  last?: { body: string; attachment_type: string | null };
+  price?: number | undefined;
+  last?: { body: string; attachment_type: string | null } | undefined;
   at: string;
   mine: boolean;
 };
