@@ -159,7 +159,7 @@ function WalletPage() {
       <div className="mt-8 border-t border-border pt-6">
         <h2 className="font-display text-xl font-bold">{t("إيداع كريبتو")}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          {t("اختر الشبكة وأدخل المبلغ لعرض عنوان إيداع خاص بعمليتك. يُضاف المبلغ تلقائيًا بعد خصم رسوم الإيداع (1 دولار).")} </p>
+          {t("اختر الشبكة وأدخل المبلغ لعرض عنوان إيداع خاص بعمليتك. يُضاف المبلغ تلقائيًا بعد خصم رسوم الإيداع (1.5 دولار).")} </p>
 
         <div className="mt-4 flex flex-wrap gap-2">
           {DEPOSIT_NETWORKS.map((n) => (
@@ -221,7 +221,12 @@ function WalletPage() {
               </Button>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              {t("سيُضاف المبلغ لرصيدك تلقائيًا بعد تأكيد الشبكة (عادة دقائق). سيُضاف للرصيد:")} {formatUsd(payment.creditedUsd)}
+              {t("سيُضاف المبلغ لرصيدك تلقائيًا بعد تأكيد الشبكة (عادة دقائق).")}
+              <span className="mt-2 block text-sm text-foreground">
+                {t("رسوم الإيداع:")} <span dir="ltr" className="font-bold">{formatUsd(payment.feeUsd)}</span>
+                {" — "}
+                {t("سيصبح في محفظتك:")} <span dir="ltr" className="font-display font-bold text-primary">{formatUsd(payment.creditedUsd)}</span>
+              </span>
             </p>
             <p className="mt-2 text-xs text-destructive">
               {t("تأكد من الإرسال عبر شبكة")} {payment.network} {t("فقط، الإرسال عبر شبكة مختلفة قد يؤدي لفقدان المبلغ.")}
