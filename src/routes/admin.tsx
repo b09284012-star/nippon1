@@ -144,9 +144,12 @@ function AdminPage() {
     return data ?? [];
   } });
   const disputeNames = useQuery({ queryKey: ["dispute-names", user?.id], enabled: canManageDisputes, queryFn: async () => {
-    const { data, error } = await supabase.from("disputes").select("orders(buyer_id,seller_id)");
+    const { data, error } = await supabase.rpc("staff_disputes");
     if (error) throw error;
-    const ids = [...new Set((data ?? []).flatMap(d => d.orders ? [d.orders.buyer_id, d.orders.seller_id] : []))];
+    const ids = [...new Set((data ?? []).flatMap(d => {
+      const order = d.orders as { buyer_id: string; seller_id: string } | null;
+      return order ? [order.buyer_id, order.seller_id] : [];
+    }))];
     if (!ids.length) return [];
     const result = await supabase.rpc("public_profile_names", { _ids: ids });
     if (result.error) throw result.error;
@@ -154,15 +157,12 @@ function AdminPage() {
   } });
 
   const disputes = useQuery({
-    queryKey: ["admin-disputes"],
+    queryKey: ["admin-disputes", user?.id],
     enabled: canManageDisputes,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("disputes")
-        .select("*, orders(amount, buyer_id, seller_id, status)")
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.rpc("staff_disputes");
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []).map(d => ({ ...d, orders: d.orders as { amount: number; buyer_id: string; seller_id: string; status: string } | null }));
     },
   });
 
