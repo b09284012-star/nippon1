@@ -38,7 +38,7 @@ describe.skipIf(!enabled)("community database authorization", () => {
     if (!listing.ok) throw new Error("Listing fixture failed");
     listingId = listing.data[0].id;
     const conv = await as(users[1], "/rest/v1/conversations", "POST", { listing_id: listingId, buyer_id: users[1].id, seller_id: users[0].id });
-    if (!conv.ok) throw new Error("Conversation fixture failed");
+    if (!conv.ok) throw new Error(`Conversation fixture failed: ${conv.data?.message ?? conv.status}`);
     conversationId = conv.data[0].id;
     const post = await as(users[0], "/rest/v1/forum_posts", "POST", { author_id: users[0].id, channel: "general", body: "Temporary country boundary test", country: "مصر" });
     if (!post.ok) throw new Error("Forum fixture failed");
