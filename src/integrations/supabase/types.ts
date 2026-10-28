@@ -517,18 +517,21 @@ export type Database = {
       staff_assignments: {
         Row: {
           assigned_by: string
+          country: string | null
           created_at: string
           responsibility: string
           user_id: string
         }
         Insert: {
           assigned_by: string
+          country?: string | null
           created_at?: string
           responsibility: string
           user_id: string
         }
         Update: {
           assigned_by?: string
+          country?: string | null
           created_at?: string
           responsibility?: string
           user_id?: string
@@ -821,11 +824,19 @@ export type Database = {
         Args: { _id: string; _tx_hash?: string }
         Returns: undefined
       }
+      assign_dispute_supervisor: {
+        Args: { _country: string; _enabled: boolean; _user_id: string }
+        Returns: undefined
+      }
       assign_staff: {
         Args: { _enabled: boolean; _responsibility: string; _user_id: string }
         Returns: undefined
       }
       can_access_conversation: { Args: { _id: string }; Returns: boolean }
+      can_supervise_dispute: {
+        Args: { _order_id: string; _user_id: string }
+        Returns: boolean
+      }
       community_account_active: { Args: never; Returns: boolean }
       company_directory: {
         Args: never
