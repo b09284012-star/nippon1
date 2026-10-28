@@ -37,7 +37,7 @@ describe.skipIf(!enabled)("community database authorization", () => {
     const listing = await call("/rest/v1/listings", adminKey, "POST", { seller_id: users[0].id, title: "Temporary community test", brand: "Test", model: "Test", hashrate: "1", power_watts: 1, condition: "Test", price_usd: 10, warranty_months: 1, description: "Temporary permission test only", images: [] });
     if (!listing.ok) throw new Error("Listing fixture failed");
     listingId = listing.data[0].id;
-    const conv = await as(users[1], "/rest/v1/conversations", "POST", { listing_id: listingId, buyer_id: users[1].id, seller_id: users[0].id });
+    const conv = await call("/rest/v1/conversations", adminKey, "POST", { listing_id: listingId, buyer_id: users[1].id, seller_id: users[0].id });
     if (!conv.ok) throw new Error(`Conversation fixture failed: ${conv.data?.message ?? conv.status}`);
     conversationId = conv.data[0].id;
     const post = await as(users[0], "/rest/v1/forum_posts", "POST", { author_id: users[0].id, channel: "general", body: "Temporary country boundary test", country: "مصر" });
