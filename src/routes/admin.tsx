@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { useServerFn } from "@tanstack/react-start";
 import { adminAccountAction, adminListBans } from "@/lib/account.functions";
 import { ForumModeration } from "@/components/site/ForumModeration";
+import { DisputeSupervisorControl } from "@/components/site/DisputeSupervisorControl";
 
 function AccountActions({ userId, bannedUntil, onDone }: { userId: string; bannedUntil?: string | undefined; onDone: () => void }) {
   const { t } = useLanguage();
@@ -139,7 +140,7 @@ function AdminPage() {
 
   const [q, setQ] = useState("");
   const assignments = useQuery({ queryKey: ["staff-assignments", user?.id], enabled: isAdmin, queryFn: async () => {
-    const { data, error } = await supabase.from("staff_assignments").select("user_id,responsibility");
+    const { data, error } = await supabase.from("staff_assignments").select("user_id,responsibility,country");
     if (error) throw error;
     return data ?? [];
   } });
@@ -162,7 +163,7 @@ function AdminPage() {
     queryFn: async () => {
       const { data, error } = await supabase.rpc("staff_disputes");
       if (error) throw error;
-      return (data ?? []).map(d => ({ ...d, orders: d.orders as { amount: number; buyer_id: string; seller_id: string; status: string } | null }));
+      return (data ?? []).map(d => ({ ...d, orders: d.orders as { amount: number; buyer_id: string; seller_id: string; status: string; country: string | null } | null }));
     },
   });
 
@@ -349,13 +350,20 @@ function AdminPage() {
                           }}
                         />
                         {t("المدير العام")} </label>
-                      {(["forum", "disputes"] as const).map(responsibility => <label key={responsibility} className="flex items-center gap-2">
+                      {(["forum"] as const).map(responsibility => <label key={responsibility} className="flex items-center gap-2">
                         <Switch checked={Boolean(assignments.data?.some(a => a.user_id === u.id && a.responsibility === responsibility))} onCheckedChange={async enabled => {
                           const { error } = await supabase.rpc("assign_staff", { _user_id: u.id, _responsibility: responsibility, _enabled: enabled });
                           if (error) toast.error(error.message);
                           else { toast.success(t("تم تحديث الصلاحية")); void assignments.refetch(); void refreshProfile(); }
-                        }} />{t(responsibility === "forum" ? "أدمن المنتدى" : "أدمن النزاعات")}
+                        }} />{t("أدمن المنتدى")}
                       </label>)}
+                      <DisputeSupervisorControl
+                        key={`${u.id}-${assignments.data?.find(a => a.user_id === u.id && a.responsibility === "disputes")?.country ?? ""}`}
+                        userId={u.id}
+                        enabled={Boolean(assignments.data?.some(a => a.user_id === u.id && a.responsibility === "disputes"))}
+                        country={assignments.data?.find(a => a.user_id === u.id && a.responsibility === "disputes")?.country ?? null}
+                        onDone={() => { void assignments.refetch(); void refreshProfile(); }}
+                      />
                     </div>
                     {u.id !== user.id && <AccountActions userId={u.id} bannedUntil={bans.data?.[u.id]} onDone={() => { void bans.refetch(); void users.refetch(); }} />}
                   </div>
@@ -390,6 +398,7 @@ function AdminPage() {
             <div key={d.id} className={cn("glass min-w-0 rounded-2xl p-4", d.status === "open" && "border-s-4 border-s-warning")}>
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant={d.status === "open" ? "default" : "secondary"}>{d.status === "open" ? t("مفتوح") : t("مغلق")}</Badge>
+                {d.orders?.country && <Badge variant="outline">{t(d.orders.country)}</Badge>}
                 <span className="ms-auto font-display font-black">{formatUsd(Number(d.orders?.amount ?? 0))}</span>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2 text-xs">

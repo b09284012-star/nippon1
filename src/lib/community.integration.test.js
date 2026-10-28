@@ -13,7 +13,7 @@ describe.skipIf(!enabled)("community database authorization", () => {
   const call = async (path, key, method = "GET", body, token) => {
     const response = await fetch(`${url}${path}`, { method, headers: {
       apikey: key, ...(token ? { Authorization: `Bearer ${token}` } : key?.startsWith("sb_") ? {} : { Authorization: `Bearer ${key}` }),
-      "Content-Type": "application/json", Prefer: "return=representation",
+       "Content-Type": "application/json", Prefer: "return=representation,resolution=merge-duplicates",
     }, ...(body ? { body: JSON.stringify(body) } : {}) });
     const text = await response.text();
     return { ok: response.ok, status: response.status, data: text ? JSON.parse(text) : null };
@@ -37,8 +37,8 @@ describe.skipIf(!enabled)("community database authorization", () => {
     const listing = await call("/rest/v1/listings", adminKey, "POST", { seller_id: users[0].id, title: "Temporary community test", brand: "Test", model: "Test", hashrate: "1", power_watts: 1, condition: "Test", price_usd: 10, warranty_months: 1, description: "Temporary permission test only", images: [] });
     if (!listing.ok) throw new Error("Listing fixture failed");
     listingId = listing.data[0].id;
-    const conv = await as(users[1], "/rest/v1/conversations", "POST", { listing_id: listingId, buyer_id: users[1].id, seller_id: users[0].id });
-    if (!conv.ok) throw new Error("Conversation fixture failed");
+    const conv = await call("/rest/v1/conversations", adminKey, "POST", { listing_id: listingId, buyer_id: users[1].id, seller_id: users[0].id });
+    if (!conv.ok) throw new Error(`Conversation fixture failed: ${conv.data?.message ?? conv.status}`);
     conversationId = conv.data[0].id;
     const post = await as(users[0], "/rest/v1/forum_posts", "POST", { author_id: users[0].id, channel: "general", body: "Temporary country boundary test", country: "مصر" });
     if (!post.ok) throw new Error("Forum fixture failed");
@@ -83,5 +83,29 @@ describe.skipIf(!enabled)("community database authorization", () => {
     expect((await as(users[2], `/rest/v1/conversations?id=eq.${conversationId}`)).data).toEqual([]);
     expect((await as(users[2], "/rest/v1/rpc/staff_disputes", "POST", {})).ok).toBe(true);
     expect((await as(users[2], "/rest/v1/rpc/admin_users_full", "POST", {})).ok).toBe(false);
+  });
+  test("dispute supervisors cannot access orders from another assigned country", async () => {
+    const order = await call("/rest/v1/orders", adminKey, "POST", { listing_id: listingId, buyer_id: users[1].id, seller_id: users[0].id, amount: 10, fee: 0.5, shipping_address: "Temporary test", status: "disputed" });
+    expect(order.ok).toBe(true);
+    const orderId = order.data[0].id;
+    let disputeId;
+    try {
+      const dispute = await call("/rest/v1/disputes", adminKey, "POST", { order_id: orderId, opened_by: users[1].id, reason: "Temporary country test" });
+      expect(dispute.ok).toBe(true);
+      disputeId = dispute.data[0].id;
+      await call(`/rest/v1/staff_assignments?user_id=eq.${users[2].id}&responsibility=eq.disputes`, adminKey, "PATCH", { country: "مصر" });
+      expect((await as(users[2], "/rest/v1/rpc/can_supervise_dispute", "POST", { _user_id: users[2].id, _order_id: orderId })).data).toBe(false);
+      expect((await as(users[2], `/rest/v1/disputes?id=eq.${disputeId}`)).data).toEqual([]);
+      expect((await as(users[2], `/rest/v1/conversations?id=eq.${conversationId}`)).data).toEqual([]);
+      expect((await as(users[2], "/rest/v1/rpc/admin_dispute_conversation", "POST", { _order_id: orderId })).ok).toBe(false);
+      expect((await as(users[2], "/rest/v1/rpc/resolve_staff_dispute", "POST", { _order_id: orderId, _refund: true })).ok).toBe(false);
+      await call(`/rest/v1/staff_assignments?user_id=eq.${users[2].id}&responsibility=eq.disputes`, adminKey, "PATCH", { country: "ليبيا" });
+      expect((await as(users[2], "/rest/v1/rpc/can_supervise_dispute", "POST", { _user_id: users[2].id, _order_id: orderId })).data).toBe(true);
+      expect((await as(users[2], "/rest/v1/rpc/staff_disputes", "POST", {})).data.some(d => d.id === disputeId)).toBe(true);
+      expect((await as(users[2], `/rest/v1/conversations?id=eq.${conversationId}`)).data.length).toBe(1);
+    } finally {
+      if (disputeId) await call(`/rest/v1/disputes?id=eq.${disputeId}`, adminKey, "DELETE");
+      await call(`/rest/v1/orders?id=eq.${orderId}`, adminKey, "DELETE");
+    }
   });
 });

@@ -20,4 +20,5 @@
 - The retired company URL redirects to the marketplace; company records and separated inventory remain intact, but no company management controls are shown.
 - Manager privileges remain in user_roles; delegated duties use staff_assignments with manager-only assignment RPCs so forum/dispute staff never inherit private user or financial access.
 - Country boundaries for forums, conversations, messages and attachments are enforced by database policies using registration country, not browser filters; dispute staff access is limited to dispute conversations.
+- Dispute supervisor assignments carry a manager-selected country; a shared database authorization helper scopes dispute reads, resolution and chat access by the seller's registration country, with manager access preserved globally.
 - About content is bilingual structured editorial data, rendered as separate substantive paragraphs rather than artificial blank lines.
