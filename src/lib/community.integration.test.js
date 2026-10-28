@@ -13,7 +13,7 @@ describe.skipIf(!enabled)("community database authorization", () => {
   const call = async (path, key, method = "GET", body, token) => {
     const response = await fetch(`${url}${path}`, { method, headers: {
       apikey: key, ...(token ? { Authorization: `Bearer ${token}` } : key?.startsWith("sb_") ? {} : { Authorization: `Bearer ${key}` }),
-      "Content-Type": "application/json", Prefer: "return=representation",
+       "Content-Type": "application/json", Prefer: "return=representation,resolution=merge-duplicates",
     }, ...(body ? { body: JSON.stringify(body) } : {}) });
     const text = await response.text();
     return { ok: response.ok, status: response.status, data: text ? JSON.parse(text) : null };
