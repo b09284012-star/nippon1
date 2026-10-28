@@ -17,3 +17,4 @@
 - [ ] Add manager-assigned forum/dispute administrators with restricted dashboards and secure moderation.
 - [ ] Add bilingual About page with at least 150 substantive lines and footer link.
 - [ ] Test permissions, country boundaries, and the visible administration/community flows.
+- [ ] Add manager-selected country for dispute supervisors and verify country-scoped access.
