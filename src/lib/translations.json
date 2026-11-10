@@ -779,5 +779,9 @@
   "المحادثات الخاصة متاحة داخل دولة حسابك فقط، باستثناء الإدارة المختصة.": "Private conversations are available within your account country only, except for authorized administration.",
   "حساب الإدارة محمي؛ راجع المدير": "Staff account protected; contact the main manager",
   "من نحن | Nippon": "About us | Nippon",
-  "تعرف على نيبون، أهداف سوق أجهزة التعدين المستعملة، حماية المشتري، مجتمع الدول، والخصوصية.": "Learn about Nippon, its used mining marketplace, buyer protection, country communities, and privacy."
+  "تعرف على نيبون، أهداف سوق أجهزة التعدين المستعملة، حماية المشتري، مجتمع الدول، والخصوصية.": "Learn about Nippon, its used mining marketplace, buyer protection, country communities, and privacy.",
+  "رسوم الإيداع 1% من المبلغ، ورسوم البيع 5% تُخصم عند تحرير المبلغ للبائع.": "Deposit fee is 1% of the amount, and the 5% sale fee is deducted when funds are released to the seller.",
+  "اختر الشبكة وأدخل المبلغ لعرض عنوان إيداع خاص بعمليتك. يُضاف المبلغ تلقائيًا بعد خصم رسوم الإيداع (1%).": "Choose a network and enter the amount to get a deposit address for your transaction. The amount is credited automatically after the 1% deposit fee.",
+  "رسوم الإيداع (1%):": "Deposit fee (1%):",
+  "تنبيه: رسوم الإيداع 1% هي رسوم بوابة الدفع وشبكة التحويل، ولا تعود للمنصة.": "Note: the 1% deposit fee covers the payment gateway and transfer network costs. It does not go to the platform."
 }
