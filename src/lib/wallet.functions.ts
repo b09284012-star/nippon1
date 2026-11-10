@@ -4,7 +4,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const NOWPAYMENTS_API = "https://api.nowpayments.io/v1";
 
-export const DEPOSIT_FEE_USD = 1.5;
+/** Deposit fee: 1% covering payment gateway + network costs (not platform revenue). */
+export const DEPOSIT_FEE_RATE = 0.01;
+export const depositFee = (amount: number) => Math.round(amount * DEPOSIT_FEE_RATE * 100) / 100;
 export const SALE_FEE_RATE = 0.05;
 
 /** Wallet + transactions for the signed-in user. */
@@ -100,7 +102,7 @@ export const createDepositAddress = createServerFn({ method: "POST" })
       payAmount: Math.max(data.amountUsd, Number(payment.pay_amount) || 0) === data.amountUsd ? data.amountUsd : Math.ceil(Number(payment.pay_amount) * 100) / 100,
       network: data.network,
       paymentId: String(payment.payment_id),
-      feeUsd: DEPOSIT_FEE_USD,
-      creditedUsd: Math.max(data.amountUsd - DEPOSIT_FEE_USD, 0),
+      feeUsd: depositFee(data.amountUsd),
+      creditedUsd: Math.max(data.amountUsd - depositFee(data.amountUsd), 0),
     };
   });
