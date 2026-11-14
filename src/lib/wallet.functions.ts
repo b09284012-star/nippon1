@@ -1,12 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { depositFee } from "@/lib/deposit-calculation";
+export { DEPOSIT_FEE_RATE, depositFee } from "@/lib/deposit-calculation";
 
 const NOWPAYMENTS_API = "https://api.nowpayments.io/v1";
 
 /** Deposit fee: 1% covering payment gateway + network costs (not platform revenue). */
-export const DEPOSIT_FEE_RATE = 0.01;
-export const depositFee = (amount: number) => Math.round(amount * DEPOSIT_FEE_RATE * 100) / 100;
 export const SALE_FEE_RATE = 0.05;
 
 /** Wallet + transactions for the signed-in user. */
@@ -66,6 +66,13 @@ export const createDepositAddress = createServerFn({ method: "POST" })
 
     const orderId = `${wallet.deposit_tag}-${Date.now()}`;
     const origin = process.env["PUBLIC_SITE_URL"] || SITE_URL;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: attempt, error: attemptError } = await supabaseAdmin.from("deposit_history").insert({
+      user_id: userId, order_id: orderId, network: data.network,
+      gross_amount: data.amountUsd, fee_amount: depositFee(data.amountUsd),
+      net_amount: data.amountUsd - depositFee(data.amountUsd),
+    }).select("id").single();
+    if (attemptError || !attempt) throw new Error("تعذر تسجيل الإيداع");
 
     const res = await fetch(`${NOWPAYMENTS_API}/payment`, {
       method: "POST",
@@ -81,6 +88,7 @@ export const createDepositAddress = createServerFn({ method: "POST" })
     });
 
     if (!res.ok) {
+      await supabaseAdmin.from("deposit_history").update({ status: "failed" }).eq("id", attempt.id);
       const body = await res.text();
       console.error("nowpayments create payment failed", res.status, body);
       if (body.toLowerCase().includes("less than minimal")) {
@@ -96,7 +104,13 @@ export const createDepositAddress = createServerFn({ method: "POST" })
       pay_currency: string;
     };
 
+    if (!payment.pay_address || !payment.payment_id) throw new Error("تعذر إنشاء عنوان الإيداع، حاول لاحقًا");
+    const { error: savedError } = await supabaseAdmin.from("deposit_history").update({
+      payment_id: String(payment.payment_id), address: payment.pay_address, status: "pending",
+    }).eq("id", attempt.id);
+    if (savedError) throw new Error("تعذر تسجيل الإيداع");
     return {
+      id: attempt.id,
       address: payment.pay_address,
       // Show the full requested amount; the gateway's small conversion gap is covered by our deposit fee.
       payAmount: Math.max(data.amountUsd, Number(payment.pay_amount) || 0) === data.amountUsd ? data.amountUsd : Math.ceil(Number(payment.pay_amount) * 100) / 100,
