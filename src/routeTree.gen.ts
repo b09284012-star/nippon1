@@ -25,6 +25,7 @@ import { Route as ProfitsRouteImport } from './routes/profits'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as WalletRouteImport } from './routes/wallet'
+import { Route as AuthenticatedDepositHistoryRouteImport } from './routes/_authenticated/deposit-history'
 import { Route as ChatIndexRouteImport } from './routes/chat.index'
 import { Route as ChatIdRouteImport } from './routes/chat.$id'
 import { Route as AuthenticatedListingsIdRouteImport } from './routes/_authenticated/listings.$id'
@@ -109,6 +110,12 @@ const WalletRoute = WalletRouteImport.update({
   path: '/wallet',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDepositHistoryRoute =
+  AuthenticatedDepositHistoryRouteImport.update({
+    id: '/deposit-history',
+    path: '/deposit-history',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ChatIndexRoute = ChatIndexRouteImport.update({
   id: '/chat/',
   path: '/chat/',
@@ -146,6 +153,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRoute
+  '/deposit-history': typeof AuthenticatedDepositHistoryRoute
   '/chat/$id': typeof ChatIdRoute
   '/chat/': typeof ChatIndexRoute
   '/listings/$id': typeof AuthenticatedListingsIdRoute
@@ -167,6 +175,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRoute
+  '/deposit-history': typeof AuthenticatedDepositHistoryRoute
   '/chat/$id': typeof ChatIdRoute
   '/chat': typeof ChatIndexRoute
   '/listings/$id': typeof AuthenticatedListingsIdRoute
@@ -190,6 +199,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sell': typeof SellRoute
   '/wallet': typeof WalletRoute
+  '/_authenticated/deposit-history': typeof AuthenticatedDepositHistoryRoute
   '/chat/$id': typeof ChatIdRoute
   '/chat/': typeof ChatIndexRoute
   '/_authenticated/listings/$id': typeof AuthenticatedListingsIdRoute
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sell'
     | '/wallet'
+    | '/deposit-history'
     | '/chat/$id'
     | '/chat/'
     | '/listings/$id'
@@ -234,6 +245,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sell'
     | '/wallet'
+    | '/deposit-history'
     | '/chat/$id'
     | '/chat'
     | '/listings/$id'
@@ -256,6 +268,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sell'
     | '/wallet'
+    | '/_authenticated/deposit-history'
     | '/chat/$id'
     | '/chat/'
     | '/_authenticated/listings/$id'
@@ -398,6 +411,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WalletRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/deposit-history': {
+      id: '/_authenticated/deposit-history'
+      path: '/deposit-history'
+      fullPath: '/deposit-history'
+      preLoaderRoute: typeof AuthenticatedDepositHistoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/chat/': {
       id: '/chat/'
       path: '/chat'
@@ -430,10 +450,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDepositHistoryRoute: typeof AuthenticatedDepositHistoryRoute
   AuthenticatedListingsIdRoute: typeof AuthenticatedListingsIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDepositHistoryRoute: AuthenticatedDepositHistoryRoute,
   AuthenticatedListingsIdRoute: AuthenticatedListingsIdRoute,
 }
 
