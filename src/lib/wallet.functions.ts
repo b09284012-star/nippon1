@@ -1,12 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { depositFee } from "@/lib/deposit-calculation";
+export { DEPOSIT_FEE_RATE, depositFee } from "@/lib/deposit-calculation";
 
 const NOWPAYMENTS_API = "https://api.nowpayments.io/v1";
 
 /** Deposit fee: 1% covering payment gateway + network costs (not platform revenue). */
-export const DEPOSIT_FEE_RATE = 0.01;
-export const depositFee = (amount: number) => Math.round(amount * DEPOSIT_FEE_RATE * 100) / 100;
 export const SALE_FEE_RATE = 0.05;
 
 /** Wallet + transactions for the signed-in user. */
