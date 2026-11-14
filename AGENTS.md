@@ -22,3 +22,6 @@
 - Country boundaries for forums, conversations, messages and attachments are enforced by database policies using registration country, not browser filters; dispute staff access is limited to dispute conversations.
 - Dispute supervisor assignments carry a manager-selected country; a shared database authorization helper scopes dispute reads, resolution and chat access by the seller's registration country, with manager access preserved globally.
 - About content is bilingual structured editorial data, rendered as separate substantive paragraphs rather than artificial blank lines.
+
+- Deposit lifecycle records are owner-readable and service-written; signed provider completion credits atomically and deduplicates by payment reference to prevent duplicate balances.
+- Deposit analytics use the injected event tracker without personal identifiers; completion is observed from persisted provider-confirmed records, not payment-address creation.

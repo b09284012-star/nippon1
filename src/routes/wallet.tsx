@@ -1,5 +1,5 @@
 import { t, useLanguage, numberLocale } from "@/lib/i18n";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth";
 import { formatUsd, formatDate } from "@/lib/media";
 import { supabase } from "@/integrations/supabase/client";
+import { depositFee } from "@/lib/deposit-calculation";
 import { getMyWallet, createDepositAddress } from "@/lib/wallet.functions";
 
 const WITHDRAWAL_STATUS: Record<string, { label: string; variant: "secondary" | "default" | "destructive" | "outline" }> = {
@@ -103,7 +104,7 @@ function WalletPage() {
   const autoDeposit = useMutation({
     mutationFn: (vars: { amountUsd: number; network: "TRC20" | "BEP20" | "ERC20" }) =>
       createDeposit({ data: vars }),
-    onSuccess: (res) => setPayment(res),
+    onSuccess: (res) => { setPayment(res); void qc.invalidateQueries({ queryKey: ["deposit-history"] }); },
     onError: (e: Error) => toast.error(e.message || t("تعذر إنشاء عنوان الإيداع، حاول لاحقًا")),
   });
 
@@ -146,6 +147,7 @@ function WalletPage() {
       <p className="mt-2 text-sm text-muted-foreground">
         {t("رسوم الإيداع 1% من المبلغ، ورسوم البيع 5% تُخصم عند تحرير المبلغ للبائع.")} </p>
 
+      <Button variant="outline" className="mt-4" asChild><Link to="/deposit-history">{t("سجل الإيداعات")}</Link></Button>
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
         <Stat icon={Wallet2} label={t("الرصيد المتاح")} value={formatUsd(wallet?.balance ?? 0)} />
         <Stat icon={ShieldCheck} label={t("محجوز في الضمان")} value={formatUsd(wallet?.held ?? 0)} />
