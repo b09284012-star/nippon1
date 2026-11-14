@@ -87,6 +87,60 @@ export type Database = {
           },
         ]
       }
+      deposit_history: {
+        Row: {
+          address: string | null
+          analytics_reported: boolean
+          created_at: string
+          credited_amount: number
+          fee_amount: number
+          fee_rate: number
+          gross_amount: number
+          id: string
+          net_amount: number
+          network: string
+          order_id: string
+          payment_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          analytics_reported?: boolean
+          created_at?: string
+          credited_amount?: number
+          fee_amount: number
+          fee_rate?: number
+          gross_amount: number
+          id?: string
+          net_amount: number
+          network: string
+          order_id: string
+          payment_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          analytics_reported?: boolean
+          created_at?: string
+          credited_amount?: number
+          fee_amount?: number
+          fee_rate?: number
+          gross_amount?: number
+          id?: string
+          net_amount?: number
+          network?: string
+          order_id?: string
+          payment_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       deposit_requests: {
         Row: {
           admin_note: string | null
@@ -836,6 +890,33 @@ export type Database = {
       can_supervise_dispute: {
         Args: { _order_id: string; _user_id: string }
         Returns: boolean
+      }
+      cancel_deposit: { Args: { _id: string }; Returns: undefined }
+      claim_deposit_analytics: {
+        Args: never
+        Returns: {
+          address: string | null
+          analytics_reported: boolean
+          created_at: string
+          credited_amount: number
+          fee_amount: number
+          fee_rate: number
+          gross_amount: number
+          id: string
+          net_amount: number
+          network: string
+          order_id: string
+          payment_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "deposit_history"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       community_account_active: { Args: never; Returns: boolean }
       company_directory: {
