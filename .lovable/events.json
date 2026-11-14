@@ -1,6 +1,35 @@
 {
   "schema_version": 1,
   "events": {
+    "project.deposit_cancelled": {
+      "event_schema_version": 1,
+      "description": "User explicitly cancels a pending deposit follow-up.",
+      "privacy": {
+        "contains_pii": false,
+        "purpose": "product_analytics"
+      },
+      "properties_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "type": "number"
+          },
+          "fee": {
+            "type": "number"
+          },
+          "net_amount": {
+            "type": "number"
+          },
+          "network": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "project.deposit_completed": {
       "event_schema_version": 1,
       "description": "Provider-confirmed credited deposit is observed once by its owner.",
