@@ -12,7 +12,7 @@ export function PerformanceReporter() {
     const session = crypto.randomUUID();
     const unsubscribe = client.getQueryCache().subscribe(event => {
       if (event.type !== "observerAdded" || !["listings", "latest-listings"].includes(String(event.query.queryKey[0]))) return;
-      recordCacheResult(!event.query.isStaleByTime(120000));
+      if (!event.query.isStaleByTime(120000)) recordCacheResult(true);
     });
     let busy = false;
     const report = async () => {

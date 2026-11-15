@@ -27,3 +27,4 @@
 - Deposit analytics use the injected event tracker without personal identifiers; completion is observed from persisted provider-confirmed records, not payment-address creation.
 - Deposit fee changes apply to unsettled and future deposits; preserve settled financial records and receipts rather than rewriting historical balances.
 - Presence subscriptions require a resolved signed-in session; public home/market inventory queries use the shared traffic policy with country-separated cache keys and preserve explicit invalidation.
+- Operational performance samples are anonymous, bounded, minute-deduplicated and retained for 24 hours; manager-only summaries distinguish observed browser sockets from provider totals to avoid overstating coverage.

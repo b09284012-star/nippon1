@@ -9,6 +9,7 @@ import { ListingCard, type ListingRow } from "@/components/site/ListingCard";
 import heroMiners from "@/assets/hero-miners.jpeg.asset.json";
 import { inventoryCountry } from "@/lib/listing-access";
 import { MARKET_CACHE_OPTIONS } from "@/lib/traffic-policy";
+import { recordCacheResult, recordMarketResponse } from "@/lib/performance-monitoring";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -26,6 +27,8 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:image", content: heroMiners.url },
+      { name: "twitter:image", content: heroMiners.url },
     ],
   }),
   component: Home,
@@ -61,9 +64,15 @@ function Home() {
     ...MARKET_CACHE_OPTIONS,
     queryKey: ["latest-listings", country],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("regular_market_listing_cards", { _country: inventoryCountry(country), _limit: 6 });
-      if (error) throw error;
-      return data as unknown as ListingRow[];
+      recordCacheResult(false);
+      const start = performance.now();
+      let failed = false;
+      try {
+        const { data, error } = await supabase.rpc("regular_market_listing_cards", { _country: inventoryCountry(country), _limit: 6 });
+        if (error) throw error;
+        return data as unknown as ListingRow[];
+      } catch (error) { failed = true; throw error; }
+      finally { recordMarketResponse(performance.now() - start, failed); }
     },
   });
 

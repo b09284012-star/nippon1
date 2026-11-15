@@ -19,6 +19,7 @@ import { COUNTRIES } from "@/lib/countries";
 import { ListingCard, type ListingRow } from "@/components/site/ListingCard";
 import { inventoryCountry } from "@/lib/listing-access";
 import { MARKET_CACHE_OPTIONS } from "@/lib/traffic-policy";
+import { recordCacheResult, recordMarketResponse } from "@/lib/performance-monitoring";
 
 export const Route = createFileRoute("/market")({
   head: () => ({
@@ -50,9 +51,15 @@ function Market() {
     ...MARKET_CACHE_OPTIONS,
     queryKey: ["listings", country],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("regular_market_listing_cards", { _country: inventoryCountry(country) });
-      if (error) throw error;
-      return data as unknown as ListingRow[];
+      recordCacheResult(false);
+      const start = performance.now();
+      let failed = false;
+      try {
+        const { data, error } = await supabase.rpc("regular_market_listing_cards", { _country: inventoryCountry(country) });
+        if (error) throw error;
+        return data as unknown as ListingRow[];
+      } catch (error) { failed = true; throw error; }
+      finally { recordMarketResponse(performance.now() - start, failed); }
     },
   });
 
