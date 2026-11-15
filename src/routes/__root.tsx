@@ -20,6 +20,7 @@ import { PresenceTracker } from "@/components/site/PresenceTracker";
 import { Footer } from "@/components/site/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { LanguageInitializer } from "@/lib/i18n";
+import { PerformanceReporter } from "@/components/site/PerformanceReporter";
 
 function NotFoundComponent() {
   const { t } = useLanguage();
@@ -137,6 +138,7 @@ function RootComponent() {
           <Footer />
         </div>
         <PresenceTracker />
+        <PerformanceReporter />
         <SupportWhatsAppButton />
         <Toaster position="top-center" richColors />
       </AuthProvider>

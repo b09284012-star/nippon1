@@ -24,3 +24,4 @@
 - [x] Correct About fee to 1% and verify deposit history/receipts; live funded completion requires an actual transfer.
 - [x] Remove deposit commissions from calculations and all pages; tests and signed-in 100 USD deposit preview, cancellation, history, receipt and About verified. No funded transfer performed.
 - [x] Stop guest Realtime and cache home/market inventories for two minutes; six tests passed and browser confirmed no guest Realtime sockets, cached market revisits, and signed-in Realtime retained.
+- [x] Add manager-only aggregate operational monitoring for reporting visits, cache hit rate, observed Realtime sockets and latency alerts; nine tests passed and real guest measurements read back in manager UI without runtime errors or mobile overflow.

@@ -18,6 +18,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { adminAccountAction, adminListBans } from "@/lib/account.functions";
 import { ForumModeration } from "@/components/site/ForumModeration";
 import { DisputeSupervisorControl } from "@/components/site/DisputeSupervisorControl";
+import { PerformanceMonitor } from "@/components/site/PerformanceMonitor";
 
 function AccountActions({ userId, bannedUntil, onDone }: { userId: string; bannedUntil?: string | undefined; onDone: () => void }) {
   const { t } = useLanguage();
@@ -245,6 +246,7 @@ function AdminPage() {
           {isAdmin && <TabsTrigger value="notify">
             <BellRing className="size-4" /> {t("إرسال إشعار")} </TabsTrigger>}
           {canModerateForum && <TabsTrigger value="forum">{t("إدارة المنتدى")}</TabsTrigger>}
+          {isAdmin && <TabsTrigger value="performance"><Radio className="size-4" />{t("مراقبة الأداء")}</TabsTrigger>}
         </TabsList>
 
         {isAdmin && <TabsContent value="withdrawals" className="mt-6 grid gap-4">
@@ -457,6 +459,7 @@ function AdminPage() {
           <SendNotification users={(users.data ?? []) as { id: string; display_name: string; email: string | null }[]} />
         </TabsContent>}
         {canModerateForum && <TabsContent value="forum" className="mt-6"><ForumModeration /></TabsContent>}
+        {isAdmin && <TabsContent value="performance" className="mt-6"><PerformanceMonitor /></TabsContent>}
       </Tabs>
     </div>
   );

@@ -488,6 +488,45 @@ export type Database = {
           },
         ]
       }
+      performance_samples: {
+        Row: {
+          cache_hits: number
+          cache_misses: number
+          errors: number
+          latency_max: number
+          latency_total: number
+          minute: string
+          realtime_connections: number
+          received_at: string
+          requests: number
+          session_key: string
+        }
+        Insert: {
+          cache_hits: number
+          cache_misses: number
+          errors: number
+          latency_max: number
+          latency_total: number
+          minute?: string
+          realtime_connections: number
+          received_at?: string
+          requests: number
+          session_key: string
+        }
+        Update: {
+          cache_hits?: number
+          cache_misses?: number
+          errors?: number
+          latency_max?: number
+          latency_total?: number
+          minute?: string
+          realtime_connections?: number
+          received_at?: string
+          requests?: number
+          session_key?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -829,6 +868,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      admin_performance_summary: { Args: never; Returns: Json }
       admin_platform_stats: {
         Args: never
         Returns: {
@@ -988,6 +1028,19 @@ export type Database = {
           display_name: string
           id: string
         }[]
+      }
+      record_performance_sample: {
+        Args: {
+          _connections: number
+          _errors: number
+          _hits: number
+          _latency_max: number
+          _latency_total: number
+          _misses: number
+          _requests: number
+          _session: string
+        }
+        Returns: boolean
       }
       refund_escrow: { Args: { _order_id: string }; Returns: undefined }
       regular_market_listing_cards: {

@@ -127,6 +127,20 @@
       "when": 1794703314768,
       "tag": "0017_commission_free_deposits",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1794704337449,
+      "tag": "0018_operational_performance_monitoring",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794704480422,
+      "tag": "0019_performance_explicit_guest_grants",
+      "breakpoints": true
     }
   ]
 }
