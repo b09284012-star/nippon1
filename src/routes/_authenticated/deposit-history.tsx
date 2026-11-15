@@ -24,7 +24,7 @@ const historyQuery = () => queryOptions({
 export const Route = createFileRoute("/_authenticated/deposit-history")({
   head: () => ({ meta: [
     { title: t("سجل الإيداعات") + " | Nippon" },
-    { name: "description", content: t("المبلغ قبل الرسوم") + " · " + t("المضاف للمحفظة") },
+    { name: "description", content: t("مبلغ الإيداع") + " · " + t("المضاف للمحفظة") },
     { property: "og:title", content: t("سجل الإيداعات") + " | Nippon" },
     { property: "og:description", content: t("سجل الإيداعات") + " · " + t("تنزيل إيصال") },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
@@ -41,7 +41,7 @@ function DepositHistory() {
   return <main className="mx-auto max-w-5xl px-4 py-10">
     <Button variant="ghost" asChild><Link to="/wallet"><ArrowRight className="size-4" />{t("المحفظة")}</Link></Button>
     <h1 className="mt-5 font-display text-3xl font-black">{t("سجل الإيداعات")}</h1>
-    <p className="mt-3 text-sm text-muted-foreground">{t("تنبيه: رسوم الإيداع 1% هي رسوم بوابة الدفع وشبكة التحويل، ولا تعود للمنصة.")}</p>
+    <p className="mt-3 text-sm text-muted-foreground">{t("الإيداع بدون عمولة.")}</p>
     <div className="mt-8 divide-y divide-border border-y border-border">
       {data.length === 0 && <p className="py-10 text-muted-foreground">{t("لا إيداعات بعد.")}</p>}
       {data.map(d => <article key={d.id} className="py-6">
@@ -50,12 +50,12 @@ function DepositHistory() {
           <Badge variant={d.status === "completed" ? "default" : "secondary"}>{t(labels[d.status] ?? d.status)}</Badge>
         </div>
         <dl className="mt-5 grid grid-cols-2 gap-5 sm:grid-cols-4">
-          {[[t("المبلغ قبل الرسوم"), d.gross_amount], [t("رسوم الإيداع") + ` (${Math.round(Number(d.fee_rate) * 10000) / 100}%)`, d.fee_amount], [t("الصافي المتوقع"), d.net_amount], [t("المضاف للمحفظة"), d.credited_amount]].map(([label, value]) => <div key={String(label)}><dt className="text-xs text-muted-foreground">{label}</dt><dd className="mt-2 font-display text-lg font-bold" dir="ltr">{formatUsd(Number(value))}</dd></div>)}
+          {[[t("مبلغ الإيداع"), d.gross_amount], ...(Number(d.fee_amount) > 0 ? [[t("رسوم الإيداع السابقة"), d.fee_amount]] : []), [t("الصافي المتوقع"), d.net_amount], [t("المضاف للمحفظة"), d.credited_amount]].map(([label, value]) => <div key={String(label)}><dt className="text-xs text-muted-foreground">{label}</dt><dd className="mt-2 font-display text-lg font-bold" dir="ltr">{formatUsd(Number(value))}</dd></div>)}
         </dl>
         <Button variant="outline" size="sm" className="mt-5" onClick={() => {
           const escape = (v: string) => v.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
-          const rows = [[t("المعرف"), d.payment_id ?? d.id], [t("التاريخ"), formatDate(d.created_at)], [t("الشبكة"), d.network], [t("الحالة"), t(labels[d.status] ?? d.status)], [t("المبلغ قبل الرسوم"), formatUsd(d.gross_amount)], [t("رسوم الإيداع") + ` (${Math.round(Number(d.fee_rate) * 10000) / 100}%)`, formatUsd(d.fee_amount)], [t("الصافي المتوقع"), formatUsd(d.net_amount)], [t("المضاف للمحفظة"), formatUsd(d.credited_amount)]];
-          const html = `<!doctype html><html lang="${language === "ar" ? "ar" : "en"}" dir="${language === "ar" ? "rtl" : "ltr"}"><meta charset="utf-8"><title>Nippon — ${escape(t("إيصال إيداع"))}</title><body><h1>Nippon — ${escape(t("إيصال إيداع"))}</h1><dl>${rows.map(([key, value]) => `<dt>${escape(String(key))}</dt><dd>${escape(String(value))}</dd>`).join("")}</dl><p>${escape(t("تنبيه: رسوم الإيداع 1% هي رسوم بوابة الدفع وشبكة التحويل، ولا تعود للمنصة."))}</p></body></html>`;
+          const rows = [[t("المعرف"), d.payment_id ?? d.id], [t("التاريخ"), formatDate(d.created_at)], [t("الشبكة"), d.network], [t("الحالة"), t(labels[d.status] ?? d.status)], [t("مبلغ الإيداع"), formatUsd(d.gross_amount)], ...(Number(d.fee_amount) > 0 ? [[t("رسوم الإيداع السابقة"), formatUsd(d.fee_amount)]] : []), [t("الصافي المتوقع"), formatUsd(d.net_amount)], [t("المضاف للمحفظة"), formatUsd(d.credited_amount)]];
+          const html = `<!doctype html><html lang="${language === "ar" ? "ar" : "en"}" dir="${language === "ar" ? "rtl" : "ltr"}"><meta charset="utf-8"><title>Nippon — ${escape(t("إيصال إيداع"))}</title><body><h1>Nippon — ${escape(t("إيصال إيداع"))}</h1><dl>${rows.map(([key, value]) => `<dt>${escape(String(key))}</dt><dd>${escape(String(value))}</dd>`).join("")}</dl></body></html>`;
           const url = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
           const a = document.createElement("a"); a.href = url; a.download = `nippon-deposit-${d.id}.html`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 30000);
         }}><Download className="size-4" />{t("تنزيل إيصال")}</Button>
