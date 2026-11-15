@@ -7,14 +7,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { useNotifications } from "@/lib/notifications";
+import { canUseRealtime } from "@/lib/traffic-policy";
 
 export function NotificationsBell() {
   const { t } = useLanguage();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const q = useNotifications(user?.id);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !canUseRealtime(user.id, loading)) return;
     const ch = supabase
       .channel(`notif-${user.id}`)
       .on(
@@ -42,7 +43,7 @@ export function NotificationsBell() {
       void supabase.removeChannel(ch);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  }, [user?.id, loading]);
 
   if (!user) return null;
   const unread = (q.data ?? []).filter((n) => !n.is_read).length;

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
+import { canUseRealtime } from "@/lib/traffic-policy";
 
 const CHANNEL = "online-users";
 
@@ -50,26 +52,30 @@ function release() {
   }
 }
 
-/** Announces the current visitor as online for the lifetime of the page. */
+/** Announces only signed-in users as online for the lifetime of the page. */
 export function usePresenceTracker(userId: string | null) {
+  const { user, loading } = useAuth();
+  const allowed = canUseRealtime(user?.id, loading);
   useEffect(() => {
-    const key = userId ?? `guest-${Math.random().toString(36).slice(2, 10)}`;
-    const c = acquire(key);
-    payload = { online_at: new Date().toISOString(), guest: !userId };
+    if (!allowed || !userId) return;
+    const c = acquire(userId);
+    payload = { online_at: new Date().toISOString(), guest: false };
     if (subscribed) void c.track(payload);
     return () => {
       payload = {};
       release();
     };
-  }, [userId]);
+  }, [userId, allowed]);
 }
 
 /** Live count of visitors currently on the site. */
 export function useOnlineCount(enabled: boolean) {
+  const { user, loading } = useAuth();
+  const allowed = enabled && canUseRealtime(user?.id, loading);
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!allowed) return;
     acquire(`watch-${Math.random().toString(36).slice(2, 10)}`);
     const listener: Listener = (n) => setCount(n);
     listeners.add(listener);
@@ -78,17 +84,19 @@ export function useOnlineCount(enabled: boolean) {
       listeners.delete(listener);
       release();
     };
-  }, [enabled]);
+  }, [allowed]);
 
-  return count;
+  return allowed ? count : 0;
 }
 
 /** Live set of presence keys (user IDs) currently online. */
 export function useOnlineKeys(enabled: boolean) {
+  const { user, loading } = useAuth();
+  const allowed = enabled && canUseRealtime(user?.id, loading);
   const [keys, setKeys] = useState<Set<string>>(() => new Set());
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!allowed) return;
     acquire(`watch-${Math.random().toString(36).slice(2, 10)}`);
     const listener: Listener = (_n, k) => setKeys(new Set(k));
     listeners.add(listener);
@@ -97,16 +105,18 @@ export function useOnlineKeys(enabled: boolean) {
       listeners.delete(listener);
       release();
     };
-  }, [enabled]);
+  }, [allowed]);
 
-  return keys;
+  return allowed ? keys : new Set<string>();
 }
 
 /** Whether a specific user is currently online (Instagram-style indicator). */
 export function useIsOnline(userId: string | null | undefined) {
+  const { user, loading } = useAuth();
+  const allowed = canUseRealtime(user?.id, loading);
   const [online, setOnline] = useState(false);
   useEffect(() => {
-    if (!userId) return;
+    if (!allowed || !userId) return;
     acquire(`watch-${Math.random().toString(36).slice(2, 10)}`);
     const listener: Listener = (_n, keys) => setOnline(keys.has(userId));
     listeners.add(listener);
@@ -115,6 +125,6 @@ export function useIsOnline(userId: string | null | undefined) {
       listeners.delete(listener);
       release();
     };
-  }, [userId]);
-  return online;
+  }, [userId, allowed]);
+  return allowed && Boolean(userId) && online;
 }
