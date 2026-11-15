@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ListingCard, type ListingRow } from "@/components/site/ListingCard";
 import heroMiners from "@/assets/hero-miners.jpeg.asset.json";
 import { inventoryCountry } from "@/lib/listing-access";
+import { MARKET_CACHE_OPTIONS } from "@/lib/traffic-policy";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -57,6 +58,7 @@ function Home() {
   const { t } = useLanguage();
   const { country } = useMyCountry();
   const { data: listings } = useQuery({
+    ...MARKET_CACHE_OPTIONS,
     queryKey: ["latest-listings", country],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("regular_market_listing_cards", { _country: inventoryCountry(country), _limit: 6 });

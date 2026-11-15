@@ -26,3 +26,4 @@
 - Deposit lifecycle records are owner-readable and service-written; signed provider completion credits atomically and deduplicates by payment reference to prevent duplicate balances.
 - Deposit analytics use the injected event tracker without personal identifiers; completion is observed from persisted provider-confirmed records, not payment-address creation.
 - Deposit fee changes apply to unsettled and future deposits; preserve settled financial records and receipts rather than rewriting historical balances.
+- Presence subscriptions require a resolved signed-in session; public home/market inventory queries use the shared traffic policy with country-separated cache keys and preserve explicit invalidation.
