@@ -1,4 +1,4 @@
-export const DEPOSIT_FEE_RATE = 0.01;
+export const DEPOSIT_FEE_RATE = 0;
 export function depositFee(amount: number) {
   return Math.round(amount * DEPOSIT_FEE_RATE * 100) / 100;
 }

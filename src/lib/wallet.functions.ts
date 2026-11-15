@@ -6,7 +6,7 @@ export { DEPOSIT_FEE_RATE, depositFee } from "@/lib/deposit-calculation";
 
 const NOWPAYMENTS_API = "https://api.nowpayments.io/v1";
 
-/** Deposit fee: 1% covering payment gateway + network costs (not platform revenue). */
+/** Sale fee charged when escrow funds are released to the seller. */
 export const SALE_FEE_RATE = 0.05;
 
 /** Wallet + transactions for the signed-in user. */
@@ -69,7 +69,7 @@ export const createDepositAddress = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: attempt, error: attemptError } = await supabaseAdmin.from("deposit_history").insert({
       user_id: userId, order_id: orderId, network: data.network,
-      gross_amount: data.amountUsd, fee_amount: depositFee(data.amountUsd),
+      gross_amount: data.amountUsd, fee_amount: depositFee(data.amountUsd), fee_rate: 0,
       net_amount: data.amountUsd - depositFee(data.amountUsd),
     }).select("id").single();
     if (attemptError || !attempt) throw new Error("تعذر تسجيل الإيداع");
@@ -112,7 +112,7 @@ export const createDepositAddress = createServerFn({ method: "POST" })
     return {
       id: attempt.id,
       address: payment.pay_address,
-      // Show the full requested amount; the gateway's small conversion gap is covered by our deposit fee.
+      // Request at least the full amount, rounding any higher provider quote up to cents.
       payAmount: Math.max(data.amountUsd, Number(payment.pay_amount) || 0) === data.amountUsd ? data.amountUsd : Math.ceil(Number(payment.pay_amount) * 100) / 100,
       network: data.network,
       paymentId: String(payment.payment_id),

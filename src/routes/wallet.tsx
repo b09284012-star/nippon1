@@ -150,7 +150,7 @@ function WalletPage() {
         {t("محفظة")} <span className="neon-text">USDT</span>
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        {t("رسوم الإيداع 1% من المبلغ، ورسوم البيع 5% تُخصم عند تحرير المبلغ للبائع.")} </p>
+        {t("الإيداع بدون عمولة، ورسوم البيع 5% تُخصم عند تحرير المبلغ للبائع.")} </p>
 
       <Button variant="outline" className="mt-4" asChild><Link to="/deposit-history">{t("سجل الإيداعات")}</Link></Button>
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -166,11 +166,7 @@ function WalletPage() {
       <div className="mt-8 border-t border-border pt-6">
         <h2 className="font-display text-xl font-bold">{t("إيداع كريبتو")}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          {t("اختر الشبكة وأدخل المبلغ لعرض عنوان إيداع خاص بعمليتك. يُضاف المبلغ تلقائيًا بعد خصم رسوم الإيداع (1%).")} </p>
-
-        <p className="mt-2 rounded-xl border border-primary/40 bg-primary/10 px-3 py-2 text-sm text-foreground">
-          {t("تنبيه: رسوم الإيداع 1% هي رسوم بوابة الدفع وشبكة التحويل، ولا تعود للمنصة.")}
-        </p>
+          {t("اختر الشبكة وأدخل المبلغ لعرض عنوان إيداع خاص بعمليتك. يُضاف مبلغ الإيداع كاملًا تلقائيًا دون عمولة بعد التأكيد.")} </p>
 
         <div className="mt-4 flex flex-wrap gap-2">
           {DEPOSIT_NETWORKS.map((n) => (
@@ -235,12 +231,9 @@ function WalletPage() {
             <p className="mt-3 text-xs text-muted-foreground">
               {t("سيُضاف المبلغ لرصيدك تلقائيًا بعد تأكيد الشبكة (عادة دقائق).")}
               <span className="mt-2 block text-sm text-foreground">
-                {t("رسوم الإيداع (1%):")} <span dir="ltr" className="font-bold">{formatUsd(payment.feeUsd)}</span>
-                {" — "}
                 {t("سيصبح في محفظتك:")} <span dir="ltr" className="font-display font-bold text-primary">{formatUsd(payment.creditedUsd)}</span>
               </span>
             </p>
-            <p className="mt-2 text-xs text-muted-foreground">{t("تنبيه: رسوم الإيداع 1% هي رسوم بوابة الدفع وشبكة التحويل، ولا تعود للمنصة.")}</p>
             <Button variant="outline" className="mt-3" onClick={async () => {
               if (!window.confirm(t("إلغاء المتابعة لا يبطل عنوان التحويل؛ لا ترسل بعد الإلغاء. أي تحويل يصل سيُسجل بعد تأكيده."))) return;
               const { error } = await supabase.rpc("cancel_deposit", { _id: payment.id });
