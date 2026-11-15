@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/media";
 import { useIsOnline } from "@/lib/presence";
 import { ChatAttachment } from "@/components/site/ChatAttachment";
+import { canUseRealtime } from "@/lib/traffic-policy";
 
 export const Route = createFileRoute("/chat/$id")({
   head: () => ({
@@ -70,7 +71,7 @@ function ChatRoomPage() {
   });
 
   useEffect(() => {
-    if (!user) return;
+    if (!canUseRealtime(user?.id, loading)) return;
     const channel = supabase
       .channel(`messages-${id}`)
       .on(
@@ -82,7 +83,7 @@ function ChatRoomPage() {
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, [id, user, refetch]);
+  }, [id, user?.id, loading, refetch]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });

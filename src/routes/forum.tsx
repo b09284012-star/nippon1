@@ -15,6 +15,7 @@ import { formatDate } from "@/lib/media";
 import { getMarketNews } from "@/lib/finance.functions";
 import { useMyCountry } from "@/lib/my-country";
 import { COUNTRIES } from "@/lib/countries";
+import { canUseRealtime } from "@/lib/traffic-policy";
 
 export const Route = createFileRoute("/forum")({
   head: () => ({
@@ -134,7 +135,7 @@ function ForumPage() {
 
 function Channel({ channel }: { channel: "general" | "announcements" }) {
   const { t } = useLanguage();
-  const { user, canModerateForum, profile } = useAuth();
+  const { user, loading, canModerateForum, profile } = useAuth();
   const { country: accountCountry, isAccount } = useMyCountry();
   const [selectedCountry, setSelectedCountry] = useState("");
   const country = canModerateForum && selectedCountry ? selectedCountry : isAccount ? accountCountry : "";
@@ -165,7 +166,7 @@ function Channel({ channel }: { channel: "general" | "announcements" }) {
   });
 
   useEffect(() => {
-    if (!user || !country) return;
+    if (!canUseRealtime(user?.id, loading) || !country) return;
     const ch = supabase
       .channel(`forum-${channel}-${country}`)
       .on(
@@ -177,7 +178,7 @@ function Channel({ channel }: { channel: "general" | "announcements" }) {
     return () => {
       void supabase.removeChannel(ch);
     };
-  }, [channel, qc, country, user]);
+  }, [channel, qc, country, user?.id, loading]);
 
   const submit = async () => {
     if (!user) return;
