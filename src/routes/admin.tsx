@@ -90,6 +90,7 @@ function AdminPage() {
   const [wdFilter, setWdFilter] = useState("all");
   const [dsSearch, setDsSearch] = useState("");
   const [dsFilter, setDsFilter] = useState("all");
+  const [userFilter, setUserFilter] = useState<"all" | "new" | "online" | "offline" | "verified" | "staff">("all");
   const { user, isAdmin, canModerateForum, canManageDisputes, loading, refreshProfile } = useAuth();
   const navigate = useNavigate();
 
@@ -232,7 +233,7 @@ function AdminPage() {
       {isAdmin && <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard icon={Radio} label={t("المستخدمون المتصلون الآن")} value={String(onlineKeys.size)} live />
         <StatCard icon={Users} label={t("إجمالي المستخدمين")} value={String(users.data?.length ?? stats.data?.total_users ?? 0)} />
-        <StatCard icon={UserPlus} label={t("حسابات جديدة (7 أيام)")} value={String(stats.data?.new_users_7d ?? 0)} />
+        <StatCard icon={UserPlus} label={t("حسابات جديدة (7 أيام)")} value={String(users.data ? users.data.filter((u) => isNewUser(u.created_at)).length : (stats.data?.new_users_7d ?? 0))} />
         <StatCard icon={Package} label={t("العروض / الطلبات")} value={`${stats.data?.total_listings ?? 0} / ${stats.data?.total_orders ?? 0}`} />
       </div>}
 
@@ -285,14 +286,31 @@ function AdminPage() {
             onChange={(e) => setQ(e.target.value.slice(0, 60))}
             placeholder={t("ابحث بمعرّف المحفظة (NPN-...) أو الاسم أو البريد أو الهاتف")}
           />
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {([
+              ["all", "الكل"], ["new", "المستخدمون الجدد"], ["online", "متصلون الآن"],
+              ["offline", "غير متصلين"], ["verified", "بائعون معتمدون"], ["staff", "الإدارة"],
+            ] as const).map(([k, label]) => {
+              const count = (users.data ?? []).filter((u) => matchUserFilter(u, k, onlineKeys)).length;
+              return (
+                <Button key={k} size="sm" variant={userFilter === k ? "default" : "outline"} className="shrink-0" onClick={() => setUserFilter(k)}>
+                  {t(label)} ({count})
+                </Button>
+              );
+            })}
+          </div>
+          {users.isLoading && <p className="text-sm text-muted-foreground">{t("جارٍ التحميل...")}</p>}
+          {users.isError && <p className="text-sm text-destructive">{t("تعذر تحميل المستخدمين")}</p>}
           {(["online", "offline"] as const).map((group) => {
             const list = (users.data ?? [])
+              .filter((u) => matchUserFilter(u, userFilter, onlineKeys))
               .filter((u) => {
                 const t = q.trim().toLowerCase();
                 if (!t) return true;
                 return [u.deposit_tag, u.display_name, u.full_name, u.email, u.phone].some((v) => (v ?? "").toLowerCase().includes(t));
               })
-              .filter((u) => (group === "online" ? onlineKeys.has(u.id) : !onlineKeys.has(u.id)));
+              .filter((u) => (group === "online" ? onlineKeys.has(u.id) : !onlineKeys.has(u.id)))
+              .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
             if (list.length === 0) return null;
 
@@ -316,7 +334,9 @@ function AdminPage() {
                           onlineKeys.has(u.id) ? "bg-primary" : "bg-muted-foreground/50",
                         )}
                       />
+                      <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary/15 font-display font-bold text-primary">{(u.display_name || u.email || "?").trim().charAt(0).toUpperCase()}</span>
                       <span className="font-display font-bold">{u.display_name ?? "—"}</span>
+                      {isNewUser(u.created_at) && <Badge className="bg-success/15 text-success">{t("حساب جديد")}</Badge>}
                       {onlineKeys.has(u.id) && <Badge className="bg-primary/15 text-primary">{t("متصل الآن")}</Badge>}
                       {u.is_admin && <Badge>{t("مدير")}</Badge>}
                       {u.is_verified_seller && <Badge variant="secondary" className="gap-1"><ShieldCheck className="size-3.5" /> {t("بائع معتمد")}</Badge>}
@@ -739,4 +759,22 @@ function SendNotification({ users }: { users: { id: string; display_name: string
       <Button disabled={busy} onClick={() => void send()}>{t("إرسال الإشعار")}</Button>
     </div>
   );
+}
+
+const NEW_USER_DAYS = 7;
+function isNewUser(createdAt: string | null | undefined) {
+  if (!createdAt) return false;
+  return Date.now() - new Date(createdAt).getTime() < NEW_USER_DAYS * 86400000;
+}
+function matchUserFilter(
+  u: { id: string; created_at: string; is_verified_seller: boolean; is_admin: boolean },
+  f: string,
+  online: Set<string>,
+) {
+  if (f === "new") return isNewUser(u.created_at);
+  if (f === "online") return online.has(u.id);
+  if (f === "offline") return !online.has(u.id);
+  if (f === "verified") return Boolean(u.is_verified_seller);
+  if (f === "staff") return Boolean(u.is_admin);
+  return true;
 }
