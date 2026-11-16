@@ -1,11 +1,10 @@
 import { createStart, createCsrfMiddleware, createMiddleware } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
 
 import { renderErrorPage } from "./lib/error-page";
 import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
 
-const errorMiddleware = createMiddleware().server(async ({ next }) => {
-  if (new URL(getRequest().url).pathname.startsWith("/lovable/")) {
+const errorMiddleware = createMiddleware().server(async ({ next, request }) => {
+  if (new URL(request.url).pathname.startsWith("/lovable/")) {
     return next();
   }
   try {
@@ -27,7 +26,7 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
 // from cross-site requests.
 const csrfMiddleware = createCsrfMiddleware({
   filter: (ctx) =>
-    !new URL(getRequest().url).pathname.startsWith("/lovable/") &&
+    !new URL(ctx.request.url).pathname.startsWith("/lovable/") &&
     ctx.handlerType === "serverFn",
 });
 
