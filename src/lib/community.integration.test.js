@@ -61,6 +61,13 @@ describe.skipIf(!enabled)("community database authorization", () => {
     const result = await as(users[2], `/rest/v1/forum_posts?id=eq.${postId}`);
     expect(result.data).toEqual([]);
   });
+  test("guests cannot execute dispute supervision checks", async () => {
+    const result = await call("/rest/v1/rpc/can_supervise_dispute", publicKey, "POST", {
+      _user_id: users[2].id, _order_id: crypto.randomUUID(),
+    });
+    expect(result.ok).toBe(false);
+    expect(result.status).toBe(401);
+  });
   test("same-country users can create and exchange private messages", async () => {
     const result = await as(users[1], "/rest/v1/messages", "POST", { conversation_id: conversationId, sender_id: users[1].id, body: "Same-country test" });
     expect(result.ok).toBe(true);
@@ -101,6 +108,11 @@ describe.skipIf(!enabled)("community database authorization", () => {
       expect((await as(users[2], "/rest/v1/rpc/resolve_staff_dispute", "POST", { _order_id: orderId, _refund: true })).ok).toBe(false);
       await call(`/rest/v1/staff_assignments?user_id=eq.${users[2].id}&responsibility=eq.disputes`, adminKey, "PATCH", { country: "ليبيا" });
       expect((await as(users[2], "/rest/v1/rpc/can_supervise_dispute", "POST", { _user_id: users[2].id, _order_id: orderId })).data).toBe(true);
+      // The same authorized staff ID must not disclose its rights to another caller.
+      const forged = await as(users[0], "/rest/v1/rpc/can_supervise_dispute", "POST", { _user_id: users[2].id, _order_id: orderId });
+      expect(forged.ok).toBe(true);
+      expect(forged.data).toBe(false);
+      expect((await as(users[2], "/rest/v1/rpc/can_supervise_dispute", "POST", { _user_id: null, _order_id: orderId })).data).toBe(false);
       expect((await as(users[2], "/rest/v1/rpc/staff_disputes", "POST", {})).data.some(d => d.id === disputeId)).toBe(true);
       expect((await as(users[2], `/rest/v1/conversations?id=eq.${conversationId}`)).data.length).toBe(1);
     } finally {
