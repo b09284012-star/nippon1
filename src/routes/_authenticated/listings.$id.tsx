@@ -24,6 +24,7 @@ import { FALLBACK_IMAGE, formatUsd, useStorageUrl } from "@/lib/media";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authenticated/listings/$id")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: t("تفاصيل الجهاز | Nippon") },

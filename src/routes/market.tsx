@@ -22,6 +22,7 @@ import { MARKET_CACHE_OPTIONS } from "@/lib/traffic-policy";
 import { recordCacheResult, recordMarketResponse } from "@/lib/performance-monitoring";
 
 export const Route = createFileRoute("/market")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: t("السوق | أجهزة تعدين مستعملة على Nippon") },

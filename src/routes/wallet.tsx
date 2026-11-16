@@ -22,6 +22,7 @@ const WITHDRAWAL_STATUS: Record<string, { label: string; variant: "secondary" | 
 };
 
 export const Route = createFileRoute("/wallet")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: t("المحفظة | Nippon") },

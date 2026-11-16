@@ -13,6 +13,7 @@ import { useAuth } from "@/lib/auth";
 import { deleteMyAccount } from "@/lib/account.functions";
 
 export const Route = createFileRoute("/profile")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: t("الملف الشخصي والإعدادات | Nippon") },

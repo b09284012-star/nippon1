@@ -12,6 +12,7 @@ import { MARKET_CACHE_OPTIONS } from "@/lib/traffic-policy";
 import { recordCacheResult, recordMarketResponse } from "@/lib/performance-monitoring";
 
 export const Route = createFileRoute("/")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: t("Nippon | سوق أجهزة تعدين الكريبتو المستعملة") },

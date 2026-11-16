@@ -11,6 +11,7 @@ import { formatDate } from "@/lib/media";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/notifications")({
+  staticData: { sitemap: false },
   head: () => ({ meta: [
     { title: t("الإشعارات | Nippon") },
     { name: "description", content: t("إشعارات حسابك ورسائلك في نيبون مع تاريخ ووقت وصولها.") },
