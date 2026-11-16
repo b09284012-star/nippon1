@@ -5,11 +5,28 @@
 //     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { loadEnv, type ConfigEnv } from "vite";
+import { fileURLToPath } from "node:url";
 
-export default defineConfig({
+const config = defineConfig({
+  vite: {
+    resolve: {
+      alias: {
+        "entities/lib/decode.js": fileURLToPath(new URL("./node_modules/entities/lib/decode.js", import.meta.url)),
+        "entities/lib/encode.js": fileURLToPath(new URL("./node_modules/entities/lib/encode.js", import.meta.url)),
+        entities: fileURLToPath(new URL("./node_modules/entities", import.meta.url)),
+      },
+    },
+  },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
   },
 });
+
+export default (env: ConfigEnv) => {
+  // Server secrets remain in process.env; the shared config still defines only VITE_* client values.
+  Object.assign(process.env, loadEnv(env.mode, process.cwd(), ""));
+  return config(env);
+};
