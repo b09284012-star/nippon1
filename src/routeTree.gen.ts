@@ -24,6 +24,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProfitsRouteImport } from './routes/profits'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SellRouteImport } from './routes/sell'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as AuthenticatedDepositHistoryRouteImport } from './routes/_authenticated/deposit-history'
 import { Route as ChatIndexRouteImport } from './routes/chat.index'
@@ -105,6 +106,11 @@ const SellRoute = SellRouteImport.update({
   path: '/sell',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WalletRoute = WalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
@@ -152,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/profits': typeof ProfitsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sell': typeof SellRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wallet': typeof WalletRoute
   '/deposit-history': typeof AuthenticatedDepositHistoryRoute
   '/chat/$id': typeof ChatIdRoute
@@ -174,6 +181,7 @@ export interface FileRoutesByTo {
   '/profits': typeof ProfitsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sell': typeof SellRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wallet': typeof WalletRoute
   '/deposit-history': typeof AuthenticatedDepositHistoryRoute
   '/chat/$id': typeof ChatIdRoute
@@ -198,6 +206,7 @@ export interface FileRoutesById {
   '/profits': typeof ProfitsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sell': typeof SellRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wallet': typeof WalletRoute
   '/_authenticated/deposit-history': typeof AuthenticatedDepositHistoryRoute
   '/chat/$id': typeof ChatIdRoute
@@ -222,6 +231,7 @@ export interface FileRouteTypes {
     | '/profits'
     | '/reset-password'
     | '/sell'
+    | '/sitemap.xml'
     | '/wallet'
     | '/deposit-history'
     | '/chat/$id'
@@ -244,6 +254,7 @@ export interface FileRouteTypes {
     | '/profits'
     | '/reset-password'
     | '/sell'
+    | '/sitemap.xml'
     | '/wallet'
     | '/deposit-history'
     | '/chat/$id'
@@ -267,6 +278,7 @@ export interface FileRouteTypes {
     | '/profits'
     | '/reset-password'
     | '/sell'
+    | '/sitemap.xml'
     | '/wallet'
     | '/_authenticated/deposit-history'
     | '/chat/$id'
@@ -291,6 +303,7 @@ export interface RootRouteChildren {
   ProfitsRoute: typeof ProfitsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SellRoute: typeof SellRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   WalletRoute: typeof WalletRoute
   ChatIdRoute: typeof ChatIdRoute
   ChatIndexRoute: typeof ChatIndexRoute
@@ -404,6 +417,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SellRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/wallet': {
       id: '/wallet'
       path: '/wallet'
@@ -478,6 +498,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfitsRoute: ProfitsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SellRoute: SellRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   WalletRoute: WalletRoute,
   ChatIdRoute: ChatIdRoute,
   ChatIndexRoute: ChatIndexRoute,

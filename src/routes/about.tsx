@@ -4,6 +4,7 @@ import sections from "@/content/about.json";
 import logo from "@/assets/nippon-logo.png.asset.json";
 
 export const Route = createFileRoute("/about")({
+  staticData: { sitemap: true },
   head: () => ({ meta: [
     { title: t("من نحن | Nippon") },
     { name: "description", content: t("تعرف على نيبون، أهداف سوق أجهزة التعدين المستعملة، حماية المشتري، مجتمع الدول، والخصوصية.") },

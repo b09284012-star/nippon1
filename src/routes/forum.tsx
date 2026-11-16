@@ -18,6 +18,7 @@ import { COUNTRIES } from "@/lib/countries";
 import { canUseRealtime } from "@/lib/traffic-policy";
 
 export const Route = createFileRoute("/forum")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: t("المنتدى والأخبار | Nippon") },

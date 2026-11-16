@@ -12,6 +12,7 @@ import { useAuth } from "@/lib/auth";
 import { useMyCountry } from "@/lib/my-country";
 
 export const Route = createFileRoute("/sell")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: t("أضف عرض جهاز تعدين | Nippon") },

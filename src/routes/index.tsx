@@ -12,6 +12,7 @@ import { MARKET_CACHE_OPTIONS } from "@/lib/traffic-policy";
 import { recordCacheResult, recordMarketResponse } from "@/lib/performance-monitoring";
 
 export const Route = createFileRoute("/")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: t("Nippon | سوق أجهزة تعدين الكريبتو المستعملة") },
@@ -27,8 +28,8 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:image", content: heroMiners.url },
-      { name: "twitter:image", content: heroMiners.url },
+      { property: "og:image", content: "https://nipponminers.com/og-home.jpg" },
+      { name: "twitter:image", content: "https://nipponminers.com/og-home.jpg" },
     ],
   }),
   component: Home,

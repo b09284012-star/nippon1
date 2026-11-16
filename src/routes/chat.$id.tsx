@@ -14,6 +14,7 @@ import { ChatAttachment } from "@/components/site/ChatAttachment";
 import { canUseRealtime } from "@/lib/traffic-policy";
 
 export const Route = createFileRoute("/chat/$id")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: t("محادثة | Nippon") },

@@ -13,6 +13,7 @@ import { useAuth } from "@/lib/auth";
 import { formatDate, formatUsd } from "@/lib/media";
 
 export const Route = createFileRoute("/orders")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: t("طلباتي | Nippon") },

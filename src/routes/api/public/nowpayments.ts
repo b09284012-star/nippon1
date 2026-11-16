@@ -15,6 +15,7 @@ function sortedStringify(value: unknown): string {
 }
 
 export const Route = createFileRoute("/api/public/nowpayments")({
+  staticData: { sitemap: false },
   server: {
     handlers: {
       POST: async ({ request }) => {

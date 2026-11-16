@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProfitsAnalytics } from "@/components/site/ProfitsAnalytics";
 
 export const Route = createFileRoute("/finance")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: t("اللوحة المالية | Nippon") },

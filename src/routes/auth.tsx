@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { listingReturnPath } from "@/lib/listing-access";
 
 export const Route = createFileRoute("/auth")({
+  staticData: { sitemap: false },
   validateSearch: (search: Record<string, unknown>): { redirect?: string | undefined } => ({ redirect: listingReturnPath(search["redirect"]) }),
   head: () => ({
     meta: [

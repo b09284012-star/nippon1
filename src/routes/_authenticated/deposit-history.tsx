@@ -22,6 +22,7 @@ const historyQuery = () => queryOptions({
 });
 
 export const Route = createFileRoute("/_authenticated/deposit-history")({
+  staticData: { sitemap: false },
   head: () => ({ meta: [
     { title: t("سجل الإيداعات") + " | Nippon" },
     { name: "description", content: t("مبلغ الإيداع") + " · " + t("المضاف للمحفظة") },

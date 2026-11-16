@@ -9,6 +9,7 @@ import { useIsOnline } from "@/lib/presence";
 import { useMyCountry } from "@/lib/my-country";
 
 export const Route = createFileRoute("/chat/")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: t("الدردشة | Nippon") },

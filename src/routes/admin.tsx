@@ -61,6 +61,7 @@ function AccountActions({ userId, bannedUntil, onDone }: { userId: string; banne
 }
 
 export const Route = createFileRoute("/admin")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: t("لوحة الإدارة | Nippon") },
