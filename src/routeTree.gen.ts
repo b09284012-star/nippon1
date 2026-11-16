@@ -29,6 +29,8 @@ import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as AuthenticatedDepositHistoryRouteImport } from './routes/_authenticated/deposit-history'
 import { Route as ChatIndexRouteImport } from './routes/chat.index'
 import { Route as ChatIdRouteImport } from './routes/chat.$id'
+import { Route as EnIndexRouteImport } from './routes/en.index'
+import { Route as EnMarketRouteImport } from './routes/en.market'
 import { Route as AuthenticatedListingsIdRouteImport } from './routes/_authenticated/listings.$id'
 import { Route as ApiPublicNowpaymentsRouteImport } from './routes/api/public/nowpayments'
 
@@ -132,6 +134,16 @@ const ChatIdRoute = ChatIdRouteImport.update({
   path: '/chat/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EnIndexRoute = EnIndexRouteImport.update({
+  id: '/en/',
+  path: '/en/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnMarketRoute = EnMarketRouteImport.update({
+  id: '/en/market',
+  path: '/en/market',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedListingsIdRoute = AuthenticatedListingsIdRouteImport.update({
   id: '/listings/$id',
   path: '/listings/$id',
@@ -162,7 +174,9 @@ export interface FileRoutesByFullPath {
   '/wallet': typeof WalletRoute
   '/deposit-history': typeof AuthenticatedDepositHistoryRoute
   '/chat/$id': typeof ChatIdRoute
+  '/en/market': typeof EnMarketRoute
   '/chat/': typeof ChatIndexRoute
+  '/en/': typeof EnIndexRoute
   '/listings/$id': typeof AuthenticatedListingsIdRoute
   '/api/public/nowpayments': typeof ApiPublicNowpaymentsRoute
 }
@@ -185,7 +199,9 @@ export interface FileRoutesByTo {
   '/wallet': typeof WalletRoute
   '/deposit-history': typeof AuthenticatedDepositHistoryRoute
   '/chat/$id': typeof ChatIdRoute
+  '/en/market': typeof EnMarketRoute
   '/chat': typeof ChatIndexRoute
+  '/en': typeof EnIndexRoute
   '/listings/$id': typeof AuthenticatedListingsIdRoute
   '/api/public/nowpayments': typeof ApiPublicNowpaymentsRoute
 }
@@ -210,7 +226,9 @@ export interface FileRoutesById {
   '/wallet': typeof WalletRoute
   '/_authenticated/deposit-history': typeof AuthenticatedDepositHistoryRoute
   '/chat/$id': typeof ChatIdRoute
+  '/en/market': typeof EnMarketRoute
   '/chat/': typeof ChatIndexRoute
+  '/en/': typeof EnIndexRoute
   '/_authenticated/listings/$id': typeof AuthenticatedListingsIdRoute
   '/api/public/nowpayments': typeof ApiPublicNowpaymentsRoute
 }
@@ -235,7 +253,9 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/deposit-history'
     | '/chat/$id'
+    | '/en/market'
     | '/chat/'
+    | '/en/'
     | '/listings/$id'
     | '/api/public/nowpayments'
   fileRoutesByTo: FileRoutesByTo
@@ -258,7 +278,9 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/deposit-history'
     | '/chat/$id'
+    | '/en/market'
     | '/chat'
+    | '/en'
     | '/listings/$id'
     | '/api/public/nowpayments'
   id:
@@ -282,7 +304,9 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/_authenticated/deposit-history'
     | '/chat/$id'
+    | '/en/market'
     | '/chat/'
+    | '/en/'
     | '/_authenticated/listings/$id'
     | '/api/public/nowpayments'
   fileRoutesById: FileRoutesById
@@ -306,7 +330,9 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   WalletRoute: typeof WalletRoute
   ChatIdRoute: typeof ChatIdRoute
+  EnMarketRoute: typeof EnMarketRoute
   ChatIndexRoute: typeof ChatIndexRoute
+  EnIndexRoute: typeof EnIndexRoute
   ApiPublicNowpaymentsRoute: typeof ApiPublicNowpaymentsRoute
 }
 
@@ -452,6 +478,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChatIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/en/': {
+      id: '/en/'
+      path: '/en'
+      fullPath: '/en/'
+      preLoaderRoute: typeof EnIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/market': {
+      id: '/en/market'
+      path: '/en/market'
+      fullPath: '/en/market'
+      preLoaderRoute: typeof EnMarketRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/listings/$id': {
       id: '/_authenticated/listings/$id'
       path: '/listings/$id'
@@ -501,7 +541,9 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   WalletRoute: WalletRoute,
   ChatIdRoute: ChatIdRoute,
+  EnMarketRoute: EnMarketRoute,
   ChatIndexRoute: ChatIndexRoute,
+  EnIndexRoute: EnIndexRoute,
   ApiPublicNowpaymentsRoute: ApiPublicNowpaymentsRoute,
 }
 export const routeTree = rootRouteImport

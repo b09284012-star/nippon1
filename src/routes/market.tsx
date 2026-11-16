@@ -36,11 +36,17 @@ export const Route = createFileRoute("/market")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [
+      { rel: "canonical", href: "https://nipponminers.com/market" },
+      { rel: "alternate", hrefLang: "ar", href: "https://nipponminers.com/market" },
+      { rel: "alternate", hrefLang: "en", href: "https://nipponminers.com/en/market" },
+      { rel: "alternate", hrefLang: "x-default", href: "https://nipponminers.com/market" },
+    ],
   }),
   component: Market,
 });
 
-function Market() {
+export function Market() {
   const { t } = useLanguage();
   const [q, setQ] = useState("");
   const [brand, setBrand] = useState("all");
