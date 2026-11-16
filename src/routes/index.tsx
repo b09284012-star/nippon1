@@ -26,6 +26,7 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: t("منصة موثوقة لتداول أجهزة التعدين المستعملة مع نظام حماية المشتري."),
       },
+      { name: "keywords", content: "used ASIC miners, buy used Antminer, sell Whatsminer, crypto mining marketplace, bitcoin miner escrow, أجهزة تعدين مستعملة, بيع أجهزة تعدين, انتمينر مستعمل" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:image", content: "https://nipponminers.com/og-home.jpg" },
