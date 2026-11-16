@@ -25,7 +25,7 @@ function SocialLinks() {
   const { t } = useLanguage();
   return (
     <div className="mt-4">
-      <h4 className="text-sm font-bold">{t("تابعنا")}</h4>
+      <h4 className="text-sm font-bold">{t("حسابات التواصل الاجتماعي")}</h4>
       <div className="mt-3 flex items-center gap-2">
         {SOCIAL_LINKS.map((social) => (
           <a
