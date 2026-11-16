@@ -11,11 +11,22 @@ import { fileURLToPath } from "node:url";
 const config = defineConfig({
   vite: {
     resolve: {
-      alias: {
-        "entities/lib/decode.js": fileURLToPath(new URL("./node_modules/entities/lib/decode.js", import.meta.url)),
-        "entities/lib/encode.js": fileURLToPath(new URL("./node_modules/entities/lib/encode.js", import.meta.url)),
-        entities: fileURLToPath(new URL("./node_modules/entities", import.meta.url)),
-      },
+      // Exact matches keep legacy imports compatible without rewriting modern
+      // subpaths (entities/decode) into nonexistent files under entities v4.
+      alias: [
+        {
+          find: /^entities\/lib\/decode\.js$/,
+          replacement: fileURLToPath(new URL("./node_modules/entities/lib/esm/decode.js", import.meta.url)),
+        },
+        {
+          find: /^entities\/lib\/encode\.js$/,
+          replacement: fileURLToPath(new URL("./node_modules/entities/lib/esm/encode.js", import.meta.url)),
+        },
+        {
+          find: /^entities$/,
+          replacement: fileURLToPath(new URL("./node_modules/entities/lib/esm/index.js", import.meta.url)),
+        },
+      ],
     },
   },
   tanstackStart: {
