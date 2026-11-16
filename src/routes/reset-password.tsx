@@ -10,6 +10,7 @@ export const Route = createFileRoute("/reset-password")({
   staticData: { sitemap: false },
   head: () => ({
     meta: [
+      { name: "robots", content: "noindex" },
       { title: t("تعيين كلمة مرور جديدة | Nippon") },
       { name: "description", content: t("عيّن كلمة مرور جديدة لحسابك في نيبون.") },
       { property: "og:title", content: t("تعيين كلمة مرور جديدة | Nippon") },
