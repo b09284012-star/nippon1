@@ -20,7 +20,9 @@ export function LanguageInitializer() {
   useEffect(() => {
     try {
       const saved = localStorage.getItem("nippon-language");
-      if (saved === "en" || saved === "ar") setLanguage(saved);
+      if (saved === "en" || saved === "ar") { setLanguage(saved); return; }
+      const langs = navigator.languages?.length ? navigator.languages : [navigator.language];
+      if (!langs.some((l) => l?.toLowerCase().startsWith("ar"))) setLanguage("en");
     } catch { /* Keep Arabic as the default. */ }
   }, []);
   return null;
