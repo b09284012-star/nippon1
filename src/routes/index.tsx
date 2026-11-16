@@ -32,6 +32,12 @@ export const Route = createFileRoute("/")({
       { property: "og:image", content: "https://nipponminers.com/og-home.jpg" },
       { name: "twitter:image", content: "https://nipponminers.com/og-home.jpg" },
     ],
+    links: [
+      { rel: "canonical", href: "https://nipponminers.com/" },
+      { rel: "alternate", hrefLang: "ar", href: "https://nipponminers.com/" },
+      { rel: "alternate", hrefLang: "en", href: "https://nipponminers.com/en" },
+      { rel: "alternate", hrefLang: "x-default", href: "https://nipponminers.com/" },
+    ],
   }),
   component: Home,
 });
@@ -59,7 +65,7 @@ const steps = [
   },
 ];
 
-function Home() {
+export function Home() {
   const { t } = useLanguage();
   const { country } = useMyCountry();
   const { data: listings } = useQuery({
