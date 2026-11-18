@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CountryChangeReview } from "@/components/site/CountryChange";
 import { useAuth } from "@/lib/auth";
 import { formatDate, formatUsd, useStorageUrl } from "@/lib/media";
 import { useOnlineKeys } from "@/lib/presence";
@@ -248,6 +249,7 @@ function AdminPage() {
           {isAdmin && <TabsTrigger value="notify">
             <BellRing className="size-4" /> {t("إرسال إشعار")} </TabsTrigger>}
           {canModerateForum && <TabsTrigger value="forum">{t("إدارة المنتدى")}</TabsTrigger>}
+          {isAdmin && <TabsTrigger value="country">{t("طلبات تغيير الدولة")}</TabsTrigger>}
           {isAdmin && <TabsTrigger value="performance"><Radio className="size-4" />{t("مراقبة الأداء")}</TabsTrigger>}
         </TabsList>
 
@@ -480,6 +482,7 @@ function AdminPage() {
           <SendNotification users={(users.data ?? []) as { id: string; display_name: string; email: string | null }[]} />
         </TabsContent>}
         {canModerateForum && <TabsContent value="forum" className="mt-6"><ForumModeration /></TabsContent>}
+        {isAdmin && <TabsContent value="country" className="mt-6"><CountryChangeReview /></TabsContent>}
         {isAdmin && <TabsContent value="performance" className="mt-6"><PerformanceMonitor /></TabsContent>}
       </Tabs>
     </div>

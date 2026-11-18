@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth";
 import { deleteMyAccount } from "@/lib/account.functions";
+import { CountryChangeRequest } from "@/components/site/CountryChange";
 
 export const Route = createFileRoute("/profile")({
   staticData: { sitemap: false },
@@ -34,6 +35,7 @@ function ProfilePage() {
   const del = useServerFn(deleteMyAccount);
   const [f, setF] = useState({ display_name: "", bio: "", full_name: "", phone: "", country: "", city: "", address: "" });
   const [cur, setCur] = useState("");
+  const [lockedCountry, setLockedCountry] = useState("");
   const [pw, setPw] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -44,6 +46,7 @@ function ProfilePage() {
         ...p,
         full_name: data?.full_name ?? "", phone: data?.phone ?? "", country: data?.country ?? "", city: data?.city ?? "", address: data?.address ?? "",
       }));
+      setLockedCountry(data?.country?.trim() ?? "");
     });
   }, [user]);
   useEffect(() => {
@@ -116,7 +119,8 @@ function ProfilePage() {
         <p className="text-xs text-muted-foreground">{t("البيانات التالية تظهر للإدارة فقط.")}</p>
         <F label={t("الاسم الحقيقي الكامل")} value={f.full_name} onChange={set("full_name")} />
         <F label={t("رقم الهاتف")} value={f.phone} onChange={set("phone")} />
-        <div className="grid grid-cols-2 gap-3"><F label={t("الدولة")} value={f.country} onChange={set("country")} /><F label={t("المدينة")} value={f.city} onChange={set("city")} /></div>
+        <div className="grid grid-cols-2 gap-3"><F label={t("الدولة")} value={f.country} onChange={set("country")} disabled={!!lockedCountry} /><F label={t("المدينة")} value={f.city} onChange={set("city")} /></div>
+        {lockedCountry && <CountryChangeRequest userId={user.id} />}
         <F label={t("العنوان")} value={f.address} onChange={set("address")} />
         <Button disabled={busy} onClick={() => void saveProfile()}>{t("حفظ التغييرات")}</Button>
       </section>

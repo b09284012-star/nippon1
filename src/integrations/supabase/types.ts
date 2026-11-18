@@ -87,6 +87,42 @@ export type Database = {
           },
         ]
       }
+      country_change_requests: {
+        Row: {
+          admin_note: string | null
+          created_at: string
+          current_country: string | null
+          id: string
+          reason: string
+          requested_country: string
+          reviewed_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          admin_note?: string | null
+          created_at?: string
+          current_country?: string | null
+          id?: string
+          reason: string
+          requested_country: string
+          reviewed_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          admin_note?: string | null
+          created_at?: string
+          current_country?: string | null
+          id?: string
+          reason?: string
+          requested_country?: string
+          reviewed_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       deposit_history: {
         Row: {
           address: string | null
@@ -1103,12 +1139,20 @@ export type Database = {
         Returns: undefined
       }
       release_escrow: { Args: { _order_id: string }; Returns: undefined }
+      request_country_change: {
+        Args: { _country: string; _reason: string }
+        Returns: string
+      }
       request_withdrawal: {
         Args: { _address: string; _amount: number }
         Returns: string
       }
       resolve_staff_dispute: {
         Args: { _order_id: string; _refund: boolean }
+        Returns: undefined
+      }
+      review_country_change: {
+        Args: { _approve: boolean; _id: string; _note: string }
         Returns: undefined
       }
       same_community: { Args: { _a: string; _b: string }; Returns: boolean }
