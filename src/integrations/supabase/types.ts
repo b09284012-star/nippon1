@@ -406,6 +406,7 @@ export type Database = {
         Row: {
           body: string
           created_at: string
+          emailed_at: string | null
           id: string
           is_read: boolean
           link: string | null
@@ -415,6 +416,7 @@ export type Database = {
         Insert: {
           body?: string
           created_at?: string
+          emailed_at?: string | null
           id?: string
           is_read?: boolean
           link?: string | null
@@ -424,6 +426,7 @@ export type Database = {
         Update: {
           body?: string
           created_at?: string
+          emailed_at?: string | null
           id?: string
           is_read?: boolean
           link?: string | null

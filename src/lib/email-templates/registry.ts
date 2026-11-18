@@ -1,3 +1,4 @@
+import { template as newNotification } from './new-notification'
 import type { ComponentType } from 'react'
 
 export interface TemplateEntry {
@@ -18,6 +19,7 @@ export interface TemplateEntry {
  *   // then add to TEMPLATES: 'welcome': welcomeTemplate
  */
 export const TEMPLATES: Record<string, TemplateEntry> = {
+  'new-notification': newNotification,
   // Add templates here as they are created, e.g.:
   // 'welcome': welcomeTemplate,
 }
