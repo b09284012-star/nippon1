@@ -1,5 +1,6 @@
 import { t, useLanguage, numberLocale } from "@/lib/i18n";
 import { useState } from "react";
+import { emailLanguage } from "@/lib/email-language";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -19,7 +20,7 @@ export function ForgotPassword({ onClose }: { onClose: () => void }) {
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) { toast.error(t("أدخل بريدًا صحيحًا")); return; }
     setBusy(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${window.location.origin}/reset-password?lang=${emailLanguage()}`,
     });
     setBusy(false);
     if (error) { toast.error(t("تعذر الإرسال"), { description: error.message }); return; }

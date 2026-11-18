@@ -1,4 +1,5 @@
 import { t, useLanguage, numberLocale } from "@/lib/i18n";
+import { emailLanguage } from "@/lib/email-language";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -83,7 +84,7 @@ function AuthPage() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""}`,
+        emailRedirectTo: `${window.location.origin}/auth?lang=${emailLanguage(country)}${redirect ? `&redirect=${encodeURIComponent(redirect)}` : ""}`,
         data: { display_name: name, full_name: fullName.trim(), phone: phone.trim(), country: country.trim(), city: city.trim(), address: addr.trim() },
       },
     });
