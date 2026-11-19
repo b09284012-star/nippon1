@@ -1,14 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { t, useLanguage } from "@/lib/i18n";
 import sections from "@/content/about.json";
+import { CompanyProfile } from "@/components/site/CompanyProfile";
 import logo from "@/assets/nippon-logo.png.asset.json";
 
 export const Route = createFileRoute("/about")({
   staticData: { sitemap: true },
   head: () => ({ meta: [
-    { title: t("من نحن | Nippon") },
+    { title: t("من نحن والشركة | Nippon Miners") },
     { name: "description", content: t("تعرف على نيبون، أهداف سوق أجهزة التعدين المستعملة، حماية المشتري، مجتمع الدول، والخصوصية.") },
-    { property: "og:title", content: t("من نحن | Nippon") },
+    { property: "og:title", content: t("من نحن والشركة | Nippon Miners") },
     { property: "og:description", content: t("تعرف على نيبون، أهداف سوق أجهزة التعدين المستعملة، حماية المشتري، مجتمع الدول، والخصوصية.") },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },
@@ -33,5 +34,6 @@ function AboutPage() {
         <div className="space-y-4 text-base leading-8 text-muted-foreground">{section.paragraphs.map(paragraph => <p key={paragraph}>{t(paragraph)}</p>)}</div>
       </section>)}</div>
     </div>
+    <CompanyProfile />
   </article>;
 }
