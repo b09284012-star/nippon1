@@ -1,5 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/company")({
-  beforeLoad: () => { throw redirect({ to: "/about", hash: "company", statusCode: 301 }); },
+  staticData: { sitemap: false },
+  beforeLoad: () => { throw redirect({
+  staticData: { sitemap: false }, to: "/about", hash: "company", statusCode: 301 }); },
 });
