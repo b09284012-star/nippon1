@@ -1061,6 +1061,10 @@ export type Database = {
         Args: { _order_id: string; _reason: string }
         Returns: string
       }
+      owner_alert: {
+        Args: { _body: string; _link: string; _title: string }
+        Returns: undefined
+      }
       public_profile_names: {
         Args: { _ids: string[] }
         Returns: {
