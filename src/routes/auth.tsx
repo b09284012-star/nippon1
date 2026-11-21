@@ -72,6 +72,7 @@ function AuthPage() {
     toast.success(t("أهلاً بعودتك"));
   };
 
+  const [agreed, setAgreed] = useState(false);
   const signUp = async () => {
     const parsed = schema.safeParse({ email, password, name });
     if (!parsed.success) { toast.error(parsed.error.issues[0]?.message); return; }
@@ -79,6 +80,7 @@ function AuthPage() {
     if (phone.trim().length < 7) { toast.error(t("أدخل رقم هاتف صحيح")); return; }
     if (country.trim().length < 2 || city.trim().length < 2) { toast.error(t("أدخل الدولة والمدينة")); return; }
     if (addr.trim().length < 8) { toast.error(t("أدخل العنوان بالتفصيل")); return; }
+    if (!agreed) { toast.error(t("يجب الموافقة على الشروط والأحكام وسياسة الخصوصية")); return; }
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email,
@@ -153,7 +155,11 @@ function AuthPage() {
               onChange={setPassword}
               type="password"
             />
-            <Button className="w-full" onClick={() => void signUp()} disabled={loading}>
+            <label className="flex items-start gap-2 text-sm">
+              <input type="checkbox" className="mt-1 size-4 accent-primary" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
+              <span>{t("أوافق على")} <a href="/about#about-15" target="_blank" rel="noreferrer" className="text-primary underline">{t("الشروط والأحكام وسياسة الخصوصية")}</a></span>
+            </label>
+            <Button className="w-full" onClick={() => void signUp()} disabled={loading || !agreed}>
               {t("إنشاء حساب")} </Button>
           </TabsContent>
         </Tabs>

@@ -823,5 +823,20 @@
   "سيصبح في محفظتك:": "Your wallet will receive:",
   "الشركة": "Company",
   "الشركة | Nippon Miners": "Company | Nippon Miners",
-  "تعرف على شركة Nippon Miners: الإدارة، مجالات العمل، الرؤية والقيم، وقنوات التواصل والشراكات.": "Meet Nippon Miners: leadership, business activities, vision and values, and contact and partnership channels."
+  "تعرف على شركة Nippon Miners: الإدارة، مجالات العمل، الرؤية والقيم، وقنوات التواصل والشراكات.": "Meet Nippon Miners: leadership, business activities, vision and values, and contact and partnership channels.",
+  "الشروط والأحكام وسياسة الخصوصية": "Terms & Privacy Policy",
+  "أوافق على": "I agree to the",
+  "يجب الموافقة على الشروط والأحكام وسياسة الخصوصية": "You must accept the Terms & Privacy Policy",
+  "باستخدامك للمنصة وإنشاء حساب فيها فإنك توافق على هذه الشروط والأحكام وسياسة الخصوصية.": "By using the platform and creating an account, you agree to these Terms and Privacy Policy.",
+  "في حال إيداع رصيد ثم طلب سحبه دون إتمام أي عملية شراء داخل المنصة، تُخصم نسبة 1% رسوم بوابة الدفع، بالإضافة إلى رسوم شبكة التحويل، من المبلغ المسحوب.": "If you deposit funds and then request a withdrawal without completing any purchase on the platform, a 1% payment gateway fee plus network transfer fees will be deducted from the withdrawn amount.",
+  "تُحفظ بياناتك الحقيقية (الاسم والهاتف والعنوان) بشكل خاص ولا يطّلع عليها إلا الإدارة، ويرى باقي المستخدمين اسمك الظاهر فقط.": "Your real details (name, phone, address) are kept private and visible only to administrators; other users see only your display name.",
+  "يلتزم المستخدم بصحة المعلومات المقدمة وعدم استخدام المنصة لأي نشاط مخالف للقانون، ويحق للإدارة تعليق أو إغلاق الحسابات المخالفة.": "Users must provide accurate information and must not use the platform for unlawful activity; administrators may suspend or close violating accounts.",
+  "سجل الطلبات": "Orders log",
+  "ابحث برقم الطلب أو الجهاز أو المشتري أو البائع": "Search by order ID, device, buyer or seller",
+  "عدد الطلبات": "Orders",
+  "محجوز": "Held",
+  "رقم الطلب": "Order ID",
+  "القيمة": "Amount",
+  "عمولة المنصة": "Platform fee",
+  "جارٍ التحميل...": "Loading..."
 }

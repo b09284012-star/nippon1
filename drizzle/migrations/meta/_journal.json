@@ -169,6 +169,13 @@
       "when": 1795294818419,
       "tag": "0023_owner_deposit_alert",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1795305156267,
+      "tag": "0024_admin_list_orders",
+      "breakpoints": true
     }
   ]
 }

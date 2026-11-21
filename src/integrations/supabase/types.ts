@@ -878,6 +878,24 @@ export type Database = {
           user_id: string
         }[]
       }
+      admin_list_orders: {
+        Args: never
+        Returns: {
+          amount: number
+          buyer_email: string
+          buyer_id: string
+          buyer_name: string
+          created_at: string
+          fee: number
+          id: string
+          listing_title: string
+          quantity: number
+          seller_email: string
+          seller_id: string
+          seller_name: string
+          status: Database["public"]["Enums"]["order_status"]
+        }[]
+      }
       admin_list_users: {
         Args: never
         Returns: {
