@@ -76,7 +76,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     });
 
-    return () => sub.subscription.unsubscribe();
+    // Verify with the server that the account still exists (deleted/banned accounts get signed out).
+    const verify = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) return;
+      const { error } = await supabase.auth.getUser();
+      const status = (error as { status?: number } | null)?.status;
+      if (error && (status === 401 || status === 403 || status === 404)) {
+        await supabase.auth.signOut({ scope: "local" });
+        if (typeof window !== "undefined") window.location.assign("/auth");
+      }
+    };
+    void verify();
+    const timer = setInterval(() => void verify(), 60_000);
+    const onFocus = () => void verify();
+    window.addEventListener("focus", onFocus);
+
+    return () => {
+      sub.subscription.unsubscribe();
+      clearInterval(timer);
+      window.removeEventListener("focus", onFocus);
+    };
   }, []);
 
   const value: AuthValue = {
