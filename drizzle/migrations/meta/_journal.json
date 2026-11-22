@@ -176,6 +176,13 @@
       "when": 1795305156267,
       "tag": "0024_admin_list_orders",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1795306149695,
+      "tag": "0025_admin_audit_logs_and_hardening",
+      "breakpoints": true
     }
   ]
 }

@@ -838,5 +838,13 @@
   "رقم الطلب": "Order ID",
   "القيمة": "Amount",
   "عمولة المنصة": "Platform fee",
-  "جارٍ التحميل...": "Loading..."
+  "جارٍ التحميل...": "Loading...",
+  "سجل الإجراءات الإدارية": "Admin actions log",
+  "ابحث باسم المدير أو المستخدم أو البريد": "Search by admin, user or email",
+  "عدد الإجراءات": "Actions",
+  "لا توجد إجراءات مسجلة": "No recorded actions",
+  "المدير المنفّذ": "Performed by",
+  "الحساب المستهدف": "Target account",
+  "أيام": "days",
+  "تعليق": "Suspend"
 }

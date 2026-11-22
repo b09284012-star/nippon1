@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Market } from "@/routes/market";
+import { Market } from "@/components/site/MarketPage";
 import { EnglishPage } from "@/lib/english-page";
 
 const title = "Used ASIC Miners for Sale | Nippon Market";

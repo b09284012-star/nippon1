@@ -4,7 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const count = z.number().int().min(0).max(1000);
 export const submitPerformanceSample = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => z.object({ session: z.string().uuid(), cache_hits: count, cache_misses: count, requests: count, errors: count, latency_total: z.number().min(0).max(60000000), latency_max: z.number().min(0).max(60000), realtime_connections: z.number().int().min(0).max(1) }).strict().parse(input))
+  .validator((input: unknown) => z.object({ session: z.string().uuid(), cache_hits: count, cache_misses: count, requests: count, errors: count, latency_total: z.number().min(0).max(60000000), latency_max: z.number().min(0).max(60000), realtime_connections: z.number().int().min(0).max(1) }).strict().parse(input))
   .handler(async ({ data }) => {
     if (data.errors > data.requests) throw new Error("INVALID_SAMPLE");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

@@ -14,7 +14,7 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
 
 export const adminAccountAction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { userId: string; action: "ban" | "suspend" | "unban" | "delete"; days?: number }) => {
+  .validator((input: { userId: string; action: "ban" | "suspend" | "unban" | "delete"; days?: number }) => {
     if (!/^[0-9a-f-]{36}$/i.test(input.userId)) throw new Error("bad id");
     if (!["ban", "suspend", "unban", "delete"].includes(input.action)) throw new Error("bad action");
     return input;
@@ -24,21 +24,39 @@ export const adminAccountAction = createServerFn({ method: "POST" })
     if (!isAdmin) throw new Error("FORBIDDEN");
     if (data.userId === context.userId) throw new Error("لا يمكنك تنفيذ هذا على حسابك");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const days = Math.min(Math.max(Math.floor(data.days ?? 7), 1), 365);
+    const person = async (id: string) => {
+      const [{ data: u }, { data: p }] = await Promise.all([
+        supabaseAdmin.auth.admin.getUserById(id),
+        supabaseAdmin.from("profiles").select("display_name").eq("id", id).maybeSingle(),
+      ]);
+      return { name: p?.display_name ?? null, email: u.user?.email ?? null };
+    };
+    const [adminInfo, target] = await Promise.all([person(context.userId), person(data.userId)]);
+    const log = async () => {
+      const { error: logErr } = await supabaseAdmin.from("admin_audit_logs").insert({
+        action: data.action, admin_id: context.userId, admin_name: adminInfo.name, admin_email: adminInfo.email,
+        target_id: data.userId, target_name: target.name, target_email: target.email,
+        details: data.action === "suspend" ? `${days}` : null,
+      });
+      if (logErr) console.error("audit log failed", logErr);
+    };
     if (data.action === "delete") {
       const { error } = await supabaseAdmin.auth.admin.deleteUser(data.userId);
       if (error) throw new Error(error.message);
+      await log();
       return { ok: true };
     }
-    const days = Math.min(Math.max(Math.floor(data.days ?? 7), 1), 365);
     const ban_duration = data.action === "ban" ? "876000h" : data.action === "suspend" ? `${days * 24}h` : "none";
     const { error } = await supabaseAdmin.auth.admin.updateUserById(data.userId, { ban_duration });
     if (error) throw new Error(error.message);
+    await log();
     return { ok: true };
   });
 
 export const adminCreateCompany = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { email: string; password: string; companyName: string }) => {
+  .validator((input: { email: string; password: string; companyName: string }) => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)) throw new Error("بريد إلكتروني غير صالح");
     if (!input.password || input.password.length < 6) throw new Error("كلمة المرور 6 أحرف على الأقل");
     if (!input.companyName?.trim()) throw new Error("اسم الشركة مطلوب");

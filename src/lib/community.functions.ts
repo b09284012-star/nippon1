@@ -17,7 +17,7 @@ export const forumMembers = createServerFn({ method: "POST" })
 
 export const moderateForumAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { userId: string; banned: boolean }) => {
+  .validator((input: { userId: string; banned: boolean }) => {
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(input.userId) || typeof input.banned !== "boolean") throw new Error("INVALID_INPUT");
     return input;
   })

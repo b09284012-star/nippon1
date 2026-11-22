@@ -44,7 +44,7 @@ const SITE_URL = "https://nipponminers.com";
 
 export const createDepositAddress = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         amountUsd: z.number().min(10).max(100000),

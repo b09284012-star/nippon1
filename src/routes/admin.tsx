@@ -21,6 +21,7 @@ import { ForumModeration } from "@/components/site/ForumModeration";
 import { DisputeSupervisorControl } from "@/components/site/DisputeSupervisorControl";
 import { PerformanceMonitor } from "@/components/site/PerformanceMonitor";
 import { OrdersLog } from "@/components/site/OrdersLog";
+import { AuditLog } from "@/components/site/AuditLog";
 
 function AccountActions({ userId, bannedUntil, onDone }: { userId: string; bannedUntil?: string | undefined; onDone: () => void }) {
   const { t } = useLanguage();
@@ -251,6 +252,7 @@ function AdminPage() {
             <BellRing className="size-4" /> {t("إرسال إشعار")} </TabsTrigger>}
           {canModerateForum && <TabsTrigger value="forum">{t("إدارة المنتدى")}</TabsTrigger>}
           {isAdmin && <TabsTrigger value="orders">{t("سجل الطلبات")}</TabsTrigger>}
+          {isAdmin && <TabsTrigger value="audit">{t("سجل الإجراءات الإدارية")}</TabsTrigger>}
           {isAdmin && <TabsTrigger value="country">{t("طلبات تغيير الدولة")}</TabsTrigger>}
           {isAdmin && <TabsTrigger value="performance"><Radio className="size-4" />{t("مراقبة الأداء")}</TabsTrigger>}
         </TabsList>
@@ -485,6 +487,7 @@ function AdminPage() {
         </TabsContent>}
         {canModerateForum && <TabsContent value="forum" className="mt-6"><ForumModeration /></TabsContent>}
         {isAdmin && <TabsContent value="orders" className="mt-6"><OrdersLog /></TabsContent>}
+        {isAdmin && <TabsContent value="audit" className="mt-6"><AuditLog /></TabsContent>}
         {isAdmin && <TabsContent value="country" className="mt-6"><CountryChangeReview /></TabsContent>}
         {isAdmin && <TabsContent value="performance" className="mt-6"><PerformanceMonitor /></TabsContent>}
       </Tabs>

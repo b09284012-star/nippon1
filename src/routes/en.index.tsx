@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Home } from "@/routes/index";
+import { Home } from "@/components/site/HomePage";
 import { EnglishPage } from "@/lib/english-page";
 
 const title = "Nippon | Used Crypto Mining Hardware Marketplace";
