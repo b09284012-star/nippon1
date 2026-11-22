@@ -183,6 +183,13 @@
       "when": 1795306149695,
       "tag": "0025_admin_audit_logs_and_hardening",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1795306928038,
+      "tag": "0026_dispute_chat_lock_and_privacy",
+      "breakpoints": true
     }
   ]
 }

@@ -58,6 +58,15 @@ function ChatRoomPage() {
   });
   const otherOnline = useIsOnline(other?.id);
 
+  const { data: chatClosed } = useQuery({
+    queryKey: ["chat-closed", id, user?.id],
+    enabled: Boolean(user),
+    queryFn: async () => {
+      const { data } = await supabase.rpc("is_closed_dispute_conversation", { _id: id });
+      return Boolean(data);
+    },
+  });
+
   const { data: messages, refetch } = useQuery({
     queryKey: ["messages", id],
     enabled: Boolean(user),
@@ -186,6 +195,11 @@ function ChatRoomPage() {
         <div ref={bottomRef} />
       </div>
 
+      {chatClosed ? (
+        <div className="mt-4 rounded-xl border border-border bg-muted/40 p-4 text-center text-sm font-bold text-muted-foreground">
+          🔒 {t("تم حسم هذا النزاع وإغلاق المحادثة من قِبل إدارة المنصة.")}
+        </div>
+      ) : (
       <div className="mt-4 flex items-center gap-2">
         <input ref={fileRef} type="file" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) void sendFile(f); }} />
         <Button variant="secondary" disabled={uploading} onClick={() => fileRef.current?.click()} aria-label={t("إرفاق صورة أو ملف")}>
@@ -201,6 +215,7 @@ function ChatRoomPage() {
         />
         <Button onClick={() => void send()}>{t("إرسال")}</Button>
       </div>
+      )}
       <p className="mt-3 text-xs text-muted-foreground">
         {t("لا تُتم أي دفعة خارج المنصة — استخدم نظام الضمان لحماية أموالك.")} </p>
     </div>

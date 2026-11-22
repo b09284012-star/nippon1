@@ -881,6 +881,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _account_country: { Args: { _user_id: string }; Returns: string }
       account_country: { Args: { _user_id: string }; Returns: string }
       admin_credit_user: {
         Args: { _amount: number; _note: string; _user_id: string }
@@ -1106,6 +1107,10 @@ export type Database = {
       }
       has_staff: {
         Args: { _responsibility: string; _user_id: string }
+        Returns: boolean
+      }
+      is_closed_dispute_conversation: {
+        Args: { _id: string }
         Returns: boolean
       }
       is_dispute_conversation: { Args: { _id: string }; Returns: boolean }
