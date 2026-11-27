@@ -14,7 +14,6 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as CompaniesRouteImport } from './routes/companies'
 import { Route as CompanyRouteImport } from './routes/company'
 import { Route as FinanceRouteImport } from './routes/finance'
 import { Route as ForumRouteImport } from './routes/forum'
@@ -27,6 +26,8 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as WalletRouteImport } from './routes/wallet'
+import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authenticated/companies'
+import { Route as AuthenticatedCompanyAccountRouteImport } from './routes/_authenticated/company-account'
 import { Route as AuthenticatedDepositHistoryRouteImport } from './routes/_authenticated/deposit-history'
 import { Route as ChatIndexRouteImport } from './routes/chat.index'
 import { Route as ChatIdRouteImport } from './routes/chat.$id'
@@ -61,11 +62,6 @@ const AdminRoute = AdminRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CompaniesRoute = CompaniesRouteImport.update({
-  id: '/companies',
-  path: '/companies',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompanyRoute = CompanyRouteImport.update({
@@ -128,6 +124,17 @@ const WalletRoute = WalletRouteImport.update({
   path: '/wallet',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedCompaniesRoute = AuthenticatedCompaniesRouteImport.update({
+  id: '/companies',
+  path: '/companies',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCompanyAccountRoute =
+  AuthenticatedCompanyAccountRouteImport.update({
+    id: '/company-account',
+    path: '/company-account',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDepositHistoryRoute =
   AuthenticatedDepositHistoryRouteImport.update({
     id: '/deposit-history',
@@ -192,7 +199,6 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
-  '/companies': typeof CompaniesRoute
   '/company': typeof CompanyRoute
   '/finance': typeof FinanceRoute
   '/forum': typeof ForumRoute
@@ -205,6 +211,8 @@ export interface FileRoutesByFullPath {
   '/sell': typeof SellRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wallet': typeof WalletRoute
+  '/companies': typeof AuthenticatedCompaniesRoute
+  '/company-account': typeof AuthenticatedCompanyAccountRoute
   '/deposit-history': typeof AuthenticatedDepositHistoryRoute
   '/chat/$id': typeof ChatIdRoute
   '/en/market': typeof EnMarketRoute
@@ -222,7 +230,6 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
-  '/companies': typeof CompaniesRoute
   '/company': typeof CompanyRoute
   '/finance': typeof FinanceRoute
   '/forum': typeof ForumRoute
@@ -235,6 +242,8 @@ export interface FileRoutesByTo {
   '/sell': typeof SellRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wallet': typeof WalletRoute
+  '/companies': typeof AuthenticatedCompaniesRoute
+  '/company-account': typeof AuthenticatedCompanyAccountRoute
   '/deposit-history': typeof AuthenticatedDepositHistoryRoute
   '/chat/$id': typeof ChatIdRoute
   '/en/market': typeof EnMarketRoute
@@ -254,7 +263,6 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
-  '/companies': typeof CompaniesRoute
   '/company': typeof CompanyRoute
   '/finance': typeof FinanceRoute
   '/forum': typeof ForumRoute
@@ -267,6 +275,8 @@ export interface FileRoutesById {
   '/sell': typeof SellRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wallet': typeof WalletRoute
+  '/_authenticated/companies': typeof AuthenticatedCompaniesRoute
+  '/_authenticated/company-account': typeof AuthenticatedCompanyAccountRoute
   '/_authenticated/deposit-history': typeof AuthenticatedDepositHistoryRoute
   '/chat/$id': typeof ChatIdRoute
   '/en/market': typeof EnMarketRoute
@@ -286,7 +296,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/auth'
-    | '/companies'
     | '/company'
     | '/finance'
     | '/forum'
@@ -299,6 +308,8 @@ export interface FileRouteTypes {
     | '/sell'
     | '/sitemap.xml'
     | '/wallet'
+    | '/companies'
+    | '/company-account'
     | '/deposit-history'
     | '/chat/$id'
     | '/en/market'
@@ -316,7 +327,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/auth'
-    | '/companies'
     | '/company'
     | '/finance'
     | '/forum'
@@ -329,6 +339,8 @@ export interface FileRouteTypes {
     | '/sell'
     | '/sitemap.xml'
     | '/wallet'
+    | '/companies'
+    | '/company-account'
     | '/deposit-history'
     | '/chat/$id'
     | '/en/market'
@@ -347,7 +359,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/auth'
-    | '/companies'
     | '/company'
     | '/finance'
     | '/forum'
@@ -360,6 +371,8 @@ export interface FileRouteTypes {
     | '/sell'
     | '/sitemap.xml'
     | '/wallet'
+    | '/_authenticated/companies'
+    | '/_authenticated/company-account'
     | '/_authenticated/deposit-history'
     | '/chat/$id'
     | '/en/market'
@@ -379,7 +392,6 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
-  CompaniesRoute: typeof CompaniesRoute
   CompanyRoute: typeof CompanyRoute
   FinanceRoute: typeof FinanceRoute
   ForumRoute: typeof ForumRoute
@@ -438,13 +450,6 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/companies': {
-      id: '/companies'
-      path: '/companies'
-      fullPath: '/companies'
-      preLoaderRoute: typeof CompaniesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/company': {
@@ -531,6 +536,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WalletRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/companies': {
+      id: '/_authenticated/companies'
+      path: '/companies'
+      fullPath: '/companies'
+      preLoaderRoute: typeof AuthenticatedCompaniesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/company-account': {
+      id: '/_authenticated/company-account'
+      path: '/company-account'
+      fullPath: '/company-account'
+      preLoaderRoute: typeof AuthenticatedCompanyAccountRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/deposit-history': {
       id: '/_authenticated/deposit-history'
       path: '/deposit-history'
@@ -612,11 +631,15 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCompaniesRoute: typeof AuthenticatedCompaniesRoute
+  AuthenticatedCompanyAccountRoute: typeof AuthenticatedCompanyAccountRoute
   AuthenticatedDepositHistoryRoute: typeof AuthenticatedDepositHistoryRoute
   AuthenticatedListingsIdRoute: typeof AuthenticatedListingsIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCompaniesRoute: AuthenticatedCompaniesRoute,
+  AuthenticatedCompanyAccountRoute: AuthenticatedCompanyAccountRoute,
   AuthenticatedDepositHistoryRoute: AuthenticatedDepositHistoryRoute,
   AuthenticatedListingsIdRoute: AuthenticatedListingsIdRoute,
 }
@@ -630,7 +653,6 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
-  CompaniesRoute: CompaniesRoute,
   CompanyRoute: CompanyRoute,
   FinanceRoute: FinanceRoute,
   ForumRoute: ForumRoute,

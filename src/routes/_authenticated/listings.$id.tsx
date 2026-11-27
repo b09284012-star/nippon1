@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/dialog";
 import { FALLBACK_IMAGE, formatUsd, useStorageUrl } from "@/lib/media";
 import { useAuth } from "@/lib/auth";
+import { useCompanies } from "@/lib/companies";
+import { CompanyIdentity } from "@/components/site/CompanyIdentity";
 
 export const Route = createFileRoute("/_authenticated/listings/$id")({
   staticData: { sitemap: false },
@@ -47,13 +49,14 @@ function ListingDetail() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user, isAdmin } = useAuth();
+  const companies = useCompanies();
   const [editOpen, setEditOpen] = useState(false);
   const [address, setAddress] = useState("");
   const [buying, setBuying] = useState(false);
   const [qty, setQty] = useState(1);
   const [open, setOpen] = useState(false);
 
-  const { data: listing, refetch } = useQuery({
+  const { data: listing, refetch, isPending: listingPending } = useQuery({
     queryKey: ["listing", id],
     queryFn: async () => {
       const { data, error } = await supabase.from("listings").select("*").eq("id", id).maybeSingle();
@@ -142,7 +145,9 @@ function ListingDetail() {
     navigate({ to: "/orders" });
   };
 
-  if (!listing) return <div className="mx-auto max-w-7xl px-4 py-20">{t("جاري التحميل…")}</div>;
+  if (listingPending) return <div className="mx-auto max-w-7xl px-4 py-20">{t("جاري التحميل…")}</div>;
+  if (!listing) return <div className="mx-auto max-w-7xl px-4 py-20"><h1 className="text-xl font-bold">{t("العرض غير متاح")}</h1><Button className="mt-4" onClick={() => navigate({ to: "/market" })}>{t("السوق")}</Button></div>;
+  const company = companies.data?.find(item => item.user_id === listing.seller_id);
 
   const isOwner = user?.id === listing.seller_id || isAdmin;
 
@@ -207,6 +212,7 @@ function ListingDetail() {
             />
           </div>
 
+          {company && <div className="mt-6 border-y border-border py-5"><CompanyIdentity company={company} /></div>}
           <div className="glass mt-6 rounded-2xl p-4">
             <div className="flex items-center justify-between">
               <div>

@@ -16,10 +16,12 @@ type Props = {
   top: [string, { qty: number; volume: number; fee: number }][];
   statusCount: Record<string, number>;
   metric: "volume" | "fee";
+  feeLabel?: string;
 };
 
-export function AnalyticsCharts({ series, top, statusCount, metric }: Props) {
+export function AnalyticsCharts({ series, top, statusCount, metric, feeLabel }: Props) {
   const { direction, t } = useLanguage();
+  const chartConfig = { ...config, fee: { ...config.fee, label: feeLabel ?? config.fee.label } };
   const timeline = series.map(([date, values]) => ({ date, ...values }));
   const statuses = Object.entries(statusCount).map(([status, value]) => ({ name: t(labels[status] ?? status), value, fill: colors[status] ?? "var(--chart-4)" }));
   const total = statuses.reduce((sum, item) => sum + item.value, 0);
@@ -28,16 +30,16 @@ export function AnalyticsCharts({ series, top, statusCount, metric }: Props) {
     <div className="mt-6 border-t border-border pt-6">
       <section aria-label={t("اتجاه المبيعات والأرباح")}>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="font-display text-lg font-bold">{metric === "volume" ? t("اتجاه المبيعات") : t("اتجاه الأرباح")}</h2>
+          <h2 className="font-display text-lg font-bold">{metric === "volume" ? t("اتجاه المبيعات") : feeLabel ? t("اتجاه صافي الإيرادات") : t("اتجاه الأرباح")}</h2>
           <span className="text-xs text-muted-foreground">{t("USD · دولار أمريكي")}</span>
         </div>
         {timeline.length === 0 ? <EmptyChart text={t("لا توجد مبيعات مكتملة في هذه الفترة")} /> : (
-          <ChartContainer config={config} className="mt-5 h-72 w-full aspect-auto" dir="ltr">
+          <ChartContainer config={chartConfig} className="mt-5 h-72 w-full aspect-auto" dir="ltr">
             <AreaChart data={timeline} margin={{ top: 16, right: 12, left: 0, bottom: 8 }} accessibilityLayer>
               <CartesianGrid vertical={false} stroke="var(--border)" strokeDasharray="3 5" />
               <XAxis dataKey="date" axisLine={false} tickLine={false} minTickGap={36} tickMargin={12} tickFormatter={(value: string) => value.slice(5)} />
               <YAxis axisLine={false} tickLine={false} tickFormatter={compactDollar} width={52} domain={[0, "auto"]} />
-              <ChartTooltip content={<ChartTooltipContent formatter={(value) => <div className="flex w-full items-center justify-between gap-5" dir={direction}><span>{t(config[metric].label)}</span><strong>{analyticsDollar(Number(value))}</strong></div>} labelFormatter={(value) => new Date(`${String(value)}T12:00:00`).toLocaleDateString(numberLocale(), { day: "numeric", month: "long", year: "numeric" })} />} />
+              <ChartTooltip content={<ChartTooltipContent formatter={(value) => <div className="flex w-full items-center justify-between gap-5" dir={direction}><span>{t(chartConfig[metric].label)}</span><strong>{analyticsDollar(Number(value))}</strong></div>} labelFormatter={(value) => new Date(`${String(value)}T12:00:00`).toLocaleDateString(numberLocale(), { day: "numeric", month: "long", year: "numeric" })} />} />
               <Area type="monotone" dataKey={metric} stroke={`var(--color-${metric})`} fill={`var(--color-${metric})`} fillOpacity={0.12} strokeWidth={3} dot={timeline.length === 1} activeDot={{ r: 5 }} isAnimationActive={false} />
             </AreaChart>
           </ChartContainer>

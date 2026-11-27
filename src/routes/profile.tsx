@@ -111,6 +111,7 @@ function ProfilePage() {
         </div>
       </div>
 
+      {profile?.is_company && <Button asChild variant="outline"><Link to="/company-account">{t("حساب الشركة")}</Link></Button>}
 
       <section className="grid gap-4 border-t border-border pt-6">
         <h2 className="font-display text-lg font-bold">{t("البيانات الشخصية")}</h2>

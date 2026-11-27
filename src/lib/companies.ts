@@ -13,9 +13,10 @@ export type Company = {
 };
 
 export function useCompanies() {
-  const { user } = useAuth();
+  const { user, profile, isAdmin } = useAuth();
   return useQuery({
     queryKey: ["company-directory", user?.id],
+    enabled: Boolean(user && (profile?.is_verified_seller || isAdmin)),
     queryFn: async () => {
       const { data, error } = await supabase.rpc("company_directory");
       if (error) throw error;

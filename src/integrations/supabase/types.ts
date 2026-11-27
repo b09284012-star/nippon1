@@ -91,9 +91,33 @@ export type Database = {
           },
         ]
       }
+      company_settings: {
+        Row: {
+          fee_percent: number
+          user_id: string
+        }
+        Insert: {
+          fee_percent: number
+          user_id: string
+        }
+        Update: {
+          fee_percent?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversations: {
         Row: {
           buyer_id: string
+          company_trade: boolean
           created_at: string
           id: string
           last_message_at: string
@@ -102,6 +126,7 @@ export type Database = {
         }
         Insert: {
           buyer_id: string
+          company_trade?: boolean
           created_at?: string
           id?: string
           last_message_at?: string
@@ -110,6 +135,7 @@ export type Database = {
         }
         Update: {
           buyer_id?: string
+          company_trade?: boolean
           created_at?: string
           id?: string
           last_message_at?: string
@@ -883,6 +909,10 @@ export type Database = {
     Functions: {
       _account_country: { Args: { _user_id: string }; Returns: string }
       account_country: { Args: { _user_id: string }; Returns: string }
+      admin_configure_company: {
+        Args: { _enabled: boolean; _fee_percent: number; _user_id: string }
+        Returns: undefined
+      }
       admin_credit_user: {
         Args: { _amount: number; _note: string; _user_id: string }
         Returns: undefined
@@ -1024,10 +1054,12 @@ export type Database = {
         Returns: undefined
       }
       can_access_conversation: { Args: { _id: string }; Returns: boolean }
+      can_shop_companies: { Args: never; Returns: boolean }
       can_supervise_dispute: {
         Args: { _order_id: string; _user_id: string }
         Returns: boolean
       }
+      can_view_company_listing: { Args: { _id: string }; Returns: boolean }
       cancel_deposit: { Args: { _id: string }; Returns: undefined }
       claim_deposit_analytics: {
         Args: never
@@ -1084,6 +1116,19 @@ export type Database = {
           status: string
           title: string
           warranty_months: number
+        }[]
+      }
+      company_sales_orders: {
+        Args: never
+        Returns: {
+          amount: number
+          created_at: string
+          fee: number
+          id: string
+          listing_id: string
+          quantity: number
+          status: string
+          title: string
         }[]
       }
       create_escrow_order: {

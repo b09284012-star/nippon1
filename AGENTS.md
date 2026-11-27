@@ -17,9 +17,9 @@
 - Public inventory RPCs expose only offer-card fields and deliberately public company branding; listing detail URLs live under the authenticated layout to require sign-in without changing existing links.
 - Auth return destinations are validated listing paths, preserving the selected offer while rejecting external redirects.
 - Site localization uses a shared language store and explicit translation dictionary; keep stored country/status values and user-entered content unchanged while translating presentation.
-- The retired company URL redirects to the marketplace; company records and separated inventory remain intact, but no company management controls are shown.
+- Company market/account routes live under the authenticated layout; company RPCs enforce verified-buyer access and owner-only analytics, and company_settings stores manager-only commission configuration so owners cannot change fees.
 - Manager privileges remain in user_roles; delegated duties use staff_assignments with manager-only assignment RPCs so forum/dispute staff never inherit private user or financial access.
-- Country boundaries for forums, conversations, messages and attachments are enforced by database policies using registration country, not browser filters; dispute staff access is limited to dispute conversations.
+- Country boundaries for forums and ordinary conversations/messages/attachments remain database-enforced; an immutable, insert-derived company_trade flag permits only listing-linked company conversations to cross countries while dispute staff retain assigned-country scope.
 - Dispute supervisor assignments carry a manager-selected country; the shared authorization helper checks only auth.uid(), rejects other supplied user IDs and excludes anonymous execution so country-scoped dispute rights cannot be probed; manager access remains global.
 - About content is bilingual structured editorial data, rendered as separate substantive paragraphs rather than artificial blank lines.
 

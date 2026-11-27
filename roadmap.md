@@ -27,3 +27,7 @@
 - [x] Add manager-only aggregate operational monitoring for reporting visits, cache hit rate, observed Realtime sockets and latency alerts; nine tests passed and real guest measurements read back in manager UI without runtime errors or mobile overflow.
 - [x] Prepare managed app-email sending and protected template previews for the configured sender domain.
 - [ ] Enable live email sending after domain verification completes (external DNS verification pending).
+- [x] Restore verified-seller-only international company inventory and company-trade access without widening ordinary country boundaries.
+- [x] Add manager-controlled company activation and reduced commission; preserve existing order fees.
+- [x] Restore company logo/profile editing and owner-scoped sales/financial analytics.
+- [x] Add Arabic/English company-market conditions to About and verify permissions and purchase flow.

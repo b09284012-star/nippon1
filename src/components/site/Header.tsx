@@ -19,7 +19,8 @@ const links = [
 
 export function Header() {
   const { language, setLanguage, t: translate } = useLanguage();
-  const { user, isAdmin, canModerateForum, canManageDisputes, signOut } = useAuth();
+  const { user, profile, isAdmin, canModerateForum, canManageDisputes, signOut } = useAuth();
+  const canShopCompanies = Boolean(user && (profile?.is_verified_seller || isAdmin));
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -44,6 +45,8 @@ export function Header() {
               {translate(l.label)}
             </Link>
           ))}
+          {canShopCompanies && <Link to="/companies" className="text-sm font-medium text-muted-foreground hover:text-foreground">{translate("الشراء من الشركات")}</Link>}
+          {profile?.is_company && <Link to="/company-account" className="text-sm font-medium text-primary">{translate("حساب الشركة")}</Link>}
           {(isAdmin || canModerateForum || canManageDisputes) && (
             <>
               <Link to="/admin" className="text-sm font-medium text-primary transition-colors hover:text-foreground">
@@ -101,6 +104,8 @@ export function Header() {
               {translate(l.label)}
             </Link>
           ))}
+          {canShopCompanies && <Link to="/companies" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-secondary">{translate("الشراء من الشركات")}</Link>}
+          {profile?.is_company && <Link to="/company-account" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm text-primary">{translate("حساب الشركة")}</Link>}
           {(isAdmin || canModerateForum || canManageDisputes) && (
             <>
               <Link to="/admin" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm text-accent">

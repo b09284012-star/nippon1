@@ -22,6 +22,7 @@ import { DisputeSupervisorControl } from "@/components/site/DisputeSupervisorCon
 import { PerformanceMonitor } from "@/components/site/PerformanceMonitor";
 import { OrdersLog } from "@/components/site/OrdersLog";
 import { AuditLog } from "@/components/site/AuditLog";
+import { CompanyAdminControls } from "@/components/site/CompanyAdminControls";
 
 function AccountActions({ userId, bannedUntil, onDone }: { userId: string; bannedUntil?: string | undefined; onDone: () => void }) {
   const { t } = useLanguage();
@@ -118,6 +119,11 @@ function AdminPage() {
     },
   });
   const listBans = useServerFn(adminListBans);
+  const companySettings = useQuery({ queryKey: ["admin-company-settings"], enabled: isAdmin, queryFn: async () => {
+    const [profiles, settings] = await Promise.all([supabase.from("profiles").select("id,is_company"), supabase.from("company_settings").select("user_id,fee_percent")]);
+    if (profiles.error || settings.error) throw new Error(profiles.error?.message ?? settings.error?.message);
+    return { profiles: profiles.data ?? [], settings: settings.data ?? [] };
+  } });
   const bans = useQuery({ queryKey: ["admin-bans"], enabled: isAdmin, queryFn: () => listBans() });
 
   const deposits = useQuery({
@@ -394,6 +400,14 @@ function AdminPage() {
                         onDone={() => { void assignments.refetch(); void refreshProfile(); }}
                       />
                     </div>
+                    {companySettings.isSuccess && <CompanyAdminControls
+                      key={`${u.id}-${companySettings.data.settings.find(s => s.user_id === u.id)?.fee_percent ?? "unset"}`}
+                      userId={u.id}
+                      verified={u.is_verified_seller}
+                      enabled={Boolean(companySettings.data.profiles.find(p => p.id === u.id)?.is_company)}
+                      fee={companySettings.data.settings.find(s => s.user_id === u.id)?.fee_percent ?? null}
+                      onDone={() => { void companySettings.refetch(); void refreshProfile(); }}
+                    />}
                     {u.id !== user.id && <AccountActions userId={u.id} bannedUntil={bans.data?.[u.id]} onDone={() => { void bans.refetch(); void users.refetch(); }} />}
                   </div>
                 ))}

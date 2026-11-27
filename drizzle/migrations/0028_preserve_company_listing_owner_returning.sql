@@ -1,0 +1,1 @@
+ALTER POLICY exclusive_company_listing_boundary ON public.listings USING(seller_id=auth.uid() OR public.has_role(auth.uid(),'admin') OR public.can_view_company_listing(id));
